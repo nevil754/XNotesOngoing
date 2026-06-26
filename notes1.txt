@@ -1,0 +1,227 @@
+
+srvai2k22 -> desktop installato su server (che ha installato sora ollama e gli LLMs0)
+OLLAMA INTERNO → http://srvai2k22:11434/
+locale qdrant → http://192.168.113.52:6333/
+
+ssh docker@192.168.113.52  //da cmd, ACCEDI AL TUO SERVER🔥🔥
+Suit-Force-Card   //psw
+
+Codeium (plugin vscode)  //w MY account gmail
+nz143727@gmail.com
+Code53pthony!
+
+DA FARE OGNI GIORNO(quando sei in azienda)
+https://compete.tbplanned.bmeweb.it/
+n.benedetto
+bpeb93tecm!
+task: CF_2026_0259 - PROGETTO CON SFEL Sviluppo
+text: Inizio test caricamento e settaggio Server per ospitare & runnare il RAG system.
+
+####TODO:
+-install on server: docker engine, docker compose, miniconda, cerbot(more info), gitlab(self-hosting github),  
+
+
+
+#######################################
+
+prjRAG1_env
+conda create -n prjRAG1_env python=3.11 -c conda-forge
+conda activate prjRAG1_env
+conda install jupyter ipykernel -c conda-forge
+python -m ipykernel install --user --name=prjRAG1_env --display-name "Python (prjRAG1_env)"
+pip install fastapi uvicorn 
+sentence-transformers
+langchain-huggingface
+langchain-text-splitters
+#pypdf
+unstructured
+pip install -r requirements.txt
+
+#######################################NOTES
+
+🔥CAG(Cache-Augmented Generation) è meglio di traditional RAG in casi di highly repeatable queries over a stable set of information, e sfrutti al massimo la cache.
+
+//#c3ed00   from https://bones.studio/
+//C:\sviluppo\devops\prjRAG_AI   dove metto folder del mio prj
+Remove-Item -Recurse -Force .git
+ctrl+shift+P   //open bar at top, digit 'GitHub Copilot: Ask'
+C:\Users\nelvisonb\AppData\Local\anaconda3   //dove è installato miniconda
+
+#######################################PRODUCTION RAG
+
+server[ codesorgente/(here va tutto il code sorgente) , docker/(è gia creata)(qua dentro va il docker-compose che gira e runna) ].
+
+-JWT secret key:
+secter93yekragbusiness05agenticd
+-chainlit auth secret:
+uibest84bytoken!
+-flower psw:
+beaflwer93!
+-langsmith api key:
+xxx
+-redis psw:
+oucache93sh!
+-sqlserver psw:
+serv95psw!
+
+ssh docker@192.168.113.52  //da cmd, ACCEDI AL TUO SERVER🔥🔥
+Suit-Force-Card   //psw
+
+ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untente docker in /home/docker
+//quando fai comando 'sudo ...' allora dici al system di login come admin 'root' SOLO x questo comando, se fai invece 'sudo -i' diventi proprio admin root finche non logout.
+
+ls    //vedi all dir (pero se fai e.g. pwd e vedi /root allora sei in home/root/ !)
+ls /      //🔥x filesystem completo Linux SEI IL MASTER DEL TUO SERVER puoi fare tutto! see all folders
+ls /root  //NEGATA X PERMESSI
+pwd       //tua posizione attuale
+cd
+cd /   //root
+cd /root   //NEGATA X PERMESSI UTENTE
+cd ..    //father
+mkdir myfolder
+ps aux   //processi in esecuzione
+htop     //🔥🔥x cpu & ram realtime
+df -h    //disk & spazio
+uname -a   //hardware & system
+ip a   //rete
+cat /etc/passwd   //users
+sudo su   //⚠️entra in root, non sei piu dentro utente docker!⚠️
+whoami   //vedi che utente attualmente sei con login, e.g.'docker' non ha certi privilegi mentre 'root' sì, è per questo che se fai e.g. cd /root da utente docker trovi permessi negati.
+sudo -l  //vedi quali comandi puoi eseguire come amministratore!! io sono (ALL : ALL) ALL QUINDI HO IL TOTALE CONTROLLO DEL SERVER!!
+ls -ld /root   //vedere permessi senza entrare
+ apt update   //🔥🔥aggiorna packs ubuntu da repo remota ufficiale
+ apt install tree 
+ tree -d -L 3 / -I "proc|sys|dev|run|tmp|snap" / ;   //🔥🔥x installare tree e vedere in .txt struttura ad albero filesystem
+apt install ncdu; ncdu / ;   //x interfaccia testuale dove puoi navigare in filesystem
+
+
+dpkg -l   //🔥🔥vedi tutti i programs installati!
+sudo ls /root    //legge cartella /root, ovviamente se attualmente non sei login admin user root, allora permesso denied
+sudo -i   //🔥⚠️ diventi utente admin 'root'!!MA DI SOLITO I PRO GIORNALMENTE LAVORANO COME UTENTE NORMALE, divenato admin user root solo x update programs o casi speciali 
+sudo su - docker   //🔥🔥switchi e diventi utente 'docker'
+exit   //esce dalla shell corrente
+groups docker   //vedi che privilegi ha utente 'docker'
+passano ad admin solo quando hanno davvero bisogno in casi particolari
+sudo adduser devuser   //crea nuovo utente da login admin user 'root'
+sudo usermod -aG sudo devuser   //dagli permessi admin
+//crea chiave ssh per lui
+sudo mkdir /home/devuser/.ssh
+sudo nano /home/devuser/.ssh/authorized_keys
+
+apt list --installed   //x programs installed
+docker --version
+docker compose version
+docker info
+which docker   //TROVA DOVE SI TROVA docker path, QUI docker salva imgs-containers-volumes-layerfilesystem
+systemctl status docker   //vedi che sta girando docker
+dpkg -l | grep docker
+
+compgen -c   //tutti comandi avaible nel PATH
+//dove trovare solitamente all programs installed 'a mano'
+ls /opt
+ls /usr/local/bin
+
+//INFO ABOUT MACHINE
+systemd-detect-virt   //se return None allora server fisico, se return kvm,xen,openvz,vmware → VPS
+  fwupdmgr get-updates   //solo x server fisici, update firware hardware
+  fwupdmgr update   //solo x server fisici, update firware hardware
+lscpu   //x cpu
+free -h  //x ram, SUL SERVER HO 8GB di RAM!! ricorda che gli LLM girano su [srvdocker01]!!
+lsblk    //disks
+nvidia-smi  //se hai gpu nvidia
+sudo lshw   //tutto l'hardware
+lspci    //x pci
+lsusb    //x usb
+hostnamectl   //🔥x os
+htop     //x cpu & ram realtime
+uname -r  //info about kernel
+
+//UPDATE MACHINE
+apt list --upgradable   //vedi tutti gli updates possibili
+apt update  //ubuntu linux scarica i packs aggiornabili da repo remota ufficiale
+apt upgrade  //🔥🔥aggiorna davvero i packs
+apt full-upgrade  //autorizzato a installare o rimuovere pacchetti se necessario per completare l'aggiornamento, mentre 'apt upgrade' preferisce non farlo
+reboot      //se necessario, x riavvio server
+ssh docker@192.168.113.52   //re-login
+uptime   //check da quanto tempo il server è attivo
+
+systemctl status unattended-upgrades  //checks se aggiornamento auto security è attivo
+
+
+docker version; apt upgrade docker-ce   //vedi se docker vuoi fare upadte, ma questo x docker engine o docker compose??
+
+apt autoremove   //disinstalla libs orfane
+apt clean  //delete i packs .deb già scaricati, non disinstalla nulla
+
+
+-linux ubuntu sistema x i programs: apt ('apt install..', i programs vengono installati nelle dir del systema), snap ('snap install..', crea un sacchetto isolato dal resto del sistema(sandbox, quando supportato) che contiene prpgram target+sue libs) snap list; snap refresh; //controlla gli snaps attivi, e se sono da aggiornare.
+🔥🔥-return to pre-state before crash of target server: viene creata immagine completa del disk (è simile ad un backup, ma puo essere usata anche x creare server identici!)
+
+
+//e come funzionano esattamente i backups?
+//info Ambiente di Testing e Ambiente di Produzione ?
+//e con GitLab (da installare) settare tutto
+
+###HOW SERVER WORKS
+
+-ssh docker@192.168.113.52 sei dentro il sistema operativo ma con i permessi dell’utente 'docker' !
+-appena accedi a server ~ significa che sei in /home/docker, dentro 'home' ci sono 2 utenti: docker e valterm.
+-quando fai 'sudo apt install git' il software viene installato in /usr/bin/git→eseguibile, /usr/lib/...→librerie, /etc/gitconfig→config globale, ... ora il comando git è globale.
+-appena accedi a server ~ significa che sei in /home/docker
+
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh   //con wget è piu easy installation rispetto a curl x installation
+
+
+
+
+
+SERVER
+│
+├── /
+│   ├── etc
+│   ├── usr
+│   ├── var
+│   ├── home
+│   │   ├── docker
+│   │   └── valterm
+│   └── root
+
+
+/home/docker   ← il TUO spazio
+│
+├── projects/
+│   ├── agentprj/
+│   ├── apiprj/
+│   └── dashboardprj/
+│
+├── docker/   //qui metti le infrastrutture docker, il modo in cui il code sorgente viene eseguito
+│   ├── qdrant/   //
+│   │	   ├── docker-compose.yml
+│   │     ├── .env
+│   │     └── volumes/
+│   ├── postgres/
+│   └── n8n/
+│
+├── data/    //x dati persistenti
+│   ├── qdrant/
+│   ├── postgres/
+│   └── backups/
+│
+├── tools/   //programmi installati manualmente da te
+│
+├── scripts/   //utility personali
+|	├── backup.sh
+|	├── deploy.sh
+|	├── restart-all.sh
+|	└── update.sh
+│
+└── miniconda3/
+
+//quando runni 'docker compose up -d' docker salva tutto nei suoi percorsi interni e.g./var/lib/docker, e le immagini?INFO
+
+//[INFO]COME FUNZIONA L'AMBIENTE DI TEST prima della produzione? cioe come è organizzato
+
+
+
+
+
