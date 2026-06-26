@@ -1,151 +1,262 @@
 
-Git Remote Item...
+srvai2k22 -> desktop installato su server (che ha installato sora ollama e gli LLMs0)
+OLLAMA INTERNO → http://srvai2k22:11434/
+locale qdrant → http://192.168.113.52:6333/
 
-Dove metterei i progetti?
+ssh docker@192.168.113.52  //da cmd, ACCEDI AL TUO SERVER🔥🔥
+Suit-Force-Card   //psw
 
-Se fossi proprietario del server:
+Codeium (plugin vscode)  //w MY account gmail
+nz143727@gmail.com
+Code53pthony!
+
+DA FARE OGNI GIORNO(quando sei in azienda)
+https://compete.tbplanned.bmeweb.it/
+n.benedetto
+bpeb93tecm!
+task: CF_2026_0259 - PROGETTO CON SFEL Sviluppo
+text: Inizio test caricamento e settaggio Server per ospitare & runnare il RAG system.
+
+####TODO:
+-install on server: docker engine, docker compose, miniconda, cerbot(more info), gitlab(self-hosting github),  
+
+//TODOe poi spiegami bene come vado avanti con Git & Forgejo con i branches rules,ect. 
+
+
+#######################################
+
+prjRAG1_env
+conda create -n prjRAG1_env python=3.11 -c conda-forge
+conda activate prjRAG1_env
+conda install jupyter ipykernel -c conda-forge
+python -m ipykernel install --user --name=prjRAG1_env --display-name "Python (prjRAG1_env)"
+pip install fastapi uvicorn 
+sentence-transformers
+langchain-huggingface
+langchain-text-splitters
+#pypdf
+unstructured
+pip install -r requirements.txt
+
+#######################################NOTES
+
+🔥CAG(Cache-Augmented Generation) è meglio di traditional RAG in casi di highly repeatable queries over a stable set of information, e sfrutti al massimo la cache.
+
+//#c3ed00   from https://bones.studio/
+//C:\sviluppo\devops\prjRAG_AI   dove metto folder del mio prj
+Remove-Item -Recurse -Force .git
+ctrl+shift+P   //open bar at top, digit 'GitHub Copilot: Ask'
+C:\Users\nelvisonb\AppData\Local\anaconda3   //dove è installato miniconda
+
+#######################################PRODUCTION RAG
+
+server[ codesorgente/(here va tutto il code sorgente) , docker/(è gia creata)(qua dentro va il docker-compose che gira e runna) ].
+
+-JWT secret key:
+secter93yekragbusiness05agenticd
+-chainlit auth secret:
+uibest84bytoken!
+-flower psw:
+beaflwer93!
+-langsmith api key:
+xxx
+-redis psw:
+oucache93sh!
+-sqlserver psw:
+serv95psw!
+
+ssh docker@192.168.113.52  //da cmd, ACCEDI AL TUO SERVER🔥🔥
+Suit-Force-Card   //psw
+
+ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untente docker in /home/docker
+//quando fai comando 'sudo ...' allora dici al system di login come admin 'root' SOLO x questo comando, se fai invece 'sudo -i' diventi proprio admin root finche non logout.
+
+ls    //vedi all dir (pero se fai e.g. pwd e vedi /root allora sei in home/root/ !)
+ls /      //🔥x filesystem completo Linux SEI IL MASTER DEL TUO SERVER puoi fare tutto! see all folders
+ls /root  //NEGATA X PERMESSI
+pwd       //tua posizione attuale
+cd
+cd /   //root
+cd /root   //NEGATA X PERMESSI UTENTE
+cd ..    //father
+mkdir myfolder
+ps aux   //processi in esecuzione
+htop     //🔥🔥x cpu & ram realtime
+df -h    //disk & spazio
+uname -a   //hardware & system
+ip a   //rete
+cat /etc/passwd   //users
+sudo su   //⚠️entra in root, non sei piu dentro utente docker!⚠️
+whoami   //vedi che utente attualmente sei con login, e.g.'docker' non ha certi privilegi mentre 'root' sì, è per questo che se fai e.g. cd /root da utente docker trovi permessi negati.
+sudo -l  //vedi quali comandi puoi eseguire come amministratore!! io sono (ALL : ALL) ALL QUINDI HO IL TOTALE CONTROLLO DEL SERVER!!
+ls -ld /root   //vedere permessi senza entrare
+
+dpkg -l   //🔥🔥vedi tutti i programs installati!
+sudo ls /root    //legge cartella /root, ovviamente se attualmente non sei login admin user root, allora permesso denied
+sudo -i   //🔥⚠️ diventi utente admin 'root'!!MA DI SOLITO I PRO GIORNALMENTE LAVORANO COME UTENTE NORMALE, divenato admin user root solo x update programs o casi speciali 
+sudo su - docker   //🔥🔥switchi e diventi utente 'docker'
+exit   //esce dalla shell corrente
+groups docker   //vedi che privilegi ha utente 'docker'
+passano ad admin solo quando hanno davvero bisogno in casi particolari
+sudo adduser devuser   //crea nuovo utente da login admin user 'root'
+sudo usermod -aG sudo devuser   //dagli permessi admin
+//crea chiave ssh per lui
+sudo mkdir /home/devuser/.ssh
+sudo nano /home/devuser/.ssh/authorized_keys
+
+apt list --installed   //x programs installed
+compgen -c   //tutti comandi avaible nel PATH
+//dove trovare solitamente all programs installed 'a mano'
+ls /opt
+ls /usr/local/bin
+
+//##INFO ABOUT MACHINE
+systemd-detect-virt   //se return None allora server fisico, se return kvm,xen,openvz,vmware → VPS
+  fwupdmgr get-updates   //solo x server fisici, update firware hardware
+  fwupdmgr update   //solo x server fisici, update firware hardware
+lscpu   //x cpu
+free -h  //x ram, SUL SERVER HO 8GB di RAM!! ricorda che gli LLM girano su [srvdocker01]!!
+lsblk    //disks
+nvidia-smi  //se hai gpu nvidia
+sudo lshw   //tutto l'hardware
+lspci    //x pci
+lsusb    //x usb
+hostnamectl   //🔥x os
+htop     //🔥x cpu & ram realtime
+uname -r  //info about kernel
+//🔥x vedere all filesystem visivamente
+apt install tree 
+tree -d -L 3 / -I "proc|sys|dev|run|tmp|snap" /    //⭐️⭐️x vedere in .txt struttura ad albero filesystem
+apt install ncdu; ncdu / ;   //opzionale, x interfaccia testuale dove puoi navigare in filesystem
+
+//##UPDATE MACHINE
+apt list --upgradable   //vedi tutti gli updates possibili
+apt update  //ubuntu linux scarica i packs aggiornabili da repo remota ufficiale
+apt upgrade  //🔥🔥aggiorna davvero i packs
+apt full-upgrade  //autorizzato a installare o rimuovere pacchetti se necessario per completare l'aggiornamento, mentre 'apt upgrade' preferisce non farlo
+reboot      //se necessario, x riavvio server
+ssh docker@192.168.113.52   //re-login
+uptime   //check da quanto tempo il server è attivo
+systemctl status unattended-upgrades  //checks se aggiornamento auto security è attivo
+apt autoremove   //disinstalla libs orfane, consigliato da fare dopo un update dei packs
+apt clean  //delete i packs .deb già scaricati, non disinstalla nulla, consigliato da fare dopo un update dei packs
+
+//##DOCKER
+docker --version
+docker compose version
+docker info
+which docker   //TROVA DOVE SI TROVA docker path, qui docker salva imgs-containers-volumes-layerfilesystem
+systemctl status docker   //vedi che sta girando docker
+dpkg -l | grep docker
+sudo apt upgrade docker-ce docker-ce-cli containerd.io   //aggiorna docker engine & docker compose
+
+
+//VM = virtual machine
+//VPS = virtual private server (e.g.quelle su hetzner)
+-linux ubuntu system x i programs: apt ('apt install..', i programs vengono installati nelle dir del systema), snap ('snap install..', crea un sacchetto isolato dal resto del sistema(sandbox, quando supportato) che contiene program target+sue libs) snap list; snap refresh; //controlla gli snaps attivi, e se sono da aggiornare.
+🔥🔥-return to pre-state before crash of target server: viene creata immagine completa del disk (è simile ad un backup, ma puo essere usata anche x creare server identici!). 
+systemd-detect-virt ti dice se hai vps(macchina virtuale e.g.'kvm') o macchina fisica: se hai vps allora lo snaphsot del server si fa da un layer piu alto del tuo server e.g. da pannello generale di hetzner (server>snapshot>create), se invece hai server fisico allora con Proxmox UI - VMware vSphere - OpenStack dashboard. 
+-capisci esattamente dove è hostato il tuo server con
+hostnamectl
+cat /sys/class/dmi/id/product_name
+ip a
+e.g.
+[ Server fisico aziendale / datacenter ]
+            ↓
+        KVM / QEMU   //hypervisor (e.g. Proxmox / OpenStack / libvirt / VMware-like setup) da qui puoi fare gli snapshots dei servers!
+            ↓
+   ┌──────────────────────┐ ← ur server, quindi tu hai una vm kvm
+   │  Ubuntu 24.04 VM     │ ← TU QUI
+   │  Docker + servizi    │
+   └──────────────────────┘
+-docker: docker engine(è il motore che crea containers imgs volumes manages sistem), docker CLI, docker compose(orchestrare più containers insieme).
+
+🔥🔥-BACKUPS: source code(via git uasando commit history), datas(e.g.databases ect), configurazioni server(e.g.system config, docker-compose ect). 
+--snapshot backup: copia completa di dir / disk, e.g./srv → /backup/srv_2026_06_26/.
+--database backup: e.g.w postgresql pg_dump mydb > backup.sql
+--docker volume backup: e.g.
+docker run --rm \
+  -v my_volume:/data \
+  -v $(pwd):/backup \
+  ubuntu tar czf /backup/volume.tar.gz /data
+--remote backup: copia su un altro server, e.g. rsync -av /srv user@backup-server:/backups/
+--backup automatici (cron): si settano auto e.g.ogni giorno alle 2am. 
+//il code lo puoi rifare con git, I DATAS NO!!“Code is disposable, data is not”
 
 /srv
+/data
+/backups
 
-è la posizione più pulita.
+/backups
+├── daily/
+├── weekly/
+├── monthly/
+└── db/
 
-Esempio:
+🔥🔥-START->PRODUCTION: spesso si usano 3 SERVER DIVERSI (ma se tu hai 1 server allora usi 3 folders dev test prod e dentro ciascuno same folders apps stacks data...), ricorda I 3 AMBIENTS PROPRIO NON SI TOCCANO (E NEANCHE I DATAS e.g.su sqlserver o qdrant!!)!!, e quando sei soddifatto per passare al next ambiente distribuisci usando git&docker.
+--ambiente di Development: lo usi come vuoi per fare tests e risolvere bugs.
+--ambiente di Testing: "Se porto questa versione in produzione, funzionerà davvero?", è una copia molto simile alla produzione.
+--ambiente di Production: è quello usato dagli users veri, qua ci sono rules downtime quasi zero backup auto monitoring logs aggiornamenti pianificati.
 
-/srv
-├── agent
-├── api
-├── dashboard
-└── qdrant
-Dove metterei Docker?
+-CI/CD self-hosted x server 8gb ram (DevOps job): 🔥Forgejo(leggero scritto in GO ideale x small machines, e puoi usare le Forgejo Actions x automatizzare), Gitea(simile a forgejo x all), 🔥GitLab CE(ottima ma è un po pesante), Jenkins.
+//🔥Uptime Kuma x monitoraggio (e.g.ti avverte se qdrant giu o fastapi giu..)
 
-Una struttura molto comune:
-
-/srv/docker
-├── postgres
-├── qdrant
-├── n8n
-└── traefik
-
-Ogni servizio:
-
-/srv/docker/qdrant
-├── docker-compose.yml
-├── .env
-└── volumes
-Dove metterei i dati persistenti?
-/srv/data
-├── postgres
-├── qdrant
-└── backups
-Dove installerei Miniconda?
-
-Qui ci sono due scuole.
-
-Opzione A (più comune)
-
-Installazione per utente:
-
-/home/docker/miniconda3
-Opzione B (server condiviso)
-
-Installazione globale:
-
-/opt/miniconda3
-
-Con:
-
-sudo bash Miniconda3-latest-Linux-x86_64.sh
-
-e path:
-
-/opt/miniconda3
-Dove stanno le immagini Docker?
-
-Molto importante:
-
-NON dentro le tue cartelle.
-
-Docker salva internamente in:
-
-/var/lib/docker
-Dove stanno i container in esecuzione?
-
-Sempre sotto il motore Docker.
-
-Li controlli con:
-
-docker ps
-
-non andando in una cartella.
-
-Come strutturerei questo server da zero
-
-Io farei:
-
-sudo mkdir -p /srv/projects
-sudo mkdir -p /srv/docker
-sudo mkdir -p /srv/data
-sudo mkdir -p /srv/backups
-
-ottenendo:
-
-/srv
-├── projects
-├── docker
-├── data
-└── backups
-
-Poi:
-
-/srv/projects
-├── my-api
-├── chatbot
-└── dashboard
-/srv/docker
-├── postgres
-├── qdrant
-├── n8n
-└── monitoring
-/srv/data
-├── postgres
-├── qdrant
-└── uploads
-In conclusione
-
-Dal tuo output:
-
-(ALL : ALL) ALL
-
-non sei un utente limitato.
-
-Sei di fatto amministratore del server.
-
-Quindi puoi scegliere tu la struttura del filesystem e non sei costretto a lavorare soltanto in /home/docker.
-
-Per un server ordinato e professionale, userei /srv come radice dei servizi/applicazioni, lasciando /home/docker per strumenti personali, script e configurazioni dell'utente.
-
-
-root@srvdocker01:~# ls /
-bin                boot   dev  home  lib64              lost+found  mnt  proc  run   sbin.usr-is-merged  srv       sys  usr
-bin.usr-is-merged  cdrom  etc  lib   lib.usr-is-merged  media       opt  root  sbin  snap                swap.img  tmp  var
-root@srvdocker01:~# cd srv
-bash: cd: srv: No such file or directory
-root@srvdocker01:~#
-
-si ho il totale controllo del server, quindi dimmi esattamente come dovrei organizzare il filesystem del mio server (Linux), a livello enterprise, dovra ospitare i progetti enterprise e ovviamente deve poterli far girare sul server con docker. 
-
-//HERE ALL THE TREE OF MY SERVER
-questa è la mia struttura praticamente vuota del mio server linux ubuntu. dimmi come organizzare a livello enterprise la struttura del mio server, avro bisogno dei 3 ambienti Development Testing e Production (che pero visto che ho 1 solo server, non posso usare 3 server separati ma dovro organizzarmi con 3 cartelle), avro bisogno capire come organizzarmi con Forgejo (xC I/CD, non ho ancora installato), avro bisogno capire come organizzarmi con Docker (gia installati tutti e tre docker engine docker compose docker cli) con tutto (e.g. i volumes, le images ect), e attualmente dentro /home/ ho 2 utenti 'docker' e 'valterm' che cosa devono poter fare questi utenti e forse me ne servono altri. Dammi la struttura ad albero a livello enterprise di come organizzarmi nel server con lo sviluppo del mio prj, deve durare per anni, e ho gia Git installato.  PENSA ANCHE 3-4 VOLTE ALLA TUA RISPOSTA CHATGPT
-
-//e poi spiegami bene come vado avanti con Git & Forgejo con i branches rules, 
+-how ur server compet-e works:
+--ssh docker@192.168.113.52 sei dentro il sistema operativo ma con i permessi dell’utente 'docker' !
+-appena accedi a server ~ significa che sei in /home/docker, dentro 'home' ci sono 2 utenti: docker e valterm.
+-quando fai 'sudo apt install git' il software viene installato in /usr/bin/git→eseguibile, /usr/lib/...→librerie, /etc/gitconfig→config globale, ... ora il comando git è globale.
+-appena accedi a server ~ significa che sei in /home/docker
+//wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh   //con wget è piu easy installation rispetto a curl x installation
 
 
 
+SERVER
+│
+├── /
+│   ├── etc
+│   ├── usr
+│   ├── var
+│   ├── home
+│   │   ├── docker
+│   │   └── valterm
+│   └── root
+
+
+/home/docker   ← il TUO spazio
+│
+├── projects/
+│   ├── agentprj/
+│   ├── apiprj/
+│   └── dashboardprj/
+│
+├── docker/   //qui metti le infrastrutture docker, il modo in cui il code sorgente viene eseguito
+│   ├── qdrant/   //
+│   │	   ├── docker-compose.yml
+│   │     ├── .env
+│   │     └── volumes/
+│   ├── postgres/
+│   └── n8n/
+│
+├── data/    //x dati persistenti
+│   ├── qdrant/
+│   ├── postgres/
+│   └── backups/
+│
+├── tools/   //programmi installati manualmente da te
+│
+├── scripts/   //utility personali
+|	├── backup.sh
+|	├── deploy.sh
+|	├── restart-all.sh
+|	└── update.sh
+│
+└── miniconda3/
+
+
+//quando runni 'docker compose up -d' docker salva tutto nei suoi percorsi interni e.g./var/lib/docker, e le immagini?INFO
 
 
 #########################TREE OF MY SERVER 
-
-
 
 /
 ├── bin -> usr/bin
@@ -1285,11 +1396,5 @@ questa è la mia struttura praticamente vuota del mio server linux ubuntu. dimmi
         └── rsyslog
 
 1136 directories
-
-
-
-
-
-
 
 
