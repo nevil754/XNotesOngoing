@@ -169,6 +169,7 @@ e.g.
    │  Docker + servizi    │
    └──────────────────────┘
 -docker: docker engine(è il motore che crea containers imgs volumes manages sistem), docker CLI, docker compose(orchestrare più containers insieme).
+
 🔥🔥-BACKUPS: source code(via git uasando commit history), datas(e.g.databases ect), configurazioni server(e.g.system config, docker-compose ect). 
 --snapshot backup: copia completa di dir / disk, e.g./srv → /backup/srv_2026_06_26/.
 --database backup: e.g.w postgresql pg_dump mydb > backup.sql
@@ -191,11 +192,13 @@ docker run --rm \
 ├── monthly/
 └── db/
 
--START->PRODUCTION: spesso si usano 3 SERVER DIVERSI (ma se tu hai 1 server allora usi 3 folders dev test prod e dentro ciascuno same folders apps stacks data...), ricorda I 3 AMBIENTS PROPRIO NON SI TOCCANO!!, e quando sei soddifatto per passare al next ambiente distribuisci usando git&docker.
+🔥🔥-START->PRODUCTION: spesso si usano 3 SERVER DIVERSI (ma se tu hai 1 server allora usi 3 folders dev test prod e dentro ciascuno same folders apps stacks data...), ricorda I 3 AMBIENTS PROPRIO NON SI TOCCANO (E NEANCHE I DATAS e.g.su sqlserver o qdrant!!)!!, e quando sei soddifatto per passare al next ambiente distribuisci usando git&docker.
 --ambiente di Development: lo usi come vuoi per fare tests e risolvere bugs.
 --ambiente di Testing: "Se porto questa versione in produzione, funzionerà davvero?", è una copia molto simile alla produzione.
 --ambiente di Production: è quello usato dagli users veri, qua ci sono rules downtime quasi zero backup auto monitoring logs aggiornamenti pianificati.
 
+-CI/CD self-hosted x server 8gb ram (DevOps job): 🔥Forgejo(leggero scritto in GO ideale x small machines, e puoi usare le Forgejo Actions x automatizzare), Gitea(simile a forgejo x all), 🔥GitLab CE(ottima ma è un po pesante), Jenkins.
+//🔥Uptime Kuma x monitoraggio (e.g.ti avverte se qdrant giu o fastapi giu..)
 
 //info Ambiente di Testing e Ambiente di Produzione ?
 //e con GitLab (da installare) settare tutto
