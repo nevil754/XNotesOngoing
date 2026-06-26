@@ -58,7 +58,7 @@ uibest84bytoken!
 -flower psw:
 beaflwer93!
 -langsmith api key:
-xxx
+
 -redis psw:
 oucache93sh!
 -sqlserver psw:
@@ -144,18 +144,33 @@ apt full-upgrade  //autorizzato a installare o rimuovere pacchetti se necessario
 reboot      //se necessario, x riavvio server
 ssh docker@192.168.113.52   //re-login
 uptime   //check da quanto tempo il server è attivo
-
 systemctl status unattended-upgrades  //checks se aggiornamento auto security è attivo
-
 
 docker version; apt upgrade docker-ce   //vedi se docker vuoi fare upadte, ma questo x docker engine o docker compose??
 
-apt autoremove   //disinstalla libs orfane
-apt clean  //delete i packs .deb già scaricati, non disinstalla nulla
+apt autoremove   //disinstalla libs orfane, consigliato da fare dopo un update dei packs
+apt clean  //delete i packs .deb già scaricati, non disinstalla nulla, consigliato da fare dopo un update dei packs
 
-
+//VM = virtual machine
+//VPS = virtual private server (e.g.quelle su hetzner)
 -linux ubuntu sistema x i programs: apt ('apt install..', i programs vengono installati nelle dir del systema), snap ('snap install..', crea un sacchetto isolato dal resto del sistema(sandbox, quando supportato) che contiene prpgram target+sue libs) snap list; snap refresh; //controlla gli snaps attivi, e se sono da aggiornare.
-🔥🔥-return to pre-state before crash of target server: viene creata immagine completa del disk (è simile ad un backup, ma puo essere usata anche x creare server identici!)
+🔥🔥-return to pre-state before crash of target server: viene creata immagine completa del disk (è simile ad un backup, ma puo essere usata anche x creare server identici!). 
+systemd-detect-virt ti dice se hai vps(macchina virtuale e.g.'kvm') o macchina fisica: se hai vps allora lo snaphsot del server si fa da un layer piu alto del tuo server e.g. da pannello generale di hetzner (server>snapshot>create), se invece hai server fisico allora con Proxmox UI - VMware vSphere - OpenStack dashboard. 
+
+-capisci esattamente dove è hostato il tuo server con
+hostnamectl
+cat /sys/class/dmi/id/product_name
+ip a
+e.g.
+[ Server fisico aziendale / datacenter ]
+            ↓
+        KVM / QEMU   //hypervisor (e.g. Proxmox / OpenStack / libvirt / VMware-like setup) da qui puoi fare gli snapshots dei servers!
+            ↓
+   ┌──────────────────────┐ ← ur server, quindi tu hai una vm kvm
+   │  Ubuntu 24.04 VM     │ ← TU QUI
+   │  Docker + servizi    │
+   └──────────────────────┘
+
 
 
 //e come funzionano esattamente i backups?
