@@ -1,260 +1,1293 @@
 
-srvai2k22 -> desktop installato su server (che ha installato sora ollama e gli LLMs0)
-OLLAMA INTERNO → http://srvai2k22:11434/
-locale qdrant → http://192.168.113.52:6333/
+Git Remote Item...
 
-ssh docker@192.168.113.52  //da cmd, ACCEDI AL TUO SERVER🔥🔥
-Suit-Force-Card   //psw
+Dove metterei i progetti?
 
-Codeium (plugin vscode)  //w MY account gmail
-nz143727@gmail.com
-Code53pthony!
-
-DA FARE OGNI GIORNO(quando sei in azienda)
-https://compete.tbplanned.bmeweb.it/
-n.benedetto
-bpeb93tecm!
-task: CF_2026_0259 - PROGETTO CON SFEL Sviluppo
-text: Inizio test caricamento e settaggio Server per ospitare & runnare il RAG system.
-
-####TODO:
--install on server: docker engine, docker compose, miniconda, cerbot(more info), gitlab(self-hosting github),  
-
-
-
-#######################################
-
-prjRAG1_env
-conda create -n prjRAG1_env python=3.11 -c conda-forge
-conda activate prjRAG1_env
-conda install jupyter ipykernel -c conda-forge
-python -m ipykernel install --user --name=prjRAG1_env --display-name "Python (prjRAG1_env)"
-pip install fastapi uvicorn 
-sentence-transformers
-langchain-huggingface
-langchain-text-splitters
-#pypdf
-unstructured
-pip install -r requirements.txt
-
-#######################################NOTES
-
-🔥CAG(Cache-Augmented Generation) è meglio di traditional RAG in casi di highly repeatable queries over a stable set of information, e sfrutti al massimo la cache.
-
-//#c3ed00   from https://bones.studio/
-//C:\sviluppo\devops\prjRAG_AI   dove metto folder del mio prj
-Remove-Item -Recurse -Force .git
-ctrl+shift+P   //open bar at top, digit 'GitHub Copilot: Ask'
-C:\Users\nelvisonb\AppData\Local\anaconda3   //dove è installato miniconda
-
-#######################################PRODUCTION RAG
-
-server[ codesorgente/(here va tutto il code sorgente) , docker/(è gia creata)(qua dentro va il docker-compose che gira e runna) ].
-
--JWT secret key:
-secter93yekragbusiness05agenticd
--chainlit auth secret:
-uibest84bytoken!
--flower psw:
-beaflwer93!
--langsmith api key:
-xxx
--redis psw:
-oucache93sh!
--sqlserver psw:
-serv95psw!
-
-ssh docker@192.168.113.52  //da cmd, ACCEDI AL TUO SERVER🔥🔥
-Suit-Force-Card   //psw
-
-ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untente docker in /home/docker
-//quando fai comando 'sudo ...' allora dici al system di login come admin 'root' SOLO x questo comando, se fai invece 'sudo -i' diventi proprio admin root finche non logout.
-
-ls    //vedi all dir (pero se fai e.g. pwd e vedi /root allora sei in home/root/ !)
-ls /      //🔥x filesystem completo Linux SEI IL MASTER DEL TUO SERVER puoi fare tutto! see all folders
-ls /root  //NEGATA X PERMESSI
-pwd       //tua posizione attuale
-cd
-cd /   //root
-cd /root   //NEGATA X PERMESSI UTENTE
-cd ..    //father
-mkdir myfolder
-ps aux   //processi in esecuzione
-htop     //🔥🔥x cpu & ram realtime
-df -h    //disk & spazio
-uname -a   //hardware & system
-ip a   //rete
-cat /etc/passwd   //users
-sudo su   //⚠️entra in root, non sei piu dentro utente docker!⚠️
-whoami   //vedi che utente attualmente sei con login, e.g.'docker' non ha certi privilegi mentre 'root' sì, è per questo che se fai e.g. cd /root da utente docker trovi permessi negati.
-sudo -l  //vedi quali comandi puoi eseguire come amministratore!! io sono (ALL : ALL) ALL QUINDI HO IL TOTALE CONTROLLO DEL SERVER!!
-ls -ld /root   //vedere permessi senza entrare
-//🔥x vedere all filesystem visivamente
-apt install tree 
-tree -d -L 3 / -I "proc|sys|dev|run|tmp|snap" / ;   //🔥x vedere in .txt struttura ad albero filesystem
-apt install ncdu; ncdu / ;   //opzionale, x interfaccia testuale dove puoi navigare in filesystem
-
-dpkg -l   //🔥🔥vedi tutti i programs installati!
-sudo ls /root    //legge cartella /root, ovviamente se attualmente non sei login admin user root, allora permesso denied
-sudo -i   //🔥⚠️ diventi utente admin 'root'!!MA DI SOLITO I PRO GIORNALMENTE LAVORANO COME UTENTE NORMALE, divenato admin user root solo x update programs o casi speciali 
-sudo su - docker   //🔥🔥switchi e diventi utente 'docker'
-exit   //esce dalla shell corrente
-groups docker   //vedi che privilegi ha utente 'docker'
-passano ad admin solo quando hanno davvero bisogno in casi particolari
-sudo adduser devuser   //crea nuovo utente da login admin user 'root'
-sudo usermod -aG sudo devuser   //dagli permessi admin
-//crea chiave ssh per lui
-sudo mkdir /home/devuser/.ssh
-sudo nano /home/devuser/.ssh/authorized_keys
-
-apt list --installed   //x programs installed
-compgen -c   //tutti comandi avaible nel PATH
-//dove trovare solitamente all programs installed 'a mano'
-ls /opt
-ls /usr/local/bin
-
-//##INFO ABOUT MACHINE
-systemd-detect-virt   //se return None allora server fisico, se return kvm,xen,openvz,vmware → VPS
-  fwupdmgr get-updates   //solo x server fisici, update firware hardware
-  fwupdmgr update   //solo x server fisici, update firware hardware
-lscpu   //x cpu
-free -h  //x ram, SUL SERVER HO 8GB di RAM!! ricorda che gli LLM girano su [srvdocker01]!!
-lsblk    //disks
-nvidia-smi  //se hai gpu nvidia
-sudo lshw   //tutto l'hardware
-lspci    //x pci
-lsusb    //x usb
-hostnamectl   //🔥x os
-htop     //🔥x cpu & ram realtime
-uname -r  //info about kernel
-
-//##UPDATE MACHINE
-apt list --upgradable   //vedi tutti gli updates possibili
-apt update  //ubuntu linux scarica i packs aggiornabili da repo remota ufficiale
-apt upgrade  //🔥🔥aggiorna davvero i packs
-apt full-upgrade  //autorizzato a installare o rimuovere pacchetti se necessario per completare l'aggiornamento, mentre 'apt upgrade' preferisce non farlo
-reboot      //se necessario, x riavvio server
-ssh docker@192.168.113.52   //re-login
-uptime   //check da quanto tempo il server è attivo
-systemctl status unattended-upgrades  //checks se aggiornamento auto security è attivo
-apt autoremove   //disinstalla libs orfane, consigliato da fare dopo un update dei packs
-apt clean  //delete i packs .deb già scaricati, non disinstalla nulla, consigliato da fare dopo un update dei packs
-
-//##DOCKER
-docker --version
-docker compose version
-docker info
-which docker   //TROVA DOVE SI TROVA docker path, qui docker salva imgs-containers-volumes-layerfilesystem
-systemctl status docker   //vedi che sta girando docker
-dpkg -l | grep docker
-sudo apt upgrade docker-ce docker-ce-cli containerd.io   //aggiorna docker engine & docker compose
-
-
-//VM = virtual machine
-//VPS = virtual private server (e.g.quelle su hetzner)
--linux ubuntu system x i programs: apt ('apt install..', i programs vengono installati nelle dir del systema), snap ('snap install..', crea un sacchetto isolato dal resto del sistema(sandbox, quando supportato) che contiene program target+sue libs) snap list; snap refresh; //controlla gli snaps attivi, e se sono da aggiornare.
-🔥🔥-return to pre-state before crash of target server: viene creata immagine completa del disk (è simile ad un backup, ma puo essere usata anche x creare server identici!). 
-systemd-detect-virt ti dice se hai vps(macchina virtuale e.g.'kvm') o macchina fisica: se hai vps allora lo snaphsot del server si fa da un layer piu alto del tuo server e.g. da pannello generale di hetzner (server>snapshot>create), se invece hai server fisico allora con Proxmox UI - VMware vSphere - OpenStack dashboard. 
--capisci esattamente dove è hostato il tuo server con
-hostnamectl
-cat /sys/class/dmi/id/product_name
-ip a
-e.g.
-[ Server fisico aziendale / datacenter ]
-            ↓
-        KVM / QEMU   //hypervisor (e.g. Proxmox / OpenStack / libvirt / VMware-like setup) da qui puoi fare gli snapshots dei servers!
-            ↓
-   ┌──────────────────────┐ ← ur server, quindi tu hai una vm kvm
-   │  Ubuntu 24.04 VM     │ ← TU QUI
-   │  Docker + servizi    │
-   └──────────────────────┘
--docker: docker engine(è il motore che crea containers imgs volumes manages sistem), docker CLI, docker compose(orchestrare più containers insieme).
-
-🔥🔥-BACKUPS: source code(via git uasando commit history), datas(e.g.databases ect), configurazioni server(e.g.system config, docker-compose ect). 
---snapshot backup: copia completa di dir / disk, e.g./srv → /backup/srv_2026_06_26/.
---database backup: e.g.w postgresql pg_dump mydb > backup.sql
---docker volume backup: e.g.
-docker run --rm \
-  -v my_volume:/data \
-  -v $(pwd):/backup \
-  ubuntu tar czf /backup/volume.tar.gz /data
---remote backup: copia su un altro server, e.g. rsync -av /srv user@backup-server:/backups/
---backup automatici (cron): si settano auto e.g.ogni giorno alle 2am. 
-//il code lo puoi rifare con git, I DATAS NO!!“Code is disposable, data is not”
+Se fossi proprietario del server:
 
 /srv
-/data
-/backups
 
-/backups
-├── daily/
-├── weekly/
-├── monthly/
-└── db/
+è la posizione più pulita.
 
-🔥🔥-START->PRODUCTION: spesso si usano 3 SERVER DIVERSI (ma se tu hai 1 server allora usi 3 folders dev test prod e dentro ciascuno same folders apps stacks data...), ricorda I 3 AMBIENTS PROPRIO NON SI TOCCANO (E NEANCHE I DATAS e.g.su sqlserver o qdrant!!)!!, e quando sei soddifatto per passare al next ambiente distribuisci usando git&docker.
---ambiente di Development: lo usi come vuoi per fare tests e risolvere bugs.
---ambiente di Testing: "Se porto questa versione in produzione, funzionerà davvero?", è una copia molto simile alla produzione.
---ambiente di Production: è quello usato dagli users veri, qua ci sono rules downtime quasi zero backup auto monitoring logs aggiornamenti pianificati.
+Esempio:
 
--CI/CD self-hosted x server 8gb ram (DevOps job): 🔥Forgejo(leggero scritto in GO ideale x small machines, e puoi usare le Forgejo Actions x automatizzare), Gitea(simile a forgejo x all), 🔥GitLab CE(ottima ma è un po pesante), Jenkins.
-//🔥Uptime Kuma x monitoraggio (e.g.ti avverte se qdrant giu o fastapi giu..)
+/srv
+├── agent
+├── api
+├── dashboard
+└── qdrant
+Dove metterei Docker?
+
+Una struttura molto comune:
+
+/srv/docker
+├── postgres
+├── qdrant
+├── n8n
+└── traefik
+
+Ogni servizio:
+
+/srv/docker/qdrant
+├── docker-compose.yml
+├── .env
+└── volumes
+Dove metterei i dati persistenti?
+/srv/data
+├── postgres
+├── qdrant
+└── backups
+Dove installerei Miniconda?
+
+Qui ci sono due scuole.
+
+Opzione A (più comune)
+
+Installazione per utente:
+
+/home/docker/miniconda3
+Opzione B (server condiviso)
+
+Installazione globale:
+
+/opt/miniconda3
+
+Con:
+
+sudo bash Miniconda3-latest-Linux-x86_64.sh
+
+e path:
+
+/opt/miniconda3
+Dove stanno le immagini Docker?
+
+Molto importante:
+
+NON dentro le tue cartelle.
+
+Docker salva internamente in:
+
+/var/lib/docker
+Dove stanno i container in esecuzione?
+
+Sempre sotto il motore Docker.
+
+Li controlli con:
+
+docker ps
+
+non andando in una cartella.
+
+Come strutturerei questo server da zero
+
+Io farei:
+
+sudo mkdir -p /srv/projects
+sudo mkdir -p /srv/docker
+sudo mkdir -p /srv/data
+sudo mkdir -p /srv/backups
+
+ottenendo:
+
+/srv
+├── projects
+├── docker
+├── data
+└── backups
+
+Poi:
+
+/srv/projects
+├── my-api
+├── chatbot
+└── dashboard
+/srv/docker
+├── postgres
+├── qdrant
+├── n8n
+└── monitoring
+/srv/data
+├── postgres
+├── qdrant
+└── uploads
+In conclusione
+
+Dal tuo output:
+
+(ALL : ALL) ALL
+
+non sei un utente limitato.
+
+Sei di fatto amministratore del server.
+
+Quindi puoi scegliere tu la struttura del filesystem e non sei costretto a lavorare soltanto in /home/docker.
+
+Per un server ordinato e professionale, userei /srv come radice dei servizi/applicazioni, lasciando /home/docker per strumenti personali, script e configurazioni dell'utente.
 
 
--how ur server compet-e works:
---ssh docker@192.168.113.52 sei dentro il sistema operativo ma con i permessi dell’utente 'docker' !
--appena accedi a server ~ significa che sei in /home/docker, dentro 'home' ci sono 2 utenti: docker e valterm.
--quando fai 'sudo apt install git' il software viene installato in /usr/bin/git→eseguibile, /usr/lib/...→librerie, /etc/gitconfig→config globale, ... ora il comando git è globale.
--appena accedi a server ~ significa che sei in /home/docker
-//wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh   //con wget è piu easy installation rispetto a curl x installation
+root@srvdocker01:~# ls /
+bin                boot   dev  home  lib64              lost+found  mnt  proc  run   sbin.usr-is-merged  srv       sys  usr
+bin.usr-is-merged  cdrom  etc  lib   lib.usr-is-merged  media       opt  root  sbin  snap                swap.img  tmp  var
+root@srvdocker01:~# cd srv
+bash: cd: srv: No such file or directory
+root@srvdocker01:~#
+
+si ho il totale controllo del server, quindi dimmi esattamente come dovrei organizzare il filesystem del mio server (Linux), a livello enterprise, dovra ospitare i progetti enterprise e ovviamente deve poterli far girare sul server con docker. 
+
+//HERE ALL THE TREE OF MY SERVER
+questa è la mia struttura praticamente vuota del mio server linux ubuntu. dimmi come organizzare a livello enterprise la struttura del mio server, avro bisogno dei 3 ambienti Development Testing e Production (che pero visto che ho 1 solo server, non posso usare 3 server separati ma dovro organizzarmi con 3 cartelle), avro bisogno capire come organizzarmi con Forgejo (xC I/CD, non ho ancora installato), avro bisogno capire come organizzarmi con Docker (gia installati tutti e tre docker engine docker compose docker cli) con tutto (e.g. i volumes, le images ect), e attualmente dentro /home/ ho 2 utenti 'docker' e 'valterm' che cosa devono poter fare questi utenti e forse me ne servono altri. Dammi la struttura ad albero a livello enterprise di come organizzarmi nel server con lo sviluppo del mio prj, deve durare per anni, e ho gia Git installato.  PENSA ANCHE 3-4 VOLTE ALLA TUA RISPOSTA CHATGPT
+
+//e poi spiegami bene come vado avanti con Git & Forgejo con i branches rules, 
 
 
 
-SERVER
-│
-├── /
-│   ├── etc
-│   ├── usr
-│   ├── var
-│   ├── home
-│   │   ├── docker
-│   │   └── valterm
-│   └── root
 
 
-/home/docker   ← il TUO spazio
-│
-├── projects/
-│   ├── agentprj/
-│   ├── apiprj/
-│   └── dashboardprj/
-│
-├── docker/   //qui metti le infrastrutture docker, il modo in cui il code sorgente viene eseguito
-│   ├── qdrant/   //
-│   │	   ├── docker-compose.yml
-│   │     ├── .env
-│   │     └── volumes/
-│   ├── postgres/
-│   └── n8n/
-│
-├── data/    //x dati persistenti
-│   ├── qdrant/
-│   ├── postgres/
-│   └── backups/
-│
-├── tools/   //programmi installati manualmente da te
-│
-├── scripts/   //utility personali
-|	├── backup.sh
-|	├── deploy.sh
-|	├── restart-all.sh
-|	└── update.sh
-│
-└── miniconda3/
+#########################TREE OF MY SERVER 
 
-//quando runni 'docker compose up -d' docker salva tutto nei suoi percorsi interni e.g./var/lib/docker, e le immagini?INFO
 
-//[INFO]COME FUNZIONA L'AMBIENTE DI TEST prima della produzione? cioe come è organizzato
+
+/
+├── bin -> usr/bin
+├── bin.usr-is-merged
+├── boot
+│   ├── grub
+│   │   ├── fonts
+│   │   ├── i386-pc
+│   │   └── locale
+│   └── lost+found
+├── cdrom
+├── etc
+│   ├── alternatives
+│   ├── apparmor
+│   ├── apparmor.d
+│   │   ├── abi
+│   │   ├── abstractions
+│   │   ├── disable
+│   │   ├── force-complain
+│   │   ├── local
+│   │   ├── rsyslog.d
+│   │   └── tunables
+│   ├── apport
+│   │   └── report-ignore
+│   ├── apt
+│   │   ├── apt.conf.d
+│   │   ├── auth.conf.d
+│   │   ├── keyrings
+│   │   ├── preferences.d
+│   │   ├── preferences.d.save
+│   │   ├── sources.list.d
+│   │   └── trusted.gpg.d
+│   ├── bash_completion.d
+│   ├── binfmt.d
+│   ├── byobu
+│   ├── ca-certificates
+│   │   └── update.d
+│   ├── cloud
+│   │   ├── clean.d
+│   │   ├── cloud.cfg.d
+│   │   └── templates
+│   ├── console-setup
+│   ├── containerd
+│   ├── credstore
+│   ├── credstore.encrypted
+│   ├── cron.d
+│   ├── cron.daily
+│   ├── cron.hourly
+│   ├── cron.monthly
+│   ├── cron.weekly
+│   ├── cron.yearly
+│   ├── cryptsetup-initramfs
+│   ├── dbus-1
+│   │   ├── session.d
+│   │   └── system.d
+│   ├── default
+│   │   └── grub.d
+│   ├── depmod.d
+│   ├── dhcp
+│   │   └── dhclient-exit-hooks.d
+│   ├── docker
+│   ├── dpkg
+│   │   ├── dpkg.cfg.d
+│   │   └── origins
+│   ├── fonts
+│   │   ├── conf.avail
+│   │   └── conf.d
+│   ├── fwupd
+│   │   ├── bios-settings.d
+│   │   └── remotes.d
+│   ├── gnutls
+│   ├── groff
+│   ├── grub.d
+│   ├── gss
+│   │   └── mech.d
+│   ├── init.d
+│   ├── initramfs-tools
+│   │   ├── conf.d
+│   │   ├── hooks
+│   │   └── scripts
+│   ├── iproute2
+│   │   ├── rt_protos.d
+│   │   └── rt_tables.d
+│   ├── iscsi
+│   ├── kernel
+│   │   ├── install.d
+│   │   ├── postinst.d
+│   │   ├── postrm.d
+│   │   └── preinst.d
+│   ├── landscape
+│   ├── ldap
+│   ├── ld.so.conf.d
+│   ├── libblockdev
+│   │   └── 3
+│   ├── libibverbs.d
+│   ├── libnl-3
+│   ├── logcheck
+│   │   ├── ignore.d.server
+│   │   └── violations.d
+│   ├── logrotate.d
+│   ├── lvm
+│   │   └── profile
+│   ├── mdadm
+│   ├── ModemManager
+│   │   ├── connection.d
+│   │   └── fcc-unlock.d
+│   ├── modprobe.d
+│   ├── modules-load.d
+│   ├── multipath
+│   ├── needrestart
+│   │   ├── conf.d
+│   │   ├── hook.d
+│   │   ├── notify.d
+│   │   └── restart.d
+│   ├── netplan
+│   ├── network
+│   │   ├── if-pre-up.d
+│   │   └── if-up.d
+│   ├── networkd-dispatcher
+│   │   ├── carrier.d
+│   │   ├── degraded.d
+│   │   ├── dormant.d
+│   │   ├── no-carrier.d
+│   │   ├── off.d
+│   │   └── routable.d
+│   ├── newt
+│   ├── opt
+│   ├── PackageKit
+│   ├── pam.d
+│   ├── perl
+│   │   └── Net
+│   ├── pki
+│   │   ├── fwupd
+│   │   └── fwupd-metadata
+│   ├── plymouth
+│   ├── pm
+│   │   └── sleep.d
+│   ├── polkit-1
+│   │   └── rules.d
+│   ├── pollinate
+│   ├── profile.d
+│   ├── python3
+│   ├── python3.12
+│   ├── rc0.d
+│   ├── rc1.d
+│   ├── rc2.d
+│   ├── rc3.d
+│   ├── rc4.d
+│   ├── rc5.d
+│   ├── rc6.d
+│   ├── rcS.d
+│   ├── rsyslog.d
+│   ├── security
+│   │   ├── limits.d
+│   │   └── namespace.d
+│   ├── selinux
+│   ├── sensors.d
+│   ├── sgml
+│   ├── skel
+│   ├── sos
+│   │   ├── cleaner
+│   │   ├── extras.d
+│   │   ├── groups.d
+│   │   └── presets.d
+│   ├── ssh
+│   │   ├── ssh_config.d
+│   │   └── sshd_config.d
+│   ├── ssl
+│   │   ├── certs
+│   │   └── private
+│   ├── sudoers.d
+│   ├── supercat
+│   ├── sysctl.d
+│   ├── sysstat
+│   ├── systemd
+│   │   ├── network
+│   │   ├── system
+│   │   ├── system-generators
+│   │   └── user
+│   ├── terminfo
+│   ├── thermald
+│   ├── tmpfiles.d
+│   ├── ubuntu-advantage
+│   ├── udev
+│   │   ├── hwdb.d
+│   │   └── rules.d
+│   ├── udisks2
+│   ├── ufw
+│   │   └── applications.d
+│   ├── update-manager
+│   │   └── release-upgrades.d
+│   ├── update-motd.d
+│   ├── update-notifier
+│   ├── UPower
+│   ├── usb_modeswitch.d
+│   ├── vim
+│   ├── vmware-tools
+│   │   ├── scripts
+│   │   └── vgauth
+│   ├── X11
+│   │   ├── xkb
+│   │   └── Xsession.d
+│   ├── xdg
+│   │   ├── autostart
+│   │   └── systemd
+│   └── xml
+├── home
+│   ├── docker
+│   │   └── docker
+│   └── valterm
+├── lib -> usr/lib
+├── lib64 -> usr/lib64
+├── lib.usr-is-merged
+├── lost+found
+├── media
+├── mnt
+├── opt
+│   └── containerd
+│       ├── bin
+│       └── lib
+├── root
+├── sbin -> usr/sbin
+├── sbin.usr-is-merged
+├── srv
+├── usr
+│   ├── bin
+│   ├── games
+│   ├── include
+│   │   ├── arpa
+│   │   ├── asm-generic
+│   │   ├── drm
+│   │   ├── finclude
+│   │   ├── iproute2
+│   │   ├── linux
+│   │   ├── misc
+│   │   ├── mtd
+│   │   ├── net
+│   │   ├── netash
+│   │   ├── netatalk
+│   │   ├── netax25
+│   │   ├── neteconet
+│   │   ├── netinet
+│   │   ├── netipx
+│   │   ├── netiucv
+│   │   ├── netpacket
+│   │   ├── netrom
+│   │   ├── netrose
+│   │   ├── nfs
+│   │   ├── protocols
+│   │   ├── rdma
+│   │   ├── regulator
+│   │   ├── rpc
+│   │   ├── rpcsvc
+│   │   ├── scsi
+│   │   ├── sound
+│   │   ├── video
+│   │   ├── x86_64-linux-gnu
+│   │   ├── xen
+│   │   └── xfs
+│   ├── lib
+│   │   ├── apparmor
+│   │   ├── apt
+│   │   ├── binfmt.d
+│   │   ├── byobu
+│   │   ├── cloud-init
+│   │   ├── console-setup
+│   │   ├── cryptsetup
+│   │   ├── dbus-1.0
+│   │   ├── dhcpcd
+│   │   ├── dpkg
+│   │   ├── dracut
+│   │   ├── environment.d
+│   │   ├── file
+│   │   ├── finalrd
+│   │   ├── firmware
+│   │   ├── girepository-1.0
+│   │   ├── git-core
+│   │   ├── gnupg
+│   │   ├── gnupg2
+│   │   ├── groff
+│   │   ├── grub
+│   │   ├── grub-legacy
+│   │   ├── hdparm
+│   │   ├── init
+│   │   ├── initcpio
+│   │   ├── initramfs-tools
+│   │   ├── kernel
+│   │   ├── klibc
+│   │   ├── linux
+│   │   ├── linux-boot-probes
+│   │   ├── linux-tools
+│   │   ├── linux-tools-6.8.0-110
+│   │   ├── linux-tools-6.8.0-124
+│   │   ├── llvm-18
+│   │   ├── locale
+│   │   ├── lsb
+│   │   ├── man-db
+│   │   ├── mime
+│   │   ├── modprobe.d
+│   │   ├── modules
+│   │   ├── modules-load.d
+│   │   ├── multipath
+│   │   ├── nagios
+│   │   ├── needrestart
+│   │   ├── netplan
+│   │   ├── networkd-dispatcher
+│   │   ├── nvidia
+│   │   ├── open-iscsi
+│   │   ├── openssh
+│   │   ├── os-probes
+│   │   ├── pam.d
+│   │   ├── pcrlock.d
+│   │   ├── pm-utils
+│   │   ├── policykit-1
+│   │   ├── polkit-1
+│   │   ├── python3
+│   │   ├── python3.12
+│   │   ├── recovery-mode
+│   │   ├── rsyslog
+│   │   ├── sasl2
+│   │   ├── snapd
+│   │   ├── software-properties
+│   │   ├── ssl
+│   │   ├── sysctl.d
+│   │   ├── sysstat
+│   │   ├── systemd
+│   │   ├── sysusers.d
+│   │   ├── tmpfiles.d
+│   │   ├── ubiquity
+│   │   ├── ubuntu-advantage
+│   │   ├── ubuntu-release-upgrader
+│   │   ├── udev
+│   │   ├── udisks2
+│   │   ├── ufw
+│   │   ├── update-notifier
+│   │   ├── valgrind
+│   │   └── x86_64-linux-gnu
+│   ├── lib64
+│   ├── libexec
+│   │   ├── coreutils
+│   │   ├── docker
+│   │   ├── dpkg
+│   │   ├── fwupd
+│   │   ├── man-db
+│   │   ├── netplan
+│   │   ├── plymouth
+│   │   ├── sudo
+│   │   ├── udisks2
+│   │   └── xfsprogs
+│   ├── local
+│   │   ├── bin
+│   │   ├── etc
+│   │   ├── games
+│   │   ├── include
+│   │   ├── lib
+│   │   ├── man -> share/man
+│   │   ├── sbin
+│   │   ├── share
+│   │   └── src
+│   ├── sbin
+│   ├── share
+│   │   ├── applications
+│   │   ├── apport
+│   │   ├── appstream
+│   │   ├── awk
+│   │   ├── base-files
+│   │   ├── base-passwd
+│   │   ├── bash-completion
+│   │   ├── binfmts
+│   │   ├── bpfcc-tools
+│   │   ├── bug
+│   │   ├── byobu
+│   │   ├── ca-certificates
+│   │   ├── cmake
+│   │   ├── common-licenses
+│   │   ├── consolefonts
+│   │   ├── console-setup
+│   │   ├── consoletrans
+│   │   ├── cryptsetup
+│   │   ├── dbus-1
+│   │   ├── debconf
+│   │   ├── debhelper
+│   │   ├── debianutils
+│   │   ├── dhcpcd
+│   │   ├── dict
+│   │   ├── distro-info
+│   │   ├── doc
+│   │   ├── doc-base
+│   │   ├── dpkg
+│   │   ├── file
+│   │   ├── finalrd
+│   │   ├── fish
+│   │   ├── fontconfig
+│   │   ├── fonts
+│   │   ├── fwupd
+│   │   ├── gcc
+│   │   ├── gdb
+│   │   ├── gettext
+│   │   ├── git-core
+│   │   ├── gitweb
+│   │   ├── glib-2.0
+│   │   ├── gnupg
+│   │   ├── groff
+│   │   ├── grub
+│   │   ├── grub-gfxpayload-lists
+│   │   ├── hwdata
+│   │   ├── i18n
+│   │   ├── icons
+│   │   ├── ieee-data
+│   │   ├── info
+│   │   ├── initramfs-tools
+│   │   ├── installed-tests
+│   │   ├── iptables
+│   │   ├── iso-codes
+│   │   ├── java
+│   │   ├── keyrings
+│   │   ├── landscape
+│   │   ├── libc-bin
+│   │   ├── libdrm
+│   │   ├── libgcrypt20
+│   │   ├── lintian
+│   │   ├── locale
+│   │   ├── locales
+│   │   ├── lxd-installer
+│   │   ├── man
+│   │   ├── man-db
+│   │   ├── maven-repo
+│   │   ├── mdadm
+│   │   ├── menu
+│   │   ├── metainfo
+│   │   ├── mime
+│   │   ├── misc
+│   │   ├── ModemManager
+│   │   ├── nano
+│   │   ├── needrestart
+│   │   ├── netplan
+│   │   ├── openssh
+│   │   ├── open-vm-tools
+│   │   ├── os-prober
+│   │   ├── package-data-downloads
+│   │   ├── PackageKit
+│   │   ├── pam
+│   │   ├── pam-configs
+│   │   ├── pastebin.d
+│   │   ├── perl
+│   │   ├── perl5
+│   │   ├── pixmaps
+│   │   ├── pkgconfig
+│   │   ├── plymouth
+│   │   ├── polkit-1
+│   │   ├── publicsuffix
+│   │   ├── python3
+│   │   ├── python-apt
+│   │   ├── python-babel-localedata
+│   │   ├── readline
+│   │   ├── rsync
+│   │   ├── rsyslog
+│   │   ├── screen
+│   │   ├── secureboot
+│   │   ├── sensible-utils
+│   │   ├── session-migration
+│   │   ├── sgml
+│   │   ├── sgml-base
+│   │   ├── snapd
+│   │   ├── systemd
+│   │   ├── tabset
+│   │   ├── tcltk
+│   │   ├── terminfo
+│   │   ├── ubuntu-drivers-common
+│   │   ├── ubuntu-release-upgrader
+│   │   ├── ucf
+│   │   ├── ufw
+│   │   ├── unattended-upgrades
+│   │   ├── update-notifier
+│   │   ├── usb_modeswitch
+│   │   ├── util-linux
+│   │   ├── vim
+│   │   ├── X11
+│   │   ├── xfsprogs
+│   │   ├── xml
+│   │   ├── xml-core
+│   │   ├── zoneinfo
+│   │   └── zsh
+│   └── src
+│       ├── linux-headers-6.8.0-110
+│       ├── linux-headers-6.8.0-110-generic
+│       ├── linux-headers-6.8.0-124
+│       └── linux-headers-6.8.0-124-generic
+└── var
+    ├── backups
+    ├── cache
+    │   ├── adduser
+    │   ├── apparmor
+    │   ├── app-info
+    │   ├── apt
+    │   ├── debconf
+    │   ├── fwupd
+    │   ├── fwupdmgr
+    │   ├── ldconfig
+    │   ├── man
+    │   ├── PackageKit
+    │   ├── pollinate
+    │   ├── private
+    │   ├── snapd
+    │   └── swcatalog
+    ├── crash
+    ├── lib
+    │   ├── app-info -> /var/lib/swcatalog
+    │   ├── apport
+    │   ├── apt
+    │   ├── boltd
+    │   ├── cloud
+    │   ├── command-not-found
+    │   ├── containerd
+    │   ├── dbus
+    │   ├── dhcpcd
+    │   ├── docker
+    │   ├── dpkg
+    │   ├── fwupd
+    │   ├── git
+    │   ├── grub
+    │   ├── ieee-data
+    │   ├── landscape
+    │   ├── libuuid
+    │   ├── logrotate
+    │   ├── man-db
+    │   ├── misc
+    │   ├── os-prober
+    │   ├── PackageKit
+    │   ├── pam
+    │   ├── plymouth
+    │   ├── polkit-1
+    │   ├── private
+    │   ├── python
+    │   ├── sgml-base
+    │   ├── snapd
+    │   ├── sudo
+    │   ├── swcatalog
+    │   ├── systemd
+    │   ├── tpm
+    │   ├── ubuntu-advantage
+    │   ├── ubuntu-drivers-common
+    │   ├── ubuntu-release-upgrader
+    │   ├── ucf
+    │   ├── udisks2
+    │   ├── unattended-upgrades
+    │   ├── update-manager
+    │   ├── update-notifier
+    │   ├── upower
+    │   ├── usb_modeswitch
+    │   ├── vim
+    │   └── xml-core
+    ├── local
+    ├── lock -> /run/lock
+    ├── log
+    │   ├── apt
+    │   ├── dist-upgrade
+    │   ├── installer
+    │   ├── journal
+    │   ├── landscape
+    │   ├── private
+    │   ├── sysstat
+    │   └── unattended-upgrades
+    ├── mail
+    ├── opt
+    └── spool
+        ├── cron
+        ├── mail -> ../mail
+        └── rsyslog
+/
+├── bin -> usr/bin
+├── bin.usr-is-merged
+├── boot
+│   ├── grub
+│   │   ├── fonts
+│   │   ├── i386-pc
+│   │   └── locale
+│   └── lost+found
+├── cdrom
+├── etc
+│   ├── alternatives
+│   ├── apparmor
+│   ├── apparmor.d
+│   │   ├── abi
+│   │   ├── abstractions
+│   │   ├── disable
+│   │   ├── force-complain
+│   │   ├── local
+│   │   ├── rsyslog.d
+│   │   └── tunables
+│   ├── apport
+│   │   └── report-ignore
+│   ├── apt
+│   │   ├── apt.conf.d
+│   │   ├── auth.conf.d
+│   │   ├── keyrings
+│   │   ├── preferences.d
+│   │   ├── preferences.d.save
+│   │   ├── sources.list.d
+│   │   └── trusted.gpg.d
+│   ├── bash_completion.d
+│   ├── binfmt.d
+│   ├── byobu
+│   ├── ca-certificates
+│   │   └── update.d
+│   ├── cloud
+│   │   ├── clean.d
+│   │   ├── cloud.cfg.d
+│   │   └── templates
+│   ├── console-setup
+│   ├── containerd
+│   ├── credstore
+│   ├── credstore.encrypted
+│   ├── cron.d
+│   ├── cron.daily
+│   ├── cron.hourly
+│   ├── cron.monthly
+│   ├── cron.weekly
+│   ├── cron.yearly
+│   ├── cryptsetup-initramfs
+│   ├── dbus-1
+│   │   ├── session.d
+│   │   └── system.d
+│   ├── default
+│   │   └── grub.d
+│   ├── depmod.d
+│   ├── dhcp
+│   │   └── dhclient-exit-hooks.d
+│   ├── docker
+│   ├── dpkg
+│   │   ├── dpkg.cfg.d
+│   │   └── origins
+│   ├── fonts
+│   │   ├── conf.avail
+│   │   └── conf.d
+│   ├── fwupd
+│   │   ├── bios-settings.d
+│   │   └── remotes.d
+│   ├── gnutls
+│   ├── groff
+│   ├── grub.d
+│   ├── gss
+│   │   └── mech.d
+│   ├── init.d
+│   ├── initramfs-tools
+│   │   ├── conf.d
+│   │   ├── hooks
+│   │   └── scripts
+│   ├── iproute2
+│   │   ├── rt_protos.d
+│   │   └── rt_tables.d
+│   ├── iscsi
+│   ├── kernel
+│   │   ├── install.d
+│   │   ├── postinst.d
+│   │   ├── postrm.d
+│   │   └── preinst.d
+│   ├── landscape
+│   ├── ldap
+│   ├── ld.so.conf.d
+│   ├── libblockdev
+│   │   └── 3
+│   ├── libibverbs.d
+│   ├── libnl-3
+│   ├── logcheck
+│   │   ├── ignore.d.server
+│   │   └── violations.d
+│   ├── logrotate.d
+│   ├── lvm
+│   │   └── profile
+│   ├── mdadm
+│   ├── ModemManager
+│   │   ├── connection.d
+│   │   └── fcc-unlock.d
+│   ├── modprobe.d
+│   ├── modules-load.d
+│   ├── multipath
+│   ├── needrestart
+│   │   ├── conf.d
+│   │   ├── hook.d
+│   │   ├── notify.d
+│   │   └── restart.d
+│   ├── netplan
+│   ├── network
+│   │   ├── if-pre-up.d
+│   │   └── if-up.d
+│   ├── networkd-dispatcher
+│   │   ├── carrier.d
+│   │   ├── degraded.d
+│   │   ├── dormant.d
+│   │   ├── no-carrier.d
+│   │   ├── off.d
+│   │   └── routable.d
+│   ├── newt
+│   ├── opt
+│   ├── PackageKit
+│   ├── pam.d
+│   ├── perl
+│   │   └── Net
+│   ├── pki
+│   │   ├── fwupd
+│   │   └── fwupd-metadata
+│   ├── plymouth
+│   ├── pm
+│   │   └── sleep.d
+│   ├── polkit-1
+│   │   └── rules.d
+│   ├── pollinate
+│   ├── profile.d
+│   ├── python3
+│   ├── python3.12
+│   ├── rc0.d
+│   ├── rc1.d
+│   ├── rc2.d
+│   ├── rc3.d
+│   ├── rc4.d
+│   ├── rc5.d
+│   ├── rc6.d
+│   ├── rcS.d
+│   ├── rsyslog.d
+│   ├── security
+│   │   ├── limits.d
+│   │   └── namespace.d
+│   ├── selinux
+│   ├── sensors.d
+│   ├── sgml
+│   ├── skel
+│   ├── sos
+│   │   ├── cleaner
+│   │   ├── extras.d
+│   │   ├── groups.d
+│   │   └── presets.d
+│   ├── ssh
+│   │   ├── ssh_config.d
+│   │   └── sshd_config.d
+│   ├── ssl
+│   │   ├── certs
+│   │   └── private
+│   ├── sudoers.d
+│   ├── supercat
+│   ├── sysctl.d
+│   ├── sysstat
+│   ├── systemd
+│   │   ├── network
+│   │   ├── system
+│   │   ├── system-generators
+│   │   └── user
+│   ├── terminfo
+│   ├── thermald
+│   ├── tmpfiles.d
+│   ├── ubuntu-advantage
+│   ├── udev
+│   │   ├── hwdb.d
+│   │   └── rules.d
+│   ├── udisks2
+│   ├── ufw
+│   │   └── applications.d
+│   ├── update-manager
+│   │   └── release-upgrades.d
+│   ├── update-motd.d
+│   ├── update-notifier
+│   ├── UPower
+│   ├── usb_modeswitch.d
+│   ├── vim
+│   ├── vmware-tools
+│   │   ├── scripts
+│   │   └── vgauth
+│   ├── X11
+│   │   ├── xkb
+│   │   └── Xsession.d
+│   ├── xdg
+│   │   ├── autostart
+│   │   └── systemd
+│   └── xml
+├── home
+│   ├── docker
+│   │   └── docker
+│   └── valterm
+├── lib -> usr/lib
+├── lib64 -> usr/lib64
+├── lib.usr-is-merged
+├── lost+found
+├── media
+├── mnt
+├── opt
+│   └── containerd
+│       ├── bin
+│       └── lib
+├── root
+├── sbin -> usr/sbin
+├── sbin.usr-is-merged
+├── srv
+├── usr
+│   ├── bin
+│   ├── games
+│   ├── include
+│   │   ├── arpa
+│   │   ├── asm-generic
+│   │   ├── drm
+│   │   ├── finclude
+│   │   ├── iproute2
+│   │   ├── linux
+│   │   ├── misc
+│   │   ├── mtd
+│   │   ├── net
+│   │   ├── netash
+│   │   ├── netatalk
+│   │   ├── netax25
+│   │   ├── neteconet
+│   │   ├── netinet
+│   │   ├── netipx
+│   │   ├── netiucv
+│   │   ├── netpacket
+│   │   ├── netrom
+│   │   ├── netrose
+│   │   ├── nfs
+│   │   ├── protocols
+│   │   ├── rdma
+│   │   ├── regulator
+│   │   ├── rpc
+│   │   ├── rpcsvc
+│   │   ├── scsi
+│   │   ├── sound
+│   │   ├── video
+│   │   ├── x86_64-linux-gnu
+│   │   ├── xen
+│   │   └── xfs
+│   ├── lib
+│   │   ├── apparmor
+│   │   ├── apt
+│   │   ├── binfmt.d
+│   │   ├── byobu
+│   │   ├── cloud-init
+│   │   ├── console-setup
+│   │   ├── cryptsetup
+│   │   ├── dbus-1.0
+│   │   ├── dhcpcd
+│   │   ├── dpkg
+│   │   ├── dracut
+│   │   ├── environment.d
+│   │   ├── file
+│   │   ├── finalrd
+│   │   ├── firmware
+│   │   ├── girepository-1.0
+│   │   ├── git-core
+│   │   ├── gnupg
+│   │   ├── gnupg2
+│   │   ├── groff
+│   │   ├── grub
+│   │   ├── grub-legacy
+│   │   ├── hdparm
+│   │   ├── init
+│   │   ├── initcpio
+│   │   ├── initramfs-tools
+│   │   ├── kernel
+│   │   ├── klibc
+│   │   ├── linux
+│   │   ├── linux-boot-probes
+│   │   ├── linux-tools
+│   │   ├── linux-tools-6.8.0-110
+│   │   ├── linux-tools-6.8.0-124
+│   │   ├── llvm-18
+│   │   ├── locale
+│   │   ├── lsb
+│   │   ├── man-db
+│   │   ├── mime
+│   │   ├── modprobe.d
+│   │   ├── modules
+│   │   ├── modules-load.d
+│   │   ├── multipath
+│   │   ├── nagios
+│   │   ├── needrestart
+│   │   ├── netplan
+│   │   ├── networkd-dispatcher
+│   │   ├── nvidia
+│   │   ├── open-iscsi
+│   │   ├── openssh
+│   │   ├── os-probes
+│   │   ├── pam.d
+│   │   ├── pcrlock.d
+│   │   ├── pm-utils
+│   │   ├── policykit-1
+│   │   ├── polkit-1
+│   │   ├── python3
+│   │   ├── python3.12
+│   │   ├── recovery-mode
+│   │   ├── rsyslog
+│   │   ├── sasl2
+│   │   ├── snapd
+│   │   ├── software-properties
+│   │   ├── ssl
+│   │   ├── sysctl.d
+│   │   ├── sysstat
+│   │   ├── systemd
+│   │   ├── sysusers.d
+│   │   ├── tmpfiles.d
+│   │   ├── ubiquity
+│   │   ├── ubuntu-advantage
+│   │   ├── ubuntu-release-upgrader
+│   │   ├── udev
+│   │   ├── udisks2
+│   │   ├── ufw
+│   │   ├── update-notifier
+│   │   ├── valgrind
+│   │   └── x86_64-linux-gnu
+│   ├── lib64
+│   ├── libexec
+│   │   ├── coreutils
+│   │   ├── docker
+│   │   ├── dpkg
+│   │   ├── fwupd
+│   │   ├── man-db
+│   │   ├── netplan
+│   │   ├── plymouth
+│   │   ├── sudo
+│   │   ├── udisks2
+│   │   └── xfsprogs
+│   ├── local
+│   │   ├── bin
+│   │   ├── etc
+│   │   ├── games
+│   │   ├── include
+│   │   ├── lib
+│   │   ├── man -> share/man
+│   │   ├── sbin
+│   │   ├── share
+│   │   └── src
+│   ├── sbin
+│   ├── share
+│   │   ├── applications
+│   │   ├── apport
+│   │   ├── appstream
+│   │   ├── awk
+│   │   ├── base-files
+│   │   ├── base-passwd
+│   │   ├── bash-completion
+│   │   ├── binfmts
+│   │   ├── bpfcc-tools
+│   │   ├── bug
+│   │   ├── byobu
+│   │   ├── ca-certificates
+│   │   ├── cmake
+│   │   ├── common-licenses
+│   │   ├── consolefonts
+│   │   ├── console-setup
+│   │   ├── consoletrans
+│   │   ├── cryptsetup
+│   │   ├── dbus-1
+│   │   ├── debconf
+│   │   ├── debhelper
+│   │   ├── debianutils
+│   │   ├── dhcpcd
+│   │   ├── dict
+│   │   ├── distro-info
+│   │   ├── doc
+│   │   ├── doc-base
+│   │   ├── dpkg
+│   │   ├── file
+│   │   ├── finalrd
+│   │   ├── fish
+│   │   ├── fontconfig
+│   │   ├── fonts
+│   │   ├── fwupd
+│   │   ├── gcc
+│   │   ├── gdb
+│   │   ├── gettext
+│   │   ├── git-core
+│   │   ├── gitweb
+│   │   ├── glib-2.0
+│   │   ├── gnupg
+│   │   ├── groff
+│   │   ├── grub
+│   │   ├── grub-gfxpayload-lists
+│   │   ├── hwdata
+│   │   ├── i18n
+│   │   ├── icons
+│   │   ├── ieee-data
+│   │   ├── info
+│   │   ├── initramfs-tools
+│   │   ├── installed-tests
+│   │   ├── iptables
+│   │   ├── iso-codes
+│   │   ├── java
+│   │   ├── keyrings
+│   │   ├── landscape
+│   │   ├── libc-bin
+│   │   ├── libdrm
+│   │   ├── libgcrypt20
+│   │   ├── lintian
+│   │   ├── locale
+│   │   ├── locales
+│   │   ├── lxd-installer
+│   │   ├── man
+│   │   ├── man-db
+│   │   ├── maven-repo
+│   │   ├── mdadm
+│   │   ├── menu
+│   │   ├── metainfo
+│   │   ├── mime
+│   │   ├── misc
+│   │   ├── ModemManager
+│   │   ├── nano
+│   │   ├── needrestart
+│   │   ├── netplan
+│   │   ├── openssh
+│   │   ├── open-vm-tools
+│   │   ├── os-prober
+│   │   ├── package-data-downloads
+│   │   ├── PackageKit
+│   │   ├── pam
+│   │   ├── pam-configs
+│   │   ├── pastebin.d
+│   │   ├── perl
+│   │   ├── perl5
+│   │   ├── pixmaps
+│   │   ├── pkgconfig
+│   │   ├── plymouth
+│   │   ├── polkit-1
+│   │   ├── publicsuffix
+│   │   ├── python3
+│   │   ├── python-apt
+│   │   ├── python-babel-localedata
+│   │   ├── readline
+│   │   ├── rsync
+│   │   ├── rsyslog
+│   │   ├── screen
+│   │   ├── secureboot
+│   │   ├── sensible-utils
+│   │   ├── session-migration
+│   │   ├── sgml
+│   │   ├── sgml-base
+│   │   ├── snapd
+│   │   ├── systemd
+│   │   ├── tabset
+│   │   ├── tcltk
+│   │   ├── terminfo
+│   │   ├── ubuntu-drivers-common
+│   │   ├── ubuntu-release-upgrader
+│   │   ├── ucf
+│   │   ├── ufw
+│   │   ├── unattended-upgrades
+│   │   ├── update-notifier
+│   │   ├── usb_modeswitch
+│   │   ├── util-linux
+│   │   ├── vim
+│   │   ├── X11
+│   │   ├── xfsprogs
+│   │   ├── xml
+│   │   ├── xml-core
+│   │   ├── zoneinfo
+│   │   └── zsh
+│   └── src
+│       ├── linux-headers-6.8.0-110
+│       ├── linux-headers-6.8.0-110-generic
+│       ├── linux-headers-6.8.0-124
+│       └── linux-headers-6.8.0-124-generic
+└── var
+    ├── backups
+    ├── cache
+    │   ├── adduser
+    │   ├── apparmor
+    │   ├── app-info
+    │   ├── apt
+    │   ├── debconf
+    │   ├── fwupd
+    │   ├── fwupdmgr
+    │   ├── ldconfig
+    │   ├── man
+    │   ├── PackageKit
+    │   ├── pollinate
+    │   ├── private
+    │   ├── snapd
+    │   └── swcatalog
+    ├── crash
+    ├── lib
+    │   ├── app-info -> /var/lib/swcatalog
+    │   ├── apport
+    │   ├── apt
+    │   ├── boltd
+    │   ├── cloud
+    │   ├── command-not-found
+    │   ├── containerd
+    │   ├── dbus
+    │   ├── dhcpcd
+    │   ├── docker
+    │   ├── dpkg
+    │   ├── fwupd
+    │   ├── git
+    │   ├── grub
+    │   ├── ieee-data
+    │   ├── landscape
+    │   ├── libuuid
+    │   ├── logrotate
+    │   ├── man-db
+    │   ├── misc
+    │   ├── os-prober
+    │   ├── PackageKit
+    │   ├── pam
+    │   ├── plymouth
+    │   ├── polkit-1
+    │   ├── private
+    │   ├── python
+    │   ├── sgml-base
+    │   ├── snapd
+    │   ├── sudo
+    │   ├── swcatalog
+    │   ├── systemd
+    │   ├── tpm
+    │   ├── ubuntu-advantage
+    │   ├── ubuntu-drivers-common
+    │   ├── ubuntu-release-upgrader
+    │   ├── ucf
+    │   ├── udisks2
+    │   ├── unattended-upgrades
+    │   ├── update-manager
+    │   ├── update-notifier
+    │   ├── upower
+    │   ├── usb_modeswitch
+    │   ├── vim
+    │   └── xml-core
+    ├── local
+    ├── lock -> /run/lock
+    ├── log
+    │   ├── apt
+    │   ├── dist-upgrade
+    │   ├── installer
+    │   ├── journal
+    │   ├── landscape
+    │   ├── private
+    │   ├── sysstat
+    │   └── unattended-upgrades
+    ├── mail
+    ├── opt
+    └── spool
+        ├── cron
+        ├── mail -> ../mail
+        └── rsyslog
+
+1136 directories
+
+
+
 
 
 
