@@ -58,7 +58,7 @@ uibest84bytoken!
 -flower psw:
 beaflwer93!
 -langsmith api key:
-
+xxx
 -redis psw:
 oucache93sh!
 -sqlserver psw:
@@ -89,11 +89,10 @@ sudo su   //⚠️entra in root, non sei piu dentro utente docker!⚠️
 whoami   //vedi che utente attualmente sei con login, e.g.'docker' non ha certi privilegi mentre 'root' sì, è per questo che se fai e.g. cd /root da utente docker trovi permessi negati.
 sudo -l  //vedi quali comandi puoi eseguire come amministratore!! io sono (ALL : ALL) ALL QUINDI HO IL TOTALE CONTROLLO DEL SERVER!!
 ls -ld /root   //vedere permessi senza entrare
- apt update   //🔥🔥aggiorna packs ubuntu da repo remota ufficiale
- apt install tree 
- tree -d -L 3 / -I "proc|sys|dev|run|tmp|snap" / ;   //🔥🔥x installare tree e vedere in .txt struttura ad albero filesystem
-apt install ncdu; ncdu / ;   //x interfaccia testuale dove puoi navigare in filesystem
-
+//🔥x vedere all filesystem visivamente
+apt install tree 
+tree -d -L 3 / -I "proc|sys|dev|run|tmp|snap" / ;   //🔥x vedere in .txt struttura ad albero filesystem
+apt install ncdu; ncdu / ;   //opzionale, x interfaccia testuale dove puoi navigare in filesystem
 
 dpkg -l   //🔥🔥vedi tutti i programs installati!
 sudo ls /root    //legge cartella /root, ovviamente se attualmente non sei login admin user root, allora permesso denied
@@ -109,19 +108,12 @@ sudo mkdir /home/devuser/.ssh
 sudo nano /home/devuser/.ssh/authorized_keys
 
 apt list --installed   //x programs installed
-docker --version
-docker compose version
-docker info
-which docker   //TROVA DOVE SI TROVA docker path, QUI docker salva imgs-containers-volumes-layerfilesystem
-systemctl status docker   //vedi che sta girando docker
-dpkg -l | grep docker
-
 compgen -c   //tutti comandi avaible nel PATH
 //dove trovare solitamente all programs installed 'a mano'
 ls /opt
 ls /usr/local/bin
 
-//INFO ABOUT MACHINE
+//##INFO ABOUT MACHINE
 systemd-detect-virt   //se return None allora server fisico, se return kvm,xen,openvz,vmware → VPS
   fwupdmgr get-updates   //solo x server fisici, update firware hardware
   fwupdmgr update   //solo x server fisici, update firware hardware
@@ -133,10 +125,10 @@ sudo lshw   //tutto l'hardware
 lspci    //x pci
 lsusb    //x usb
 hostnamectl   //🔥x os
-htop     //x cpu & ram realtime
+htop     //🔥x cpu & ram realtime
 uname -r  //info about kernel
 
-//UPDATE MACHINE
+//##UPDATE MACHINE
 apt list --upgradable   //vedi tutti gli updates possibili
 apt update  //ubuntu linux scarica i packs aggiornabili da repo remota ufficiale
 apt upgrade  //🔥🔥aggiorna davvero i packs
@@ -145,18 +137,24 @@ reboot      //se necessario, x riavvio server
 ssh docker@192.168.113.52   //re-login
 uptime   //check da quanto tempo il server è attivo
 systemctl status unattended-upgrades  //checks se aggiornamento auto security è attivo
-
-docker version; apt upgrade docker-ce   //vedi se docker vuoi fare upadte, ma questo x docker engine o docker compose??
-
 apt autoremove   //disinstalla libs orfane, consigliato da fare dopo un update dei packs
 apt clean  //delete i packs .deb già scaricati, non disinstalla nulla, consigliato da fare dopo un update dei packs
 
+//##DOCKER
+docker --version
+docker compose version
+docker info
+which docker   //TROVA DOVE SI TROVA docker path, qui docker salva imgs-containers-volumes-layerfilesystem
+systemctl status docker   //vedi che sta girando docker
+dpkg -l | grep docker
+sudo apt upgrade docker-ce docker-ce-cli containerd.io   //aggiorna docker engine & docker compose
+
+
 //VM = virtual machine
 //VPS = virtual private server (e.g.quelle su hetzner)
--linux ubuntu sistema x i programs: apt ('apt install..', i programs vengono installati nelle dir del systema), snap ('snap install..', crea un sacchetto isolato dal resto del sistema(sandbox, quando supportato) che contiene prpgram target+sue libs) snap list; snap refresh; //controlla gli snaps attivi, e se sono da aggiornare.
+-linux ubuntu system x i programs: apt ('apt install..', i programs vengono installati nelle dir del systema), snap ('snap install..', crea un sacchetto isolato dal resto del sistema(sandbox, quando supportato) che contiene program target+sue libs) snap list; snap refresh; //controlla gli snaps attivi, e se sono da aggiornare.
 🔥🔥-return to pre-state before crash of target server: viene creata immagine completa del disk (è simile ad un backup, ma puo essere usata anche x creare server identici!). 
 systemd-detect-virt ti dice se hai vps(macchina virtuale e.g.'kvm') o macchina fisica: se hai vps allora lo snaphsot del server si fa da un layer piu alto del tuo server e.g. da pannello generale di hetzner (server>snapshot>create), se invece hai server fisico allora con Proxmox UI - VMware vSphere - OpenStack dashboard. 
-
 -capisci esattamente dove è hostato il tuo server con
 hostnamectl
 cat /sys/class/dmi/id/product_name
@@ -170,10 +168,35 @@ e.g.
    │  Ubuntu 24.04 VM     │ ← TU QUI
    │  Docker + servizi    │
    └──────────────────────┘
+-docker: docker engine(è il motore che crea containers imgs volumes manages sistem), docker CLI, docker compose(orchestrare più containers insieme).
+🔥🔥-BACKUPS: source code(via git uasando commit history), datas(e.g.databases ect), configurazioni server(e.g.system config, docker-compose ect). 
+--snapshot backup: copia completa di dir / disk, e.g./srv → /backup/srv_2026_06_26/.
+--database backup: e.g.w postgresql pg_dump mydb > backup.sql
+--docker volume backup: e.g.
+docker run --rm \
+  -v my_volume:/data \
+  -v $(pwd):/backup \
+  ubuntu tar czf /backup/volume.tar.gz /data
+--remote backup: copia su un altro server, e.g. rsync -av /srv user@backup-server:/backups/
+--backup automatici (cron): si settano auto e.g.ogni giorno alle 2am. 
+//il code lo puoi rifare con git, I DATAS NO!!“Code is disposable, data is not”
+
+/srv
+/data
+/backups
+
+/backups
+├── daily/
+├── weekly/
+├── monthly/
+└── db/
+
+-START->PRODUCTION: spesso si usano 3 SERVER DIVERSI (ma se tu hai 1 server allora usi 3 folders dev test prod e dentro ciascuno same folders apps stacks data...), ricorda I 3 AMBIENTS PROPRIO NON SI TOCCANO!!, e quando sei soddifatto per passare al next ambiente distribuisci usando git&docker.
+--ambiente di Development: lo usi come vuoi per fare tests e risolvere bugs.
+--ambiente di Testing: "Se porto questa versione in produzione, funzionerà davvero?", è una copia molto simile alla produzione.
+--ambiente di Production: è quello usato dagli users veri, qua ci sono rules downtime quasi zero backup auto monitoring logs aggiornamenti pianificati.
 
 
-
-//e come funzionano esattamente i backups?
 //info Ambiente di Testing e Ambiente di Produzione ?
 //e con GitLab (da installare) settare tutto
 
