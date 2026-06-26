@@ -200,19 +200,13 @@ docker run --rm \
 -CI/CD self-hosted x server 8gb ram (DevOps job): 🔥Forgejo(leggero scritto in GO ideale x small machines, e puoi usare le Forgejo Actions x automatizzare), Gitea(simile a forgejo x all), 🔥GitLab CE(ottima ma è un po pesante), Jenkins.
 //🔥Uptime Kuma x monitoraggio (e.g.ti avverte se qdrant giu o fastapi giu..)
 
-//info Ambiente di Testing e Ambiente di Produzione ?
-//e con GitLab (da installare) settare tutto
 
-###HOW SERVER WORKS
-
--ssh docker@192.168.113.52 sei dentro il sistema operativo ma con i permessi dell’utente 'docker' !
+-how ur server compet-e works:
+--ssh docker@192.168.113.52 sei dentro il sistema operativo ma con i permessi dell’utente 'docker' !
 -appena accedi a server ~ significa che sei in /home/docker, dentro 'home' ci sono 2 utenti: docker e valterm.
 -quando fai 'sudo apt install git' il software viene installato in /usr/bin/git→eseguibile, /usr/lib/...→librerie, /etc/gitconfig→config globale, ... ora il comando git è globale.
 -appena accedi a server ~ significa che sei in /home/docker
-
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh   //con wget è piu easy installation rispetto a curl x installation
-
-
+//wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh   //con wget è piu easy installation rispetto a curl x installation
 
 
 
