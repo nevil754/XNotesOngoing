@@ -18,10 +18,8 @@ task: CF_2026_0259 - PROGETTO CON SFEL Sviluppo
 text: Inizio test caricamento e settaggio Server per ospitare & runnare il RAG system.
 
 ####TODO:
--install on server: docker engine, docker compose, miniconda, cerbot(more info), gitlab(self-hosting github),  
-
+-install on server: docker engine, docker compose, miniconda, cerbot(more info), Forgejo(self-hosting github),  
 //TODOe poi spiegami bene come vado avanti con Git & Forgejo con i branches rules,ect. 
-
 
 #######################################
 
@@ -85,11 +83,13 @@ htop     //🔥🔥x cpu & ram realtime
 df -h    //disk & spazio
 uname -a   //hardware & system
 ip a   //rete
-cat /etc/passwd   //users
+cut -d: -f1 /etc/passwd   //x users solo nomi
+cat /etc/passwd   //x users
 sudo su   //⚠️entra in root, non sei piu dentro utente docker!⚠️
 whoami   //vedi che utente attualmente sei con login, e.g.'docker' non ha certi privilegi mentre 'root' sì, è per questo che se fai e.g. cd /root da utente docker trovi permessi negati.
 sudo -l  //vedi quali comandi puoi eseguire come amministratore!! io sono (ALL : ALL) ALL QUINDI HO IL TOTALE CONTROLLO DEL SERVER!!
 ls -ld /root   //vedere permessi senza entrare
+cut -d: -f1 /etc/passwd   //vedi tutti gli utenti
 
 dpkg -l   //🔥🔥vedi tutti i programs installati!
 sudo ls /root    //legge cartella /root, ovviamente se attualmente non sei login admin user root, allora permesso denied
@@ -126,7 +126,7 @@ htop     //🔥x cpu & ram realtime
 uname -r  //info about kernel
 //🔥x vedere all filesystem visivamente
 apt install tree 
-tree -d -L 3 / -I "proc|sys|dev|run|tmp|snap" /    //⭐️⭐️x vedere in .txt struttura ad albero filesystem
+tree -d -L 3 / -I "proc|sys|dev|run|tmp|snap" /    //🪾🔥🔥x vedere in .txt struttura ad albero filesystem
 apt install ncdu; ncdu / ;   //opzionale, x interfaccia testuale dove puoi navigare in filesystem
 
 //##UPDATE MACHINE
@@ -142,6 +142,8 @@ apt autoremove   //disinstalla libs orfane, consigliato da fare dopo un update d
 apt clean  //delete i packs .deb già scaricati, non disinstalla nulla, consigliato da fare dopo un update dei packs
 
 //##DOCKER
+//x installare docker engine docker compose docker cli sul server linux ubuntu -> https://docs.docker.com/engine/install/ubuntu/?utm_source=chatgpt.com
+//docker: docker engine(è il motore che crea containers imgs volumes manages sistem), docker CLI, docker compose(orchestrare più containers insieme).
 docker --version
 docker compose version
 docker info
@@ -149,7 +151,6 @@ which docker   //TROVA DOVE SI TROVA docker path, qui docker salva imgs-containe
 systemctl status docker   //vedi che sta girando docker
 dpkg -l | grep docker
 sudo apt upgrade docker-ce docker-ce-cli containerd.io   //aggiorna docker engine & docker compose
-
 
 //VM = virtual machine
 //VPS = virtual private server (e.g.quelle su hetzner)
@@ -169,7 +170,6 @@ e.g.
    │  Ubuntu 24.04 VM     │ ← TU QUI
    │  Docker + servizi    │
    └──────────────────────┘
--docker: docker engine(è il motore che crea containers imgs volumes manages sistem), docker CLI, docker compose(orchestrare più containers insieme).
 
 🔥🔥-BACKUPS: source code(via git uasando commit history), datas(e.g.databases ect), configurazioni server(e.g.system config, docker-compose ect). 
 --snapshot backup: copia completa di dir / disk, e.g./srv → /backup/srv_2026_06_26/.
@@ -198,15 +198,143 @@ docker run --rm \
 --ambiente di Testing: "Se porto questa versione in produzione, funzionerà davvero?", è una copia molto simile alla produzione.
 --ambiente di Production: è quello usato dagli users veri, qua ci sono rules downtime quasi zero backup auto monitoring logs aggiornamenti pianificati.
 
--CI/CD self-hosted x server 8gb ram (DevOps job): 🔥Forgejo(leggero scritto in GO ideale x small machines, e puoi usare le Forgejo Actions x automatizzare), Gitea(simile a forgejo x all), 🔥GitLab CE(ottima ma è un po pesante), Jenkins.
+🔥-CI/CD self-hosted x server 8gb ram (DevOps job)(come GitHub ma self-hosted): 🔥Forgejo(leggero scritto in GO ideale x small machines, e puoi usare le Forgejo Actions x automatizzare), Gitea(simile a forgejo x all), 🔥GitLab CE(ottima ma è un po pesante), Jenkins.
 //🔥Uptime Kuma x monitoraggio (e.g.ti avverte se qdrant giu o fastapi giu..)
 
--how ur server compet-e works:
+-notes how ur server business compet-esrl works:
 --ssh docker@192.168.113.52 sei dentro il sistema operativo ma con i permessi dell’utente 'docker' !
 -appena accedi a server ~ significa che sei in /home/docker, dentro 'home' ci sono 2 utenti: docker e valterm.
 -quando fai 'sudo apt install git' il software viene installato in /usr/bin/git→eseguibile, /usr/lib/...→librerie, /etc/gitconfig→config globale, ... ora il comando git è globale.
 -appena accedi a server ~ significa che sei in /home/docker
 //wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh   //con wget è piu easy installation rispetto a curl x installation
+
+🔥-SERVER SETUP X PRJ RAG SYSTEM from bottom:
+//gia esistenti 'valterm'(admin principale creato durante installazione ubuntu)
+//'tree mypath' per vedere subito la struttura ad albero!!
+
+sudo -i
+whoami
+tree /home/docker   //questo utente e questo folder in realta anche non serve conteneva i volumes di qdrant ma io intanto uso mia struttura 
+
+//crea gli utenti (dovresti gia aver 'valterm' creato durante installazione linux ubuntu, e 'docker' che non utilizzo ma che era creato & settato x usare docker engine (ma intanto io uso tutto nei containers) )
+adduser deploy   //crea user deploy (psw 12345678)
+adduser runner   //crea user runner (psw 12345678), x runnare comandi di forgejo
+usermod -s /usr/sbin/nologin runner   //runner non deve avere shell pura xk è solo ci/cd
+
+//ora crea i groups
+getent group  //vedi tutti i grups
+getent group docker   //🔥DONT DELETE è creato da DockerEngine e tutti gli users all'interno possono usare DockerEngine!
+groupadd srv-deploy
+groupadd srv-read
+//aggiungi utenti ai gruppi
+usermod -aG docker valterm
+usermod -aG docker runner      //quasi sempre l'utente runner(x ci/cd forgejo) deve poter usare Docker Engine
+usermod -aG srv-deploy valterm   //aggiungi user valterm a group 
+usermod -aG docker deploy  //aggiungi user deploy a group
+usermod -aG srv-deploy deploy
+
+//ora crea struttura tree
+mkdir -p \
+/srv/environments/{dev,staging,prod} \
+/srv/infrastructure/{nginx,forgejo,forgejo-runner,monitoring,certbot} \
+/srv/data/{dev,staging,prod,infrastructure} \
+/srv/backups/{dev,staging,prod,forgejo,scripts} \
+/srv/logs/{dev,staging,prod,nginx} \
+/srv/scripts
+
+mkdir -p \
+/srv/data/dev/{sqlserver,qdrant,redis,uploads} \
+/srv/data/staging/{sqlserver,qdrant,redis,uploads} \
+/srv/data/prod/{sqlserver,qdrant,redis,uploads}
+
+mkdir -p \
+/srv/data/infrastructure/{forgejo,prometheus,grafana}
+
+mkdir -p \
+/srv/infrastructure/nginx/{conf.d,ssl}
+
+mkdir -p \
+/srv/infrastructure/monitoring/prometheus
+
+mkdir -p \
+/srv/infrastructure/monitoring/grafana/provisioning
+
+//ora crea gli script vuoti
+touch \
+/srv/scripts/deploy.sh \
+/srv/scripts/promote.sh \
+/srv/scripts/healthcheck.sh \
+/srv/scripts/new_environment.sh
+
+touch \
+/srv/backups/scripts/backup_all.sh \
+/srv/backups/scripts/backup_sqlserver.sh \
+/srv/backups/scripts/backup_qdrant.sh \
+/srv/backups/scripts/restore.sh \
+/srv/backups/scripts/offsite_sync.sh
+
+//setta i permessi
+chown -R root:srv-deploy /srv
+chmod 2775 /srv
+chown root:srv-deploy /srv
+
+
+
+//TODO QUALI DI QUESTO SONO OK??
+chown -R deploy:srv-deploy /srv/environments
+chmod -R 2775 /srv/environments
+chmod 2750 /srv/environments/prod
+chown -R deploy:docker /srv/data
+chmod -R 2775 /srv/data
+chmod 2770 /srv/data/prod
+chown -R deploy:srv-deploy /srv/infrastructure
+chmod -R 2750 /srv/infrastructure
+chown -R deploy:srv-deploy /srv/backups
+chmod -R 2750 /srv/backups
+
+//TODO QUESTI SONO TUTTI OK??
+chmod 2775 /srv/environments/dev
+chmod 2775 /srv/environments/staging
+chmod 2750 /srv/environments/prod
+chmod 2775 /srv/data/dev
+chmod 2775 /srv/data/staging
+chmod 2770 /srv/data/prod
+
+//quindi per staging/dev → 2775 e in production ancora piu chiuso prod → 2750 / 2770-
+
+
+
+//setta script eseguibili
+chmod +x /srv/scripts/*.sh
+chmod +x /srv/backups/scripts/*.sh
+
+//setta ssh per il deploy
+mkdir -p /home/deploy/.ssh
+chmod 700 /home/deploy/.ssh
+touch /home/deploy/.ssh/authorized_keys
+chmod 600 /home/deploy/.ssh/authorized_keys
+chown -R deploy:deploy /home/deploy/.ssh
+
+TODO
+-ora pensa a Forgejo CI/CD come installare, e poi setta con Git i branchs (il branch 'main' ha anche tag della version e.g.v1.0.0) e clona il prj dentro cd /srv/environments/dev cd /srv/environments/staging cd /srv/environments/prod.
+
+##delete X user target, CMNQ USER 'docker' NON è da cancellare viene ancora usato da qualcosa
+id docker
+ps -u docker   //vedi processi attivi che lo utilizzano (se ce ne sono fermali)
+docker ps -a  //non dipende da user 'docker', ma cmnq check containers running on docker engine
+pkill -u docker   //ferma eventuali processi
+deluser --remove-home docker  //elimina user & home/myusertarget
+rm -rf /home/docker
+rm -rf /home/docker_backup
+id docker   //ora dovresti vedere null
+##
+
+##install docker engine docker compose docker cli
+//quando installi docker, viene creato group 'docker'DA NON CANCELLARE e solo gli users all'interno possono usare Docker Engine. e.g.docker:x:999:  quindi 999 o 998
+...
+##
+
+
 
 
 
