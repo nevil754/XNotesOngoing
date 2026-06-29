@@ -68,6 +68,7 @@ Suit-Force-Card   //psw
 ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untente docker in /home/docker
 //quando fai comando 'sudo ...' allora dici al system di login come admin 'root' SOLO x questo comando, se fai invece 'sudo -i' diventi proprio admin root finche non logout.
 
+hostname -I  //ip della tua macchina, i primi 4 numeri sono quelli che ti servono e.g.192.168.113.52
 ls    //vedi all dir (pero se fai e.g. pwd e vedi /root allora sei in home/root/ !)
 ls /      //🔥x filesystem completo Linux SEI IL MASTER DEL TUO SERVER puoi fare tutto! see all folders
 ls /root  //NEGATA X PERMESSI
@@ -93,7 +94,7 @@ cut -d: -f1 /etc/passwd   //vedi tutti gli utenti
 dpkg -l   //🔥🔥vedi tutti i programs installati!
 sudo ls /root    //legge cartella /root, ovviamente se attualmente non sei login admin user root, allora permesso denied
 sudo -i   //☄️⚠️ diventi utente admin 'root'!!MA DI SOLITO I PRO GIORNALMENTE LAVORANO COME UTENTE NORMALE, divenato admin user root solo x update programs o casi speciali 
-su - valterm  //diventi utente 'valterm'
+su - X  //diventi utente X
 sudo su - docker   //🔥🔥switchi e diventi utente 'docker'
 passwd X   //☄️🔥RESETTI PSW USER 'X' da user root
 sexit   //esce dalla shell corrente
@@ -349,7 +350,7 @@ services:
       - USER_GID=1002
     ports:
       - "3000:3000"
-      - "222:22"
+      - "222:22"    #!!quando accederai a http://192.168.113.52:3000 la prima volta setta porta ssh = 222!!
     volumes:
       - /srv/data/infrastructure/forgejo:/data   #in /srv/data/infrastructure/forgejo/ ci sara /forgejo.db in sqllite, git/repositories/ code git , ...
       - /etc/localtime:/etc/localtime:ro    #questo dice che come fuso orario utilizza lo stesso di quello della linux machine
@@ -372,8 +373,14 @@ services:
 //ctrl+O per salvare(ti chiedere nome file ok docker-compose.yml) e poi ctrl+X per uscire da editor.
 id deploy  //e.g.uid=1002(deploy) gid=1002(deploy) groups=1002(deploy)...
 chown -R 1002:1002 /srv/data/infrastructure/forgejo
-cd /srv/infrastructure/forgejo docker compose up -d    //🔥avvia container
-docker ps   e   http://SERVER_IP:3000
+cd /srv/infrastructure/forgejo
+docker compose up -d  //🔥avvia container
+docker ps   e   http://192.168.113.52:3000
+
+Ora nella pagina web di settaggio finale di forgejo setta:  
+porta server ssh=222 (perché guarda come hai fatto docker-compose.yml),
+disattiva 'attiva accesso con openid' se vuoi che il system rimanga fuori web,
+nome utente admin (è il primo account web git cioe l'admin, non è account linux)= valterm , psw=Suap45skh, email=nelvison.benedetto2@gmail.com
 
 Ora se vuoi anche poter eseguire pipelines di CI/CD allora installa Forgejo Runner.
 
