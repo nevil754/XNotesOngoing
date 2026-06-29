@@ -47,8 +47,7 @@ ctrl+shift+P   //open bar at top, digit 'GitHub Copilot: Ask'
 C:\Users\nelvisonb\AppData\Local\anaconda3   //dove è installato miniconda
 
 #######################################PRODUCTION RAG
-
-server[ codesorgente/(here va tutto il code sorgente) , docker/(è gia creata)(qua dentro va il docker-compose che gira e runna) ].
+//🔥'nano …docker-compose.yml' entri in editor Gnu dove puoi scrivere sul file, ctrl+O per salvare(ti chiedere nome file ok docker-compose.yml) e poi ctrl+X per uscire.
 
 -JWT secret key:
 secter93yekragbusiness05agenticd
@@ -282,7 +281,10 @@ touch \
 /srv/backups/scripts/restore.sh \
 /srv/backups/scripts/offsite_sync.sh
 
-//setta i permessi
+//setta i permessi  e.g. 
+//chown(chi possiede il file) user:group path perché linux valuta accesso con  sei il owner?→regole owner sei nel group?→regole group altro→regole Others
+//-R è ricorsivo cioè applica a sottocartelle annidate
+//chmod chi puo fare cosa [ special ][ user ][ group ][ others ] e.g.2775, 4=read 2=write 1=execute
 # owner
 chown root:srv-deploy /srv
 chown -R deploy:srv-deploy /srv/environments
@@ -292,7 +294,7 @@ chown -R deploy:srv-deploy /srv/backups
 chown -R deploy:srv-deploy /srv/logs
 chown -R deploy:srv-deploy /srv/scripts
 
-# permessi directory. e.g. chown(chi possiede il file) user:group path perché linux valuta accesso con  sei il owner?→regole owner sei nel group?→regole group altro→regole others
+# permessi directory. 
 chmod 2775 /srv
 chmod 2775 /srv/environments/dev
 chmod 2775 /srv/environments/staging
@@ -307,7 +309,8 @@ chmod 2775 /srv/logs
 chmod 2775 /srv/scripts
 chmod 2750 /srv/backups/prod
 
-//quindi per staging/dev → 2775 e in production → 2750 / 2770 cioe ancora piu chiuso.
+tree -pug /srv   //x vedere permessi - owner - group  applicati
+//quindi per staging/dev → 2775 e in production → 2750 / 2770 cioè ancora piu chiuso.
 
 //setta script eseguibili
 chmod +x /srv/scripts/*.sh
@@ -324,12 +327,40 @@ chown -R deploy:deploy /home/deploy/.ssh
 touch /home/deploy/.ssh/config
 chmod 600 /home/deploy/.ssh/config
 
+######INSTALL Forgejo CI/CD
+nano /srv/infrastructure/forgejo/docker-compose.yml
+networks:
+  forgejo:
 
+services:
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:15
+    container_name: forgejo
+    restart: always
+
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+
+    ports:
+      - "3000:3000"
+      - "222:22"
+
+    volumes:
+      - /srv/data/infrastructure/forgejo:/data
+      - /etc/localtime:/etc/localtime:ro    #questo dice che come fuso orario utilizza lo stesso di quello della linux machine
+
+    networks:
+      - forgejo
+
+//ctrl+O per salvare(ti chiedere nome file ok docker-compose.yml) e poi ctrl+X per uscire da editor.
+
+######
 
 TODO
 -ora pensa a Forgejo CI/CD come installare, e poi setta con Git i branchs (il branch 'main' ha anche tag della version e.g.v1.0.0) e clona il prj dentro cd /srv/environments/dev cd /srv/environments/staging cd /srv/environments/prod.
 
-##delete X user target, CMNQ USER 'docker' NON è da cancellare viene ancora usato da qualcosa
+##x delete user X, CMNQ USER 'docker' NON è da cancellare viene ancora usato da qualcosa
 id docker
 ps -u docker   //vedi processi attivi che lo utilizzano (se ce ne sono fermali)
 docker ps -a  //non dipende da user 'docker', ma cmnq check containers running on docker engine
