@@ -292,7 +292,7 @@ chown -R deploy:srv-deploy /srv/backups
 chown -R deploy:srv-deploy /srv/logs
 chown -R deploy:srv-deploy /srv/scripts
 
-# permessi directory
+# permessi directory. e.g. chown(chi possiede il file) user:group path perché linux valuta accesso con  sei il owner?→regole owner sei nel group?→regole group altro→regole others
 chmod 2775 /srv
 chmod 2775 /srv/environments/dev
 chmod 2775 /srv/environments/staging
@@ -313,7 +313,7 @@ chmod 2750 /srv/backups/prod
 chmod +x /srv/scripts/*.sh
 chmod +x /srv/backups/scripts/*.sh
 
-//now install git, forgejo(x ci/cd), docker, nginx,...tutto quello che ti serve.
+//now install git, forgejo(x ci/cd), docker, nginx,...tutto quello che ti serve.  //Forgejo come docker container cosi lo metti dentro /srv/infrastructure/forgejo/ e i dati persistenti in /srv/data/infrastructure/forgejo/
 
 //setta ssh per il deploy 
 mkdir -p /home/deploy/.ssh
@@ -324,8 +324,8 @@ chown -R deploy:deploy /home/deploy/.ssh
 touch /home/deploy/.ssh/config
 chmod 600 /home/deploy/.ssh/config
 
-//ORA INSTALL Forgejo (X CI/CD)
-installalo come docker container, NON come linux program! cosi lo metti dentro /srv/infrastructure/forgejo/ e i dati persistenti in /srv/data/infrastructure/forgejo/.
+
+
 TODO
 -ora pensa a Forgejo CI/CD come installare, e poi setta con Git i branchs (il branch 'main' ha anche tag della version e.g.v1.0.0) e clona il prj dentro cd /srv/environments/dev cd /srv/environments/staging cd /srv/environments/prod.
 
