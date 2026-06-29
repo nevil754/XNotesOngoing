@@ -93,8 +93,10 @@ cut -d: -f1 /etc/passwd   //vedi tutti gli utenti
 dpkg -l   //🔥🔥vedi tutti i programs installati!
 sudo ls /root    //legge cartella /root, ovviamente se attualmente non sei login admin user root, allora permesso denied
 sudo -i   //☄️⚠️ diventi utente admin 'root'!!MA DI SOLITO I PRO GIORNALMENTE LAVORANO COME UTENTE NORMALE, divenato admin user root solo x update programs o casi speciali 
+su - valterm  //diventi utente 'valterm'
 sudo su - docker   //🔥🔥switchi e diventi utente 'docker'
-exit   //esce dalla shell corrente
+passwd X   //☄️🔥RESETTI PSW USER 'X' da user root
+sexit   //esce dalla shell corrente
 groups docker   //vedi che privilegi ha utente 'docker'
 passano ad admin solo quando hanno davvero bisogno in casi particolari
 sudo adduser devuser   //crea nuovo utente da login admin user 'root'
@@ -212,7 +214,8 @@ docker run --rm \
 -appena accedi a server ~ significa che sei in /home/docker
 //wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh   //con wget è piu easy installation rispetto a curl x installation
 
-🔥🔥🔥-SERVER SETUP X PRJ RAG SYSTEM from bottom:
+
+🔥🔥🔥######SERVER SETUP X PRJ RAG SYSTEM from bottom:
 //gia esistenti 'valterm'(admin principale creato durante installazione ubuntu)
 //'tree mypath' per vedere subito la struttura ad albero!!
 
@@ -220,13 +223,15 @@ sudo -i
 whoami
 tree /home/docker   //questo utente e questo folder in realta anche non serve conteneva i volumes di qdrant ma io intanto uso mia struttura 
 
-//crea gli utenti (dovresti gia aver 'valterm' creato durante installazione linux ubuntu, e 'docker' che non utilizzo ma che era creato & settato x usare docker engine (ma intanto io uso tutto nei containers) )
+//🔥crea gli utenti (dovresti gia aver 'valterm' creato durante installazione linux ubuntu, e 'docker' che non utilizzo ma che era creato & settato x usare docker engine (ma intanto io uso tutto nei containers) )
 adduser deploy   //crea user deploy (psw 12345678)
 adduser --disabled-password --gecos "" runner   //crea user runner (psw disabilitata x è per ci/cd), x runnare comandi di forgejo, non chiamarlo runner-forgejo perché quello è il nome del servizio docker
   usermod -s /usr/sbin/nologin runner   //runner non deve avere shell pura xk è solo ci/cd
   passwd -l runner   //disabilitat psw se utente era gia stato creato w psw
   sudo grep runner /etc/Shadow   //se return 'runner:!$6$...' allora ok psw disabilitata
- 
+
+🔥🔥⚡️👥👥⚡️ QUINDI I TUOI USERS SONO 'root'(x installazione os, recovery, emergenze), 'valterm'(è admin umano, x set server, ect), 'deploy'(robot operativo del system, usato da forgejo all'interno del suo system (cmqn tu fai push utilizzando user 'valterm')), 'runner'(x pipeline ci/cd di forgejo runner). psw '12345678' x valterm, deploy, runner; psw 'Suit-Force-Card' x root,docker(non lo utilizzo).
+
 //ora crea i groups
 getent group  //vedi tutti i grups
 getent group X   //vedi chi c'è dentro X group
@@ -327,37 +332,50 @@ chown -R deploy:deploy /home/deploy/.ssh
 touch /home/deploy/.ssh/config
 chmod 600 /home/deploy/.ssh/config
 
-######INSTALL Forgejo CI/CD
+######INSTALL Forgejo (x normale add/commit/push ect) & Forgejo Runner (per poter eseguire anche pipeline ci/cd)
+//forgejo usa un git system embedded proprio, non quello installato su machine linux
+
 nano /srv/infrastructure/forgejo/docker-compose.yml
+
 networks:
   forgejo:
-
 services:
   forgejo:
     image: codeberg.org/forgejo/forgejo:15
     container_name: forgejo
     restart: always
-
     environment:
-      - USER_UID=1000
-      - USER_GID=1000
-
+      - USER_UID=1002   #x permessi filesystem dentro /data, visto che lavora solo internamente a forgejo usi user 'deploy' ( 'id deploy' e ti esce 1002)
+      - USER_GID=1002
     ports:
       - "3000:3000"
       - "222:22"
-
     volumes:
-      - /srv/data/infrastructure/forgejo:/data
+      - /srv/data/infrastructure/forgejo:/data   #in /srv/data/infrastructure/forgejo/ ci sara /forgejo.db in sqllite, git/repositories/ code git , ...
       - /etc/localtime:/etc/localtime:ro    #questo dice che come fuso orario utilizza lo stesso di quello della linux machine
-
     networks:
       - forgejo
+
+/srv/data/infrastructure/forgejo:/data  crea struttura e.g.
+/srv/data/infrastructure/forgejo/
+├── forgejo.db   //questo è in sqllite x settings&metadati
+├── git/   
+│   └── repositories/
+│       ├── user1/
+│       │   └── progetto.git
+│       └── user2/
+│           └── altro-progetto.git
+├── attachments/
+├── avatars/
+└── sessions/
 
 //ctrl+O per salvare(ti chiedere nome file ok docker-compose.yml) e poi ctrl+X per uscire da editor.
 id deploy  //e.g.uid=1002(deploy) gid=1002(deploy) groups=1002(deploy)...
 chown -R 1002:1002 /srv/data/infrastructure/forgejo
-cd /srv/infrastructure/forgejo docker compose up -d    //avvia container
+cd /srv/infrastructure/forgejo docker compose up -d    //🔥avvia container
 docker ps   e   http://SERVER_IP:3000
+
+Ora se vuoi anche poter eseguire pipelines di CI/CD allora installa Forgejo Runner.
 
 ######
 
