@@ -354,6 +354,10 @@ services:
       - forgejo
 
 //ctrl+O per salvare(ti chiedere nome file ok docker-compose.yml) e poi ctrl+X per uscire da editor.
+id deploy  //e.g.uid=1002(deploy) gid=1002(deploy) groups=1002(deploy)...
+chown -R 1002:1002 /srv/data/infrastructure/forgejo
+cd /srv/infrastructure/forgejo docker compose up -d    //avvia container
+docker ps   e   http://SERVER_IP:3000
 
 ######
 
