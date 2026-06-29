@@ -93,7 +93,7 @@ cut -d: -f1 /etc/passwd   //vedi tutti gli utenti
 
 dpkg -l   //🔥🔥vedi tutti i programs installati!
 sudo ls /root    //legge cartella /root, ovviamente se attualmente non sei login admin user root, allora permesso denied
-sudo -i   //🔥⚠️ diventi utente admin 'root'!!MA DI SOLITO I PRO GIORNALMENTE LAVORANO COME UTENTE NORMALE, divenato admin user root solo x update programs o casi speciali 
+sudo -i   //☄️⚠️ diventi utente admin 'root'!!MA DI SOLITO I PRO GIORNALMENTE LAVORANO COME UTENTE NORMALE, divenato admin user root solo x update programs o casi speciali 
 sudo su - docker   //🔥🔥switchi e diventi utente 'docker'
 exit   //esce dalla shell corrente
 groups docker   //vedi che privilegi ha utente 'docker'
@@ -201,6 +201,11 @@ docker run --rm \
 🔥-CI/CD self-hosted x server 8gb ram (DevOps job)(come GitHub ma self-hosted): 🔥Forgejo(leggero scritto in GO ideale x small machines, e puoi usare le Forgejo Actions x automatizzare), Gitea(simile a forgejo x all), 🔥GitLab CE(ottima ma è un po pesante), Jenkins.
 //🔥Uptime Kuma x monitoraggio (e.g.ti avverte se qdrant giu o fastapi giu..)
 
+🔥-install program like a DockerContainer vs Linux program: 
+☄️--installed as docker container on the machine: isolamento totale, riproducibilità perfetta, backup&restore easy (basta copy e paste folder del volume), upgrade sicuri, perfetto x ci/cd.
+--linux program: usa systemd per l'avvio, usa db locale, logging in /var/log, subito disponibile agli users linux; 
+
+
 -notes how ur server business compet-esrl works:
 --ssh docker@192.168.113.52 sei dentro il sistema operativo ma con i permessi dell’utente 'docker' !
 -appena accedi a server ~ significa che sei in /home/docker, dentro 'home' ci sono 2 utenti: docker e valterm.
@@ -208,7 +213,7 @@ docker run --rm \
 -appena accedi a server ~ significa che sei in /home/docker
 //wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh   //con wget è piu easy installation rispetto a curl x installation
 
-🔥-SERVER SETUP X PRJ RAG SYSTEM from bottom:
+🔥🔥🔥-SERVER SETUP X PRJ RAG SYSTEM from bottom:
 //gia esistenti 'valterm'(admin principale creato durante installazione ubuntu)
 //'tree mypath' per vedere subito la struttura ad albero!!
 
@@ -218,14 +223,18 @@ tree /home/docker   //questo utente e questo folder in realta anche non serve co
 
 //crea gli utenti (dovresti gia aver 'valterm' creato durante installazione linux ubuntu, e 'docker' che non utilizzo ma che era creato & settato x usare docker engine (ma intanto io uso tutto nei containers) )
 adduser deploy   //crea user deploy (psw 12345678)
-adduser runner   //crea user runner (psw 12345678), x runnare comandi di forgejo
-usermod -s /usr/sbin/nologin runner   //runner non deve avere shell pura xk è solo ci/cd
-
+adduser --disabled-password --gecos "" runner   //crea user runner (psw disabilitata x è per ci/cd), x runnare comandi di forgejo, non chiamarlo runner-forgejo perché quello è il nome del servizio docker
+  usermod -s /usr/sbin/nologin runner   //runner non deve avere shell pura xk è solo ci/cd
+  passwd -l runner   //disabilitat psw se utente era gia stato creato w psw
+  sudo grep runner /etc/Shadow   //se return 'runner:!$6$...' allora ok psw disabilitata
+ 
 //ora crea i groups
 getent group  //vedi tutti i grups
+getent group X   //vedi chi c'è dentro X group
 getent group docker   //🔥DONT DELETE è creato da DockerEngine e tutti gli users all'interno possono usare DockerEngine!
 groupadd srv-deploy
 groupadd srv-read
+
 //aggiungi utenti ai gruppi
 usermod -aG docker valterm
 usermod -aG docker runner      //quasi sempre l'utente runner(x ci/cd forgejo) deve poter usare Docker Engine
@@ -233,7 +242,7 @@ usermod -aG srv-deploy valterm   //aggiungi user valterm a group
 usermod -aG docker deploy  //aggiungi user deploy a group
 usermod -aG srv-deploy deploy
 
-//ora crea struttura tree
+//ora crea struttura tree (remember 'tree mypath' x vedere grafico)
 mkdir -p \
 /srv/environments/{dev,staging,prod} \
 /srv/infrastructure/{nginx,forgejo,forgejo-runner,monitoring,certbot} \
@@ -274,47 +283,49 @@ touch \
 /srv/backups/scripts/offsite_sync.sh
 
 //setta i permessi
-chown -R root:srv-deploy /srv
-chmod 2775 /srv
+# owner
 chown root:srv-deploy /srv
-
-
-
-//TODO QUALI DI QUESTO SONO OK??
 chown -R deploy:srv-deploy /srv/environments
-chmod -R 2775 /srv/environments
-chmod 2750 /srv/environments/prod
 chown -R deploy:docker /srv/data
-chmod -R 2775 /srv/data
-chmod 2770 /srv/data/prod
 chown -R deploy:srv-deploy /srv/infrastructure
-chmod -R 2750 /srv/infrastructure
 chown -R deploy:srv-deploy /srv/backups
-chmod -R 2750 /srv/backups
+chown -R deploy:srv-deploy /srv/logs
+chown -R deploy:srv-deploy /srv/scripts
 
-//TODO QUESTI SONO TUTTI OK??
+# permessi directory
+chmod 2775 /srv
 chmod 2775 /srv/environments/dev
 chmod 2775 /srv/environments/staging
 chmod 2750 /srv/environments/prod
 chmod 2775 /srv/data/dev
 chmod 2775 /srv/data/staging
 chmod 2770 /srv/data/prod
+chmod 2750 /srv/infrastructure
+chmod 2775 /srv/backups
+chmod 2775 /srv/backups/scripts
+chmod 2775 /srv/logs
+chmod 2775 /srv/scripts
+chmod 2750 /srv/backups/prod
 
-//quindi per staging/dev → 2775 e in production ancora piu chiuso prod → 2750 / 2770-
-
-
+//quindi per staging/dev → 2775 e in production → 2750 / 2770 cioe ancora piu chiuso.
 
 //setta script eseguibili
 chmod +x /srv/scripts/*.sh
 chmod +x /srv/backups/scripts/*.sh
 
-//setta ssh per il deploy
+//now install git, forgejo(x ci/cd), docker, nginx,...tutto quello che ti serve.
+
+//setta ssh per il deploy 
 mkdir -p /home/deploy/.ssh
 chmod 700 /home/deploy/.ssh
 touch /home/deploy/.ssh/authorized_keys
 chmod 600 /home/deploy/.ssh/authorized_keys
 chown -R deploy:deploy /home/deploy/.ssh
+touch /home/deploy/.ssh/config
+chmod 600 /home/deploy/.ssh/config
 
+//ORA INSTALL Forgejo (X CI/CD)
+installalo come docker container, NON come linux program! cosi lo metti dentro /srv/infrastructure/forgejo/ e i dati persistenti in /srv/data/infrastructure/forgejo/.
 TODO
 -ora pensa a Forgejo CI/CD come installare, e poi setta con Git i branchs (il branch 'main' ha anche tag della version e.g.v1.0.0) e clona il prj dentro cd /srv/environments/dev cd /srv/environments/staging cd /srv/environments/prod.
 
@@ -333,7 +344,8 @@ id docker   //ora dovresti vedere null
 //quando installi docker, viene creato group 'docker'DA NON CANCELLARE e solo gli users all'interno possono usare Docker Engine. e.g.docker:x:999:  quindi 999 o 998
 ...
 ##
-###################################
+
+################################################
 
 # Struttura Server Enterprise — RAG Enterprise Legal
 
@@ -398,22 +410,22 @@ I tre ambienti non sono solo cartelle diverse. Sono isolati a ogni livello:
 │   │   └── ssl/                         # certificati Let's Encrypt
 │   │       └── (gestito da certbot)
 │   │
-│   ├── forgejo/                         # Git + CI/CD self-hosted
+│   ├── forgejo/                         # Git + CI/CD self-hosted, INSTALLATO COME DOCKERCONTAINER
 │   │   ├── docker-compose.yml
 │   │   └── .env
 │   │
-│   ├── forgejo-runner/                  # esegue le pipeline CI/CD
+│   ├── forgejo-runner/                  # esegue le pipeline CI/CD, installato come dockercontainer
 │   │   ├── docker-compose.yml
 │   │   └── config.yml
 │   │
-│   ├── monitoring/                      # osservabilità
+│   ├── monitoring/                      # osservabilità, **
 │   │   ├── docker-compose.yml
 │   │   ├── prometheus/
 │   │   │   └── prometheus.yml
 │   │   └── grafana/
 │   │       └── provisioning/
 │   │
-│   └── certbot/                         # rinnovo automatico SSL
+│   └── certbot/                         # rinnovo automatico SSL, **
 │       └── docker-compose.yml
 │
 ├── data/                                # DATI PERSISTENTI — mai versionati
@@ -525,7 +537,8 @@ Il bit `2` davanti (setgid) fa sì che ogni nuovo file creato erediti automatica
 ```
 
 
-###################################
+################################################
+
 SERVER
 │
 ├── /
