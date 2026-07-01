@@ -72,8 +72,10 @@ ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untent
 the psw '12345678' x users valterm, deploy, runner; psw 'Suit-Force-Card' x root,docker(non lo utilizzo).
 //ricorda che e.g.se sei deploy e vuoi diventare root, devi prima passare da valterm (admin fisico umano)
 
+
 tree /srv/      //vedi graph struttura a cartelle
 tree -a /srv/   //per vedere anche i nomi files
+//QUINDI APPENA DOPO AVER INSTALLATO UN NUOVO PROGRAM (come docker) fai SEMPRE 'ls -ld mypath' dove mypath è /srv/infrastructure..Xprogramdir e /srv/data/infrastructure/...Xprogramdir oe vedi che deve essere user linux 'deploy' che puo accederci (non 'root' altrimenti rompi il tuo system di isolamento)!!
 
 
 hostname -I  //ip della tua macchina, i primi 4 numeri sono quelli che ti servono e.g.192.168.113.52
@@ -307,9 +309,15 @@ touch \
 /srv/backups/scripts/offsite_sync.sh
 
 //setta i permessi  e.g. 
-//chown(chi possiede il file) user:group path perché linux valuta accesso con  sei il owner?→regole owner sei nel group?→regole group altro→regole Others
+//chown(chi possiede il file) user:group path perché linux valuta accesso con  sei il owner?→regole owner sei nel group? -> regole group altro -> regole Others
 //-R è ricorsivo cioè applica a sottocartelle annidate
-//chmod chi puo fare cosa [ special ][ user ][ group ][ others ] e.g.2775, 4=read 2=write 1=execute
+///🔥🔥⚡️⚡️MAI CREARE FOLDERS IN srv/ come linux user 'root' "a mano"!!! XK CREI DEI BUCHI DELLA TUA STRUTTURA DI ownership-based CHE HAI SETTATO, usa sempre user linux 'deploy'!!
+//🔥🔥⚡️⚡️RICORDATI CHE SE E.G. crei nuovo folder in '/srv/infrastructure' come user linux root, una rule e.g.'chown -R...' MICA SI AUTOAGGIORNA!! quindi poi magari non puoi scrivere sul file docker-compose !!
+altrimenti dovrai re-run manualmente (come user root )e.g. (con netdata per il docker-compose ho avuto prioprio questo problema) 
+sudo chown -R deploy:srv-deploy /srv/infrastructure/monitoring/netdata
+sudo chmod 2775 /srv/infrastructure/monitoring/netdata
+//QUINDI APPENA DOPO AVER INSTALLATO UN NUOVO PROGRAM (come docker) fai SEMPRE 'ls -ld mypath' dove mypath è /srv/infrastructure..Xprogramdir e /srv/data/infrastructure/...Xprogramdir oe vedi che deve essere user linux 'deploy' che puo accederci (non 'root' altrimenti rompi il tuo system di isolamento)!!
+
 # owner
 chown root:srv-deploy /srv
 chown -R deploy:srv-deploy /srv/environments
@@ -319,6 +327,7 @@ chown -R deploy:srv-deploy /srv/backups
 chown -R deploy:srv-deploy /srv/logs
 chown -R deploy:srv-deploy /srv/scripts
 
+//chmod chi puo fare cosa [ special ][ user ][ group ][ others ] e.g.2775, 4=read 2=write 1=execute 0=Others. 2770 è x ambiente chiuso (production hardcore), 2775 è x ambiente collaborativo (anche altri users possono leggere/esplorare)
 # permessi directory. 
 chmod 2775 /srv
 chmod 2775 /srv/environments/dev
@@ -474,9 +483,9 @@ services:
     security_opt:
       - apparmor:unconfined
     volumes:
-      - netdataconfig:/etc/netdata
-      - netdatalib:/var/lib/netdata
-      - netdatacache:/var/cache/netdata
+      - /srv/data/infrastructure/netdata/config:/etc/netdata
+      - /srv/data/infrastructure/netdata/lib:/var/lib/netdata
+      - /srv/data/infrastructure/netdata/cache:/var/cache/netdata
       - /:/host/root:ro,rslave
       - /etc/passwd:/host/etc/passwd:ro
       - /etc/group:/host/etc/group:ro
@@ -497,10 +506,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-volumes:
-  netdataconfig:
-  netdatalib:
-  netdatacache:
 
 
 cd /srv/infrastructure/monitoring/netdata
