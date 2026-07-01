@@ -101,6 +101,7 @@ whoami   //vedi che utente attualmente sei con login, e.g.'docker' non ha certi 
 sudo -l  //vedi quali comandi puoi eseguire come amministratore!! io sono (ALL : ALL) ALL QUINDI HO IL TOTALE CONTROLLO DEL SERVER!!
 ls -ld /root   //vedere permessi senza entrare
 cut -d: -f1 /etc/passwd   //vedi tutti gli utenti
+ls -ld pathX   //per vedere chi ha i permessi (cioe chown e chmod) x questo path
 
 dpkg -l   //🔥🔥vedi tutti i programs installati!
 sudo ls /root    //legge cartella /root, ovviamente se attualmente non sei login admin user root, allora permesso denied
@@ -345,7 +346,7 @@ chmod 2775 /srv/scripts
 chmod 2750 /srv/backups/prod
 
 tree -pug /srv   //x vedere permessi - owner - group  applicati
-//quindi per staging/dev → 2775 e in production → 2750 / 2770 cioè ancora piu chiuso.
+//quindi per staging/dev -> 2775 e in production -> 2750 / 2770 cioè ancora piu chiuso.
 
 //setta script eseguibili
 chmod +x /srv/scripts/*.sh
@@ -514,8 +515,13 @@ cd /srv/infrastructure/monitoring/netdata
 docker compose up -d
 e go to url http://192.168.113.52:19999
 
+##################FORGEJO X GIT complete setup
 
-######
+
+
+
+
+##################
 
 TODO
 -ora pensa a Forgejo CI/CD come installare, e poi setta con Git i branchs (il branch 'main' ha anche tag della version e.g.v1.0.0) e clona il prj dentro cd /srv/environments/dev cd /srv/environments/staging cd /srv/environments/prod.
