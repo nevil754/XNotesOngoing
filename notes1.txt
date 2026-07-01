@@ -81,7 +81,8 @@ tree -a /srv/   //per vedere anche i nomi files
 hostname -I  //ip della tua macchina, i primi 4 numeri sono quelli che ti servono e.g.192.168.113.52
 ls    //vedi all dir (pero se fai e.g. pwd e vedi /root allora sei in home/root/ !)
 ls /      //🔥x filesystem completo Linux SEI IL MASTER DEL TUO SERVER puoi fare tutto! see all folders
-ls /root  //NEGATA X PERMESSI
+ls /root  
+tree -d -L 3 / -I "proc|sys|dev|run|tmp|snap" /    //🪾🔥🔥x vedere in .txt struttura ad albero filesystem
 pwd       //tua posizione attuale
 cd
 cd /   //root
