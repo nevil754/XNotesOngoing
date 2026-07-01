@@ -517,6 +517,7 @@ e go to url http://192.168.113.52:19999
 
 ##################FORGEJO X GIT complete setup
 
+i 3 ambienti (develop,testing,production) sono asettici l'uno dall'altro a livello di filesystem (se non possono essere in db separati, allora configura che siano in folders con permessi ect che siano al massimo isolati), di rete docker (network isolati), e db/volumi separati ovviamente.
 
 
 
