@@ -68,6 +68,13 @@ Suit-Force-Card   //psw
 ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untente docker in /home/docker
 //quando fai comando 'sudo ...' allora dici al system di login come admin 'root' SOLO x questo comando, se fai invece 'sudo -i' diventi proprio admin root finche non logout.
 
+🔥🔥⚡️👥👥⚡️ QUINDI I TUOI USERS SONO 'root'(x installazione os, recovery, emergenze), 'valterm'(è admin umano, x set server, ect), 'deploy'(robot operativo del system, usato da forgejo all'interno del suo system, questo utente linux esegue i containers fa ci/cd runner eseguire script), 'runner'(x pipeline ci/cd di forgejo runner). 
+the psw '12345678' x users valterm, deploy, runner; psw 'Suit-Force-Card' x root,docker(non lo utilizzo).
+
+tree /srv/      //vedi graph struttura a cartelle
+tree -a /srv/   //per vedere anche i nomi files
+
+
 hostname -I  //ip della tua macchina, i primi 4 numeri sono quelli che ti servono e.g.192.168.113.52
 ls    //vedi all dir (pero se fai e.g. pwd e vedi /root allora sei in home/root/ !)
 ls /      //🔥x filesystem completo Linux SEI IL MASTER DEL TUO SERVER puoi fare tutto! see all folders
@@ -93,8 +100,8 @@ cut -d: -f1 /etc/passwd   //vedi tutti gli utenti
 
 dpkg -l   //🔥🔥vedi tutti i programs installati!
 sudo ls /root    //legge cartella /root, ovviamente se attualmente non sei login admin user root, allora permesso denied
-sudo -i   //☄️⚠️ diventi utente admin 'root'!!MA DI SOLITO I PRO GIORNALMENTE LAVORANO COME UTENTE NORMALE, divenato admin user root solo x update programs o casi speciali 
-su - X  //diventi utente X
+sudo -i   //☄️⚠️ diventi utente admin 'root'!!MA DI SOLITO I PRO GIORNALMENTE LAVORANO COME UTENTE NORMALE, divento admin user root solo x update programs o casi speciali 
+su - X  //☄️diventi utente X
 sudo su - docker   //🔥🔥switchi e diventi utente 'docker'
 passwd X   //☄️🔥RESETTI PSW USER 'X' da user root
 sexit   //esce dalla shell corrente
@@ -200,13 +207,24 @@ docker run --rm \
 --ambiente di Testing: "Se porto questa versione in produzione, funzionerà davvero?", è una copia molto simile alla produzione.
 --ambiente di Production: è quello usato dagli users veri, qua ci sono rules downtime quasi zero backup auto monitoring logs aggiornamenti pianificati.
 
-🔥-CI/CD self-hosted x server 8gb ram (DevOps job)(come GitHub ma self-hosted): 🔥Forgejo(leggero scritto in GO ideale x small machines, e puoi usare le Forgejo Actions x automatizzare), Gitea(simile a forgejo x all), 🔥GitLab CE(ottima ma è un po pesante), Jenkins.
-//🔥Uptime Kuma x monitoraggio (e.g.ti avverte se qdrant giu o fastapi giu..)
+🔥☄️-CI/CD self-hosted x server 8gb ram (DevOps job)(come GitHub ma self-hosted): 🔥Forgejo(leggero scritto in GO ideale x small machines, e puoi usare le Forgejo Actions x automatizzare), Gitea(simile a forgejo x all), 🔥GitLab CE(ottima ma è un po pesante), Jenkins.
+🔥--Uptime Kuma: self-hosted x monitoraggio (e.g.ti avverte se qdrant giu o fastapi giu chiama il servizio /health ogni 30sec)
+--Sentry: x tracing errors in app e ti manda notifica appena avviene un bug o qualcosa.
+//ricordati sempre di settare anche backup automatici dei volumes di sqlserver e qdrant
 
-🔥-install program like a DockerContainer vs Linux program: 
+🔥-DockerContainer vs Linux program for installa a target program on the machine: 
 ☄️--installed as docker container on the machine: isolamento totale, riproducibilità perfetta, backup&restore easy (basta copy e paste folder del volume), upgrade sicuri, perfetto x ci/cd.
 --linux program: usa systemd per l'avvio, usa db locale, logging in /var/log, subito disponibile agli users linux; 
 
+📡📡-OBSERVABILITY & TRACING:
+--Uptime Kuma: self-hosted leggero (ram 100mb) x monitoraggio, ti avverte se qdrant giu o fastapi giu chiama il endpoint /health ogni 30sec tramite email/WhatsApp/ect (pero non ti dice perché è giu).
+--Flower (è nel mio docker-compose e lo uso anche come plugin): controlla se i workers Celery sono giu che siano ok.
+--logs strutturati grazie a plugin 'loguru'.
+--logs error LLM pipeline grazie a plugin 'langsmith' pero problemi GDPR/compliance risk i dati escono!! meglio self-hosted 🔥LangFuse (!pero occupa ram 1.5-3gb!! no install now)!!
+--consigliato self-hosted NetData(ram 200mb) x controllo live ram&cpu sia di server ma anche dei sottocontainers che stanno runnando! e logs xk crasha (ma non ti avverte come Uptime Kuma tramite email/WhatsApp/ect!)
+//Sentry x tracing errors ma se vuoi self-hosted non consigliato hai server con ram troppo poco, meglio 🔥Loki self-hosted!
+//in futuro puoi pensare di usare anche Grafana + Prometheus per pro metriche di server system real-time
+//CMNQ PER ORA MAGARI tieni langsmith e installa e sett Uptime Kuma e Netdata, poi magari in futuro trovi qualcosa per errors tracing come Sentry ma in self-hosted.
 
 -notes how ur server business compet-esrl works:
 --ssh docker@192.168.113.52 sei dentro il sistema operativo ma con i permessi dell’utente 'docker' !
@@ -216,7 +234,7 @@ docker run --rm \
 //wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh   //con wget è piu easy installation rispetto a curl x installation
 
 
-🔥🔥🔥######SERVER SETUP X PRJ RAG SYSTEM from bottom:
+🔥🔥🔥############SERVER SETUP X PRJ RAG SYSTEM from bottom:
 //gia esistenti 'valterm'(admin principale creato durante installazione ubuntu)
 //'tree mypath' per vedere subito la struttura ad albero!!
 
@@ -335,6 +353,8 @@ chmod 600 /home/deploy/.ssh/config
 
 ######INSTALL Forgejo (x normale add/commit/push ect) & Forgejo Runner (per poter eseguire anche pipeline ci/cd)
 //forgejo usa un git system embedded proprio, non quello installato su machine linux
+//nome admin=forgejo-admin ,psw=Suap45skh!, email=nelvison.benedetto2@gmail.com
+Suap45skh!
 
 nano /srv/infrastructure/forgejo/docker-compose.yml
 
@@ -345,7 +365,7 @@ services:
     image: codeberg.org/forgejo/forgejo:15
     container_name: forgejo
     restart: always
-    environment:
+    environment:   #dice "Forgejo dentro il container deve girare come utente Linux con UID 1002"
       - USER_UID=1002   #x permessi filesystem dentro /data, visto che lavora solo internamente a forgejo usi user 'deploy' ( 'id deploy' e ti esce 1002)
       - USER_GID=1002
     ports:
@@ -372,17 +392,27 @@ services:
 
 //ctrl+O per salvare(ti chiedere nome file ok docker-compose.yml) e poi ctrl+X per uscire da editor.
 id deploy  //e.g.uid=1002(deploy) gid=1002(deploy) groups=1002(deploy)...
-chown -R 1002:1002 /srv/data/infrastructure/forgejo
+chown -R 1002:1002 /srv/data/infrastructure/forgejo    //🔥🔥x i permessi! solo user 1002 cioe 'deploy' puo usare Forgejo!!
 cd /srv/infrastructure/forgejo
 docker compose up -d  //🔥avvia container
-docker ps   e   http://192.168.113.52:3000
+docker ps   e  go to dashboard http://192.168.113.52:3000
 
-Ora nella pagina web di settaggio finale di forgejo setta:  
+Ora sei nella pagina web di settaggio finale di forgejo setta:  
 porta server ssh=222 (perché guarda come hai fatto docker-compose.yml),
 disattiva 'attiva accesso con openid' se vuoi che il system rimanga fuori web,
-nome utente admin (è il primo account web git cioe l'admin, non è account linux)= valterm , psw=Suap45skh, email=nelvison.benedetto2@gmail.com
-
+nome utente admin (è il primo account web git cioe l'admin, non è account linux)= forgejo-admin , psw=Suap45skh!, email=nelvison.benedetto2@gmail.com
+root@srvdocker01:~# sqlite3 /srv/data/infrastructure/forgejo/gitea/gitea.db "select id, name, email from user;"   //x cheackare che li hai creati davvero (usa user linux 'root')
+ORA PER ACCEDERE devi usare user linux 1002!! e vai poi su http://192.168.113.52:3000
 Ora se vuoi anche poter eseguire pipelines di CI/CD allora installa Forgejo Runner.
+
+-disintallazione completa di forgejo (dockerizzato):
+cd /srv/infrastructure/forgejo
+docker compose down
+rm -rf /srv/data/infrastructure/forgejo/*
+docker volume prune
+
+###### INSTALL Uptime Kuma (che ogni 30sec check se sottoconainer è su ok)
+valterm
 
 ######
 
