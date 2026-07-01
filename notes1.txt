@@ -405,7 +405,8 @@ id deploy  //e.g.uid=1002(deploy) gid=1002(deploy) groups=1002(deploy)...
 chown -R 1002:1002 /srv/data/infrastructure/forgejo    //🔥🔥x i permessi! solo user 1002 cioe 'deploy' puo usare Forgejo!!
 cd /srv/infrastructure/forgejo
 docker compose up -d  //🔥avvia container
-docker ps   e  go to dashboard http://192.168.113.52:3000
+//nome admin=forgejo-admin ,psw=Suap45skh!
+http://192.168.113.52:3000  (DEVI ESSERE SU SUL SERVER COME user 'deploy'!!)
 
 Ora sei nella pagina web di settaggio finale di forgejo setta:  
 porta server ssh=222 (perché guarda come hai fatto docker-compose.yml),
@@ -776,6 +777,7 @@ SERVER
 
 #########################TREE OF MY SERVER 
 
+deploy@srvdocker01:/srv/infrastructure/monitoring/netdata$ tree -d -L 3 / -I "proc|sys|dev|run|tmp|snap" /
 /
 ├── bin -> usr/bin
 ├── bin.usr-is-merged
@@ -784,7 +786,7 @@ SERVER
 │   │   ├── fonts
 │   │   ├── i386-pc
 │   │   └── locale
-│   └── lost+found
+│   └── lost+found  [error opening dir]
 ├── cdrom
 ├── etc
 │   ├── alternatives
@@ -818,8 +820,8 @@ SERVER
 │   │   └── templates
 │   ├── console-setup
 │   ├── containerd
-│   ├── credstore
-│   ├── credstore.encrypted
+│   ├── credstore  [error opening dir]
+│   ├── credstore.encrypted  [error opening dir]
 │   ├── cron.d
 │   ├── cron.daily
 │   ├── cron.hourly
@@ -883,7 +885,7 @@ SERVER
 │   │   └── fcc-unlock.d
 │   ├── modprobe.d
 │   ├── modules-load.d
-│   ├── multipath
+│   ├── multipath  [error opening dir]
 │   ├── needrestart
 │   │   ├── conf.d
 │   │   ├── hook.d
@@ -982,23 +984,45 @@ SERVER
 │   │   └── systemd
 │   └── xml
 ├── home
+│   ├── deploy
 │   ├── docker
-│   │   └── docker
-│   └── valterm
+│   ├── runner  [error opening dir]
+│   └── valterm  [error opening dir]
 ├── lib -> usr/lib
 ├── lib64 -> usr/lib64
 ├── lib.usr-is-merged
-├── lost+found
+├── lost+found  [error opening dir]
 ├── media
 ├── mnt
 ├── opt
-│   └── containerd
-│       ├── bin
-│       └── lib
-├── root
+│   └── containerd  [error opening dir]
+├── root  [error opening dir]
 ├── sbin -> usr/sbin
 ├── sbin.usr-is-merged
 ├── srv
+│   ├── backups
+│   │   ├── forgejo
+│   │   ├── prod
+│   │   ├── scripts
+│   │   └── staging
+│   ├── data
+│   │   ├── infrastructure
+│   │   ├── prod
+│   │   └── staging
+│   ├── environments
+│   │   ├── prod
+│   │   └── staging
+│   ├── infrastructure
+│   │   ├── certbot
+│   │   ├── forgejo
+│   │   ├── forgejo-runner
+│   │   ├── monitoring
+│   │   └── nginx
+│   ├── logs
+│   │   ├── nginx
+│   │   ├── prod
+│   │   └── staging
+│   └── scripts
 ├── usr
 │   ├── bin
 │   ├── games
@@ -1352,7 +1376,7 @@ SERVER
 │   │   ├── fonts
 │   │   ├── i386-pc
 │   │   └── locale
-│   └── lost+found
+│   └── lost+found  [error opening dir]
 ├── cdrom
 ├── etc
 │   ├── alternatives
@@ -1386,8 +1410,8 @@ SERVER
 │   │   └── templates
 │   ├── console-setup
 │   ├── containerd
-│   ├── credstore
-│   ├── credstore.encrypted
+│   ├── credstore  [error opening dir]
+│   ├── credstore.encrypted  [error opening dir]
 │   ├── cron.d
 │   ├── cron.daily
 │   ├── cron.hourly
@@ -1451,7 +1475,7 @@ SERVER
 │   │   └── fcc-unlock.d
 │   ├── modprobe.d
 │   ├── modules-load.d
-│   ├── multipath
+│   ├── multipath  [error opening dir]
 │   ├── needrestart
 │   │   ├── conf.d
 │   │   ├── hook.d
@@ -1550,23 +1574,45 @@ SERVER
 │   │   └── systemd
 │   └── xml
 ├── home
+│   ├── deploy
 │   ├── docker
-│   │   └── docker
-│   └── valterm
+│   ├── runner  [error opening dir]
+│   └── valterm  [error opening dir]
 ├── lib -> usr/lib
 ├── lib64 -> usr/lib64
 ├── lib.usr-is-merged
-├── lost+found
+├── lost+found  [error opening dir]
 ├── media
 ├── mnt
 ├── opt
-│   └── containerd
-│       ├── bin
-│       └── lib
-├── root
+│   └── containerd  [error opening dir]
+├── root  [error opening dir]
 ├── sbin -> usr/sbin
 ├── sbin.usr-is-merged
 ├── srv
+│   ├── backups
+│   │   ├── forgejo
+│   │   ├── prod
+│   │   ├── scripts
+│   │   └── staging
+│   ├── data
+│   │   ├── infrastructure
+│   │   ├── prod
+│   │   └── staging
+│   ├── environments
+│   │   ├── prod
+│   │   └── staging
+│   ├── infrastructure
+│   │   ├── certbot
+│   │   ├── forgejo
+│   │   ├── forgejo-runner
+│   │   ├── monitoring
+│   │   └── nginx
+│   ├── logs
+│   │   ├── nginx
+│   │   ├── prod
+│   │   └── staging
+│   └── scripts
 ├── usr
 │   ├── bin
 │   ├── games
@@ -1913,6 +1959,4 @@ SERVER
         ├── mail -> ../mail
         └── rsyslog
 
-1136 directories
-
-
+1180 directories
