@@ -70,6 +70,7 @@ ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untent
 
 🔥🔥⚡️👥👥⚡️ QUINDI I TUOI USERS SONO 'root'(x installazione os, recovery, emergenze), 'valterm'(è admin umano, x set server, ect), 'deploy'(robot operativo del system, usato da forgejo all'interno del suo system, questo utente linux esegue i containers fa ci/cd runner eseguire script), 'runner'(x pipeline ci/cd di forgejo runner). 
 the psw '12345678' x users valterm, deploy, runner; psw 'Suit-Force-Card' x root,docker(non lo utilizzo).
+//ricorda che e.g.se sei deploy e vuoi diventare root, devi prima passare da valterm (admin fisico umano)
 
 tree /srv/      //vedi graph struttura a cartelle
 tree -a /srv/   //per vedere anche i nomi files
@@ -402,7 +403,7 @@ porta server ssh=222 (perché guarda come hai fatto docker-compose.yml),
 disattiva 'attiva accesso con openid' se vuoi che il system rimanga fuori web,
 nome utente admin (è il primo account web git cioe l'admin, non è account linux)= forgejo-admin , psw=Suap45skh!, email=nelvison.benedetto2@gmail.com
 root@srvdocker01:~# sqlite3 /srv/data/infrastructure/forgejo/gitea/gitea.db "select id, name, email from user;"   //x cheackare che li hai creati davvero (usa user linux 'root')
-ORA PER ACCEDERE devi usare user linux 1002!! e vai poi su http://192.168.113.52:3000
+🔥ORA PER ACCEDERE devi usare SEMPRE user linux 1002!! e vai poi su http://192.168.113.52:3000  (xk su docker-compose hai settato 1002(cioe user deploy) e poi hai anche settato i permessi chown..!)
 Ora se vuoi anche poter eseguire pipelines di CI/CD allora installa Forgejo Runner.
 
 -disintallazione completa di forgejo (dockerizzato):
@@ -411,8 +412,49 @@ docker compose down
 rm -rf /srv/data/infrastructure/forgejo/*
 docker volume prune
 
-###### INSTALL Uptime Kuma (che ogni 30sec check se sottoconainer è su ok)
-valterm
+######INSTALL Uptime Kuma (che ogni 30sec check se sottoconainer è su ok) credenziali uptimekuma-admin Suap85skk! 
+mkdir -p /srv/infrastructure/monitoring/uptime-kuma    //-p per creare anche cartelle intermedie del path
+mkdir -p /srv/data/infrastructure/uptime-kuma
+cd /srv/infrastructure/monitoring/uptime-kuma
+nano docker-compose.yml
+
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2
+    container_name: uptime-kuma
+    restart: always
+    ports:
+      - "3001:3001"
+    volumes:
+      - /srv/data/infrastructure/uptime-kuma:/app/data
+    environment:
+      - TZ=Europe/Rome
+    networks:      #serve xk questo container ha accesso a naming dn degli altri container cosi puo fare il ping e checkare che siano up
+      - monitoring  
+    healthcheck:   #prova ogni tanto a capire se questo stesso container is up, se is down facendo 'docker ps' per this container vedrai unhealthy
+      test: ["CMD", "curl", "-f", "http://localhost:3001"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+networks:
+  monitoring:
+    external: false
+
+cd /srv/infrastructure/monitoring/uptime-kuma
+docker compose up -d
+go to url http://192.168.113.52:3001
+credenziali
+name admin: uptimekuma-admin
+psw: Suap85skk!
+
+######INSTALL NetData (per metriche cpu&ram del server ma anche dei sottocontainers docker attivi(moolto utile) )
+
 
 ######
 
