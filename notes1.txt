@@ -710,7 +710,7 @@ main            ← sempre stabile, = ciò che gira in PRODUCTION
 staging         ← = ciò che gira in STAGING (testing)
   ↑ merge (da develop quando pronto per test)
 develop         ← = ciò che gira in DEV, integrazione continua
-  ↑ merge (Pull Request da feature)
+  ↑ merge (main request (cioe Pull Request) da feature)
 feature/xxx     ← una branch per ogni nuova funzionalità
 hotfix/xxx      ← fix urgenti, partono da main
 
@@ -739,7 +739,7 @@ Quando la Milestone è completa, crei una Release (es. v1.0.0)
 
 
 -flow:
-viluppatore crea feature/xxx da develop
+sviluppatore crea feature/xxx da develop
          ↓
 lavora, commit frequenti, rebase su develop se serve
          ↓
