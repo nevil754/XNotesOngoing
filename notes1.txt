@@ -541,36 +541,49 @@ quando hai concluso una feature chiedi merge request (called also Pull Request) 
 
 -usa le Issues: ogni bug, ogni feature richiesta, ogni task = una Issue in Forgejo, e usa commit e.g.`git commit -m "fix: timeout Qdrant (closes #23)"` e quando il commit viene mergiato l'issue #23 si chiude auto.
 
-
-
-### Issues
-Ogni bug, ogni feature richiesta, ogni task = una Issue in Forgejo.
-Collega i commit alle issue: `git commit -m "fix: timeout Qdrant (closes #23)"`.
-Quando il commit viene mergiato, l'issue #23 si chiude automaticamente.
-
-### Milestone
+Milestone
 Raggruppano issue verso un obiettivo:
-```
 MVP           → le issue per la prima versione funzionante
 Beta          → issue per la versione beta
 v1.0 Release  → issue per il primo rilascio produzione
-```
-### Tag + Release
+Tag + Release
 Ogni volta che rilasci in produzione, crei un tag (`v1.2.0`) e una Release
 su Forgejo con le note (cosa è cambiato). Fra due anni puoi tornare
 esattamente a v0.4.2 se serve.
-
 Semantic versioning: `vMAJOR.MINOR.PATCH`
-- MAJOR: cambiamenti che rompono la compatibilità (v1 → v2)
-- MINOR: nuove funzionalità retrocompatibili (v1.2 → v1.3)
-- PATCH: solo bugfix (v1.2.0 → v1.2.1)
-
+MAJOR: cambiamenti che rompono la compatibilità (v1 → v2)
+MINOR: nuove funzionalità retrocompatibili (v1.2 → v1.3)
+PATCH: solo bugfix (v1.2.0 → v1.2.1)
 
 -ovviamente in locale hai docker-compose.yml e docker-compose.override.yml e .env.example e .env(questo ovviamente è nel .gitignore), e poi sul server ogni ambiente ha il suo .env (ho lo ignietta forgejo runner quando runni la pipeline).
 
 //in futuro installerai anche Forgejo Runner per avere anche CI/CD (cioe automazione di flussi)
 
 //GitFlow completo (con develop + feature + release + hotfix) è considerato vecchio oggi, si usa invece
+-flow:
+viluppatore crea feature/xxx da develop
+         ↓
+lavora, commit frequenti, rebase su develop se serve
+         ↓
+push + Pull Request verso develop
+         ↓
+code review + CI (test automatici)
+         ↓
+merge commit in develop
+         ↓
+deploy automatico in DEV → si testa
+         ↓
+merge develop → staging
+         ↓
+deploy in STAGING → test con dati realistici
+         ↓
+merge staging → main + TAG vX.Y.Z
+         ↓
+deploy manuale approvato in PROD
+         ↓
+Release notes su Forgejo
+
+
 -the final flow is:
 feature
 ↓
