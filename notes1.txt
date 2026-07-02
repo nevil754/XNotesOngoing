@@ -805,16 +805,22 @@ production
 
 
 STARTING SETUP
-new organization: CompeteSrl
-logo alto a dx >site administration> user accounts> create user account 
+--new organization: CompeteSrl
+--logo alto a dx >site administration> user accounts> create user account 
 
 user: nelvison.benedetto
 psw: Utod83win!
 //questo è l'account che userai quotidianamente
 
-explore>organizations>competesrl>teams:owners>add team member> search and find target accout to add (nelvison.benedetto)
-organization>repositories>new repository: 
+--explore>organizations>competesrl>teams:owners>add team member> search and find target accout to add (nelvison.benedetto)
+--organization>repositories>new repository: 
 name: rag-system (CONSIGLIATO NOMENCLATURA SEMPRE in minuscolo e con - per gli spazi), make repository private: check, default branch: main, initialize repo: gitignore python, advanced options labels: advanced(Kind/Bug,Kind/Feature,...), NON spuntare 'make this repo a template' xk attualemente il tuo rag system non è ancora ultimato final finito ma ancora in fase di evoluzione.
+--repo target>settings>branches>branch protection rules:
+
+
+
+
+
 
 
 
