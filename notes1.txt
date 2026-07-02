@@ -535,31 +535,209 @@ main
 feature1 feature2 feature3
 quando hai concluso una feature chiedi merge request (called also Pull Request) verso 'develop', dopodiche quando develop è stabile allora chiedi merge request (called also Pull Request) verso 'main'.
 
--usa le conventions per i commit:  feat:..., fix:..., docs:..., refactor:..., perf:..., test:..., build:..., ci:...., style:.... .
--Merge vs Rebase quando usarli: duranto lo sviluppo della feature usa 'rebase'(cosi non crei commit inutili di merge), quando integri una feature allora usa 'merge commit'(perché questo MANTIENE LA HISTORY!! anche fra anni)(non usare 'squash' xk perdi la history).  
--quando rilasci una nuove version del product: usa tag e.g. git tag v1.0  cosi potrai sempre tornare alla version e.g.v0.4.2 anche fra anni. AGGIUNGI ANCHE LE Releases cioe release notes, binary, docker image ect è molto molto utile!
+-usa le Issues (attività): ogni bug, ogni feature richiesta, ogni task = una Issue in Forgejo, e usa commit e.g.`git commit -m "fix: timeout Qdrant (closes #23)"` e quando il commit viene mergiato l'issue #23 si chiude auto.
 
--usa le Issues: ogni bug, ogni feature richiesta, ogni task = una Issue in Forgejo, e usa commit e.g.`git commit -m "fix: timeout Qdrant (closes #23)"` e quando il commit viene mergiato l'issue #23 si chiude auto.
 
 Milestone
 Raggruppano issue verso un obiettivo:
 MVP           → le issue per la prima versione funzionante
 Beta          → issue per la versione beta
 v1.0 Release  → issue per il primo rilascio produzione
-Tag + Release
-Ogni volta che rilasci in produzione, crei un tag (`v1.2.0`) e una Release
-su Forgejo con le note (cosa è cambiato). Fra due anni puoi tornare
-esattamente a v0.4.2 se serve.
-Semantic versioning: `vMAJOR.MINOR.PATCH`
+
+-Milestone: è un obbiettivo, tutte le attività (Issue) necessarie per raggiungere quell'obiettivo vengono raccolte dentro la stessa milestone.
+se hai centinaia di issue, quali fai a sapere quali servono per arrivare alla prima versione funzionante? con una Milestone.
+quando tutte le issue della target milestone sono chiuse, Forgejo ti mostra per quel milestone '100% Completed' ora puoi rilasciare la version e.g. v1.0.0
+quindi le milestone è il gruppo di lavoro (che contiene N Issues) che serve ad arrivare a quella versione.
+
+-Semantic versioning(SemVer):
 MAJOR: cambiamenti che rompono la compatibilità (v1 → v2)
 MINOR: nuove funzionalità retrocompatibili (v1.2 → v1.3)
 PATCH: solo bugfix (v1.2.0 → v1.2.1)
+convenzione utilizzata in tutto il mondo per indicare quanto è cambiato un software e se l'aggiornamento può rompere la compatibilità.
+la forma è 'vMAJOR.MINOR.PATCH' e.g. v1.4.7  , patch=fissato il bug, minor=si aggiunge una nuova funzionalita (non hai rotto niente, e patch torna a 0), major=hai rotto la compatibilita(le vecchie configurazioni non funzionano piu, questo è un breaking change )  
+!!ogni volta che raggiungi una versione importante, crei un 🔥Tag e una Release(sono le releases notes):
+git tag v1.0.0
+e la 🔥Release che descrive le novita
+Release v1.2.0
+✓ Hybrid Search
+✓ OCR
+✓ Better Prompt Engineering
+✓ Faster indexing
+✓ Docker improvements
 
 -ovviamente in locale hai docker-compose.yml e docker-compose.override.yml e .env.example e .env(questo ovviamente è nel .gitignore), e poi sul server ogni ambiente ha il suo .env (ho lo ignietta forgejo runner quando runni la pipeline).
 
-//in futuro installerai anche Forgejo Runner per avere anche CI/CD (cioe automazione di flussi)
+-Ogni branch principale corrisponde a un ambiente fisico sul server:
+  `develop` → deploy in /srv/environments/dev
+  `staging` → deploy in /srv/environments/staging
+  `main`    → deploy in /srv/environments/prod
 
-//GitFlow completo (con develop + feature + release + hotfix) è considerato vecchio oggi, si usa invece
+-naming dei branches
+feature/rag-hybrid-search       # nuova funzionalità
+feature/multi-tenant-billing
+fix/qdrant-connection-timeout   # fix, correzione bug non urgente
+hotfix/auth-token-leak          # hotfix, correzione URGENTE in produzione
+refactor/retriever-cleanup      # refactor, refactoring senza nuove feature
+docs/api-documentation          # docs, solo documentazione
+chore/update-dependencies       # chore, manutenzione
+
+-naming dei commit
+feat:... e.g. aggiunge reranking cross-encoder al retriever
+fix:... e.g. corregge timeout connessione Qdrant su documenti grandi
+docs:... e.g. aggiorna README con istruzioni deploy
+refactor:... e.g. estrae logica embedding in modulo separato
+perf:... e.g. ottimizza batch size embedding per ridurre RAM
+test:... e.g. aggiunge test unitari per il chunker
+build:... e.g. aggiorna Dockerfile con multi-stage
+ci:... e.g. aggiunge pipeline Forgejo Actions per deploy dev
+chore:... e.g. aggiorna dipendenze pip
+style:... e.g. formattazione codice con ruff
+
+esempio aggiunta body descrizione al commit per commit importante
+```
+feat: aggiunge memoria long-term stile Zep
+Implementa summary automatico conversazioni e fact extraction
+via LLM. Salvato in SQL Server + Qdrant per ricerca semantica.
+Attivo solo se memory.long_term_enabled=true.
+Closes #42
+```
+
+-Merge vs Rebase: 
+duranto lo sviluppo della feature usa 'rebase'(cosi non crei commit inutili di merge), quando integri una feature allora usa 'merge commit'(perché questo MANTIENE LA HISTORY!! anche fra anni)(non usare 'squash' xk perdi la history).
+mentre sviluppi la tua feature usi rebase (riscrive la history come se avessi iniziato dall'ultimo develop, quindi storia lineare pulita). USA REBASE SOLO SUL prioprio branch feature in sviluppo NON ALTROVE!!(altrimenti riscrivi la history)
+```bash
+git checkout feature/mia-feature
+git fetch origin
+git rebase origin/develop
+```
+quando hai completato la feature e vai raggiungere il 'develop' branch allora usi merge request(called also Pull Request).
+//!mai usare 'squash' perché schiaccia tutti i commit di una feature in uno solo
+
+
+//in futuro installerai anche Forgejo Runner per avere anche CI/CD (cioe automazione di flussi)
+//GitFlow completo (con develop + feature + release + hotfix) è considerato vecchio oggi
+
+
+## Il flusso completo di una feature
+```bash
+# 1. Parti sempre da develop aggiornato
+git checkout develop
+git pull origin develop
+
+# 2. Crea la feature branch
+git checkout -b feature/rag-web-search
+
+# 3. Lavori, fai commit piccoli e frequenti
+git add app/rag/agents/web_agent.py
+git commit -m "feat: aggiunge web agent con Tavily"
+git add tests/unit/test_web_agent.py
+git commit -m "test: aggiunge test per web agent"
+
+# 4. develop è andato avanti? Aggiorna con rebase
+git fetch origin
+git rebase origin/develop
+
+# 5. Push della feature
+git push origin feature/rag-web-search
+
+# 6. Su Forgejo: apri Pull Request feature/rag-web-search → develop
+#    Il team fa code review, la CI gira i test
+
+# 7. Merge approvato → "Create merge commit"
+#    develop ora contiene la feature
+
+# 8. develop viene deployato automaticamente in DEV dal runner
+
+# 9. Cancella la feature branch (locale e remota)
+git branch -d feature/rag-web-search
+git push origin --delete feature/rag-web-search
+```
+
+## Da develop a produzione
+# Quando develop è stabile e testato in DEV:
+
+# 1. Merge develop → staging
+git checkout staging
+git pull origin staging
+git merge develop
+git push origin staging
+# → deploy automatico in STAGING, si testa con dati realistici
+
+# 2. Staging validato? Merge staging → main
+git checkout main
+git pull origin main
+git merge staging
+git push origin main
+
+# 3. Tag della release
+git tag -a v1.2.0 -m "Release 1.2.0: web search + memoria long-term"
+git push origin v1.2.0
+
+# 4. Deploy manuale approvato in PRODUCTION
+#    (sul server: /srv/scripts/deploy.sh prod)
+
+
+## Hotfix — bug urgente in produzione
+# Un bug critico è in produzione. NON passi da develop.
+
+# 1. Parti da main (= produzione)
+git checkout main
+git pull origin main
+git checkout -b hotfix/auth-token-leak
+
+# 2. Correggi
+git commit -m "fix: corregge leak token JWT nei log"
+
+# 3. Merge diretto in main
+git checkout main
+git merge hotfix/auth-token-leak
+git tag -a v1.2.1 -m "Hotfix: security token leak"
+git push origin main --tags
+
+# 4. IMPORTANTE: porta il fix anche in develop e staging
+git checkout develop
+git merge hotfix/auth-token-leak
+git push origin develop
+
+git checkout staging
+git merge hotfix/auth-token-leak
+git push origin staging
+# Così il fix non si perde al prossimo rilascio
+
+
+main            ← sempre stabile, = ciò che gira in PRODUCTION
+  ↑ merge (solo da staging testato, con tag)
+staging         ← = ciò che gira in STAGING (testing)
+  ↑ merge (da develop quando pronto per test)
+develop         ← = ciò che gira in DEV, integrazione continua
+  ↑ merge (Pull Request da feature)
+feature/xxx     ← una branch per ogni nuova funzionalità
+hotfix/xxx      ← fix urgenti, partono da main
+
+
+Idea
+    ↓
+Crei una Issue
+    ↓
+Assegni la Issue a una Milestone
+    ↓
+Crei un branch dedicato
+    ↓
+Sviluppi la funzionalità
+    ↓
+Apri una Pull Request
+    ↓
+Review del codice
+    ↓
+Merge nel branch principale
+    ↓
+Chiudi automaticamente la Issue
+    ↓
+La Milestone avanza verso il 100%
+    ↓
+Quando la Milestone è completa, crei una Release (es. v1.0.0)
+
+
 -flow:
 viluppatore crea feature/xxx da develop
          ↓
@@ -621,161 +799,7 @@ Tag
 Release
 ↓
 production
--
 
-
-main            ← sempre stabile, = ciò che gira in PRODUCTION
-  ↑ merge (solo da staging testato, con tag)
-staging         ← = ciò che gira in STAGING (testing)
-  ↑ merge (da develop quando pronto per test)
-develop         ← = ciò che gira in DEV, integrazione continua
-  ↑ merge (Pull Request da feature)
-feature/xxx     ← una branch per ogni nuova funzionalità
-hotfix/xxx      ← fix urgenti, partono da main
-
--Ogni branch principale corrisponde a un ambiente fisico sul server:
-  `develop` → deploy in /srv/environments/dev
-  `staging` → deploy in /srv/environments/staging
-  `main`    → deploy in /srv/environments/prod
-
--naming dei branches
-feature/rag-hybrid-search       # nuova funzionalità
-feature/multi-tenant-billing
-fix/qdrant-connection-timeout   # correzione bug non urgente
-hotfix/auth-token-leak          # correzione URGENTE in produzione
-refactor/retriever-cleanup      # refactoring senza nuove feature
-docs/api-documentation          # solo documentazione
-chore/update-dependencies       # manutenzione
-
--naming dei commit
-feat: aggiunge reranking cross-encoder al retriever
-fix: corregge timeout connessione Qdrant su documenti grandi
-docs: aggiorna README con istruzioni deploy
-refactor: estrae logica embedding in modulo separato
-perf: ottimizza batch size embedding per ridurre RAM
-test: aggiunge test unitari per il chunker
-build: aggiorna Dockerfile con multi-stage
-ci: aggiunge pipeline Forgejo Actions per deploy dev
-chore: aggiorna dipendenze pip
-style: formattazione codice con ruff
-//x commit importanti aggiungi anche body con descrizione accurata e.g.
-```
-feat: aggiunge memoria long-term stile Zep
-
-Implementa summary automatico conversazioni e fact extraction
-via LLM. Salvato in SQL Server + Qdrant per ricerca semantica.
-Attivo solo se memory.long_term_enabled=true.
-
-Closes #42
-```
-
--Merge vs Rebase: 
-mentre sviluppi la tua feature usi rebase (riscrive la history come se avessi iniziato dall'ultimo develop, quindi storia lineare pulita). USA SEMPRE E SOLO REBASE SUL prioprio branch feature in sviluppo NON AL DI FUORI!!(altrimenti riscrivi la history)
-```bash
-git checkout feature/mia-feature
-git fetch origin
-git rebase origin/develop
-```
-quindo hai completato la feature e vai raggiungere il 'develop' branch allora usi merge request(called also Pull Request).
-//mai usare 'squash' perché schiaccia tutti i commit di una feature in uno solo. 
-
-
-## Il flusso completo di una feature
-
-```bash
-# 1. Parti sempre da develop aggiornato
-git checkout develop
-git pull origin develop
-
-# 2. Crea la feature branch
-git checkout -b feature/rag-web-search
-
-# 3. Lavori, fai commit piccoli e frequenti
-git add app/rag/agents/web_agent.py
-git commit -m "feat: aggiunge web agent con Tavily"
-git add tests/unit/test_web_agent.py
-git commit -m "test: aggiunge test per web agent"
-
-# 4. develop è andato avanti? Aggiorna con rebase
-git fetch origin
-git rebase origin/develop
-
-# 5. Push della feature
-git push origin feature/rag-web-search
-
-# 6. Su Forgejo: apri Pull Request feature/rag-web-search → develop
-#    Il team fa code review, la CI gira i test
-
-# 7. Merge approvato → "Create merge commit"
-#    develop ora contiene la feature
-
-# 8. develop viene deployato automaticamente in DEV dal runner
-
-# 9. Cancella la feature branch (locale e remota)
-git branch -d feature/rag-web-search
-git push origin --delete feature/rag-web-search
-```
-
----
-
-## Da develop a produzione
-
-```bash
-# Quando develop è stabile e testato in DEV:
-
-# 1. Merge develop → staging
-git checkout staging
-git pull origin staging
-git merge develop
-git push origin staging
-# → deploy automatico in STAGING, si testa con dati realistici
-
-# 2. Staging validato? Merge staging → main
-git checkout main
-git pull origin main
-git merge staging
-git push origin main
-
-# 3. Tag della release
-git tag -a v1.2.0 -m "Release 1.2.0: web search + memoria long-term"
-git push origin v1.2.0
-
-# 4. Deploy manuale approvato in PRODUCTION
-#    (sul server: /srv/scripts/deploy.sh prod)
-```
-
----
-
-## Hotfix — bug urgente in produzione
-
-```bash
-# Un bug critico è in produzione. NON passi da develop.
-
-# 1. Parti da main (= produzione)
-git checkout main
-git pull origin main
-git checkout -b hotfix/auth-token-leak
-
-# 2. Correggi
-git commit -m "fix: corregge leak token JWT nei log"
-
-# 3. Merge diretto in main
-git checkout main
-git merge hotfix/auth-token-leak
-git tag -a v1.2.1 -m "Hotfix: security token leak"
-git push origin main --tags
-
-# 4. IMPORTANTE: porta il fix anche in develop e staging
-git checkout develop
-git merge hotfix/auth-token-leak
-git push origin develop
-
-git checkout staging
-git merge hotfix/auth-token-leak
-git push origin staging
-
-# Così il fix non si perde al prossimo rilascio
-```
 
 
 ##################
