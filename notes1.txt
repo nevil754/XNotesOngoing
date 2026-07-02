@@ -76,7 +76,7 @@ the psw '12345678' x users valterm, deploy, runner; psw 'Suit-Force-Card' x root
 tree /srv/      //vedi graph struttura a cartelle
 tree -a /srv/   //per vedere anche i nomi files
 //QUINDI APPENA DOPO AVER INSTALLATO UN NUOVO PROGRAM (come docker) fai SEMPRE 'ls -ld mypath' dove mypath è /srv/infrastructure..Xprogramdir e /srv/data/infrastructure/...Xprogramdir oe vedi che deve essere user linux 'deploy' che puo accederci (non 'root' altrimenti rompi il tuo system di isolamento)!!
-
+//ls -ld xpath   //x vedere i permessi x questo path
 
 hostname -I  //ip della tua macchina, i primi 4 numeri sono quelli che ti servono e.g.192.168.113.52
 ls    //vedi all dir (pero se fai e.g. pwd e vedi /root allora sei in home/root/ !)
@@ -519,7 +519,72 @@ e go to url http://192.168.113.52:19999
 
 i 3 ambienti (develop,testing,production) sono asettici l'uno dall'altro a livello di filesystem (se non possono essere in db separati, allora configura che siano in folders con permessi ect che siano al massimo isolati), di rete docker (network isolati), e db/volumi separati ovviamente.
 
+//forgejo-admin: da usare solo x amministrare forgejo (creare repos, creare organizations, gestire runne, gestire users, config forgejo), non per lavorare giornalmente!
+//per un team enorme usano GitFlow
+-crea organization: here in questa organization (e.g."RAGsystem") conterra tutti i prjs, gestione utenti e permessi condivisa (solitamente un'organization è per azienda).
+-creati un account git personale: questo è quello tuo con cui farai i commit push ect. x convenzione nome.cognome .
+-creati repository dentro target organization: e.g.'rag-system'(potrai dividerlo in più repository quando crescerà e.g.necessiti di 2 pipeline ci/cd separate) al cui interno avrai frontend backend ect
+-setta branches: main(sempre stabile), develop(per lo sviluppo), feature/*(per le nuove funzionalita), hotfix*(per bug urgenti). 
+main
+ │
+ └───────────┐
+                 │
+             develop
+            /    |   \
+           /     |    \
+feature1 feature2 feature3
+quando hai concluso una feature chiedi merge request (called also Pull Request) verso 'develop', dopodiche quando develop è stabile allora chiedi merge request (called also Pull Request) verso 'main'.
 
+-usa le conventions per i commit:  feat:..., fix:..., docs:..., refactor:..., perf:..., test:..., build:..., ci:...., style:.... .
+-Merge vs Rebase quando usarli: duranto lo sviluppo della feature usa 'rebase'(cosi non crei commit inutili di merge), quando integri una feature allora usa 'merge commit'(perché questo MANTIENE LA HISTORY!! anche fra anni)(non usare 'squash' xk perdi la history).  
+-quando rilasci una nuove version del product: usa tag e.g.git tag v1.0  cosi potrai sempre tornare alla version e.g.v0.4.2 anche fra anni. AGGIUNGI ANCHE LE Releases cioe release notes, binary, docker image ect è molto molto utile!
+-usa le Issues: se ci sono dei problemi usa sempre le Issue per comunicare un problema!
+-le milestones, i kanban, e i wiki solitamente usati sono: 
+mvp -> beta -> production -> enterprise -> v2.
+todo -> in progress -> review -> done.
+wiki e.g. 
+-usa sempre in maniera separata: .env.dev .env.staging, .env.prod, e anche docker-compose.dev.yml(che usa il suo .env file) docker-compose.staging.yml docker-compose.prod.yml.
+//in futuro installerai anche Forgejo Runner per avere anche CI/CD (cioe automazione di flussi)
+
+//GitFlow completo (con develop + feature + release + hotfix) è considerato vecchio oggi, si usa invece
+-the final flow is:
+feature
+↓
+develop
+↓
+deploy DEV
+↓
+test
+↓
+merge su main
+↓
+deploy STAGING
+↓
+test
+↓
+deploy PROD 
+
+
+feature
+↓
+Pull Request
+↓
+develop
+↓
+CI
+↓
+staging
+↓
+Merge
+↓
+main
+↓
+Tag
+↓
+Release
+↓
+production
+-
 
 
 ##################
