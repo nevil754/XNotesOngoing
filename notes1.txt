@@ -2447,3 +2447,209 @@ deploy@srvdocker01:/srv/infrastructure/monitoring/netdata$ tree -d -L 3 / -I "pr
         └── rsyslog
 
 1180 directories
+
+##################################################################################
+
+
+FASE 9 — SSH Key
+
+Sul tuo PC
+
+ssh-keygen
+
+Genera una chiave.
+
+Poi
+
+Settings
+
+↓
+
+SSH Keys
+
+↓
+
+Add Key
+
+Così non userai password per fare push.
+
+
+
+FASE 10 — Clone
+
+Sul PC
+
+git clone ssh://git@192.168.113.52:222/ValtermLabs/rag-system.git
+
+Da questo momento lavori sempre in locale.
+
+
+
+FASE 11 — Branch Strategy
+
+Io userei questa.
+
+main
+
+sempre stabile.
+
+Poi
+
+feature/*
+
+esempio
+
+feature/pdf-parser
+
+feature/chat
+
+feature/reranker
+
+feature/frontend
+
+Quando finisci
+
+Pull Request
+
+↓
+
+main
+
+
+
+FASE 12 — Commit
+
+Usa Conventional Commits.
+
+feat:
+fix:
+docs:
+refactor:
+perf:
+test:
+
+
+
+FASE 13 — Issue Workflow
+
+Ogni nuova idea diventa una Issue.
+
+Mai lavorare "a memoria".
+
+Esempio
+
+Issue
+
+Implement OCR
+
+Assegni
+
+Milestone
+
+Core RAG
+
+Poi
+
+branch
+
+feature/ocr
+
+Poi
+
+Pull Request
+
+Poi
+
+Merge
+
+L'Issue si chiude.
+
+
+
+FASE 14 — CI/CD
+
+Quando installerai Forgejo Runner:
+
+Push
+
+↓
+
+Tests
+
+↓
+
+Lint
+
+↓
+
+Docker Build
+
+↓
+
+Deploy DEV
+
+↓
+
+Deploy STAGING
+
+↓
+
+Deploy PROD
+
+
+
+FASE 15 — Ambienti
+
+Hai già predisposto
+
+dev
+
+staging
+
+prod
+
+Quindi la pipeline ideale sarà
+
+feature/*
+        │
+        ▼
+Pull Request
+        │
+        ▼
+main
+        │
+        ▼
+CI/CD
+        │
+        ├── deploy dev
+        │
+        ├── test
+        │
+        ├── deploy staging
+        │
+        ├── test
+        │
+        └── deploy production
+
+
+
+🚀 PROSSIMO STEP (se vuoi livello enterprise vero)
+
+Posso guidarti su:
+
+🔥 “Issue → Branch → PR → Merge → Release workflow”
+
+con:
+
+naming branch standard
+auto link issue (#12)
+PR template
+release v0.1 / v1.0
+semantic versioning reale
+milestone automation
+
+Questa è la parte che trasforma Forgejo in una vera piattaforma aziendale.
+
+
+
+
