@@ -525,15 +525,16 @@ i 3 ambienti (develop,testing,production) sono asettici l'uno dall'altro a livel
 -crea organization: here in questa organization (e.g."RAGsystem") conterra tutti i prjs, gestione utenti e permessi condivisa (solitamente un'organization è per azienda).
 -creati un account git personale: questo è quello tuo con cui farai i commit push ect. x convenzione nome.cognome .
 -creati repository dentro target organization: e.g.'rag-system'(potrai dividerlo in più repository quando crescerà e.g.necessiti di 2 pipeline ci/cd separate) al cui interno avrai frontend backend ect
--setta branches: main(sempre stabile), develop(per lo sviluppo), feature/*(per le nuove funzionalita), hotfix*(per bug urgenti). 
+🔥🔥-setta branches: main(sempre stabile), develop(per lo sviluppo), feature/*(per le nuove funzionalita), hotfix*(per bug urgenti). 
 main
  │
  └───────────┐
                  │
-             develop
+             🔥develop
             /    |   \
            /     |    \
 feature1 feature2 feature3
+
 quando hai concluso una feature chiedi merge request (called also Pull Request) verso 'develop', dopodiche quando develop è stabile allora chiedi merge request (called also Pull Request) verso 'main'.
 
 -usa le Issues (attività): ogni bug, ogni feature richiesta, ogni task = una Issue in Forgejo, e usa commit e.g.`git commit -m "fix: timeout Qdrant (closes #23)"` e quando il commit viene mergiato l'issue #23 si chiude auto.
@@ -895,15 +896,25 @@ Projects: RAG System Roadmap
 Assignees: nelvison.benedetto
 
 //🔥remember NON FARE MAI Issues troppo grandi e.g.'build RAG system'
-//appena crei la issue te la mette nella col 'backlog' del project target, se l'hai gia fatta (QUINDI ISSUES IS CLOSED successfully)puoi semplicemente trascinarla in col 'done'.
+//appena crei la issue te la mette nella col 'backlog' del project target, se l'hai gia fatta (QUINDI ISSUES IS CLOSED successfully) puoi semplicemente trascinarla in col 'done'.
+
+-set Wiki (per documentare tutto cioe che il nuovo sviluppatore dovrebbe sapere about il progetto):
+la wiki è un piccolo repository git separato, ogni file è un .md, quindi ogni modifica alla wiki ha cronologia/commit/versionamento/ect.
+(target repo>settings>units>wiki: verifica che sia abilitato)
+
 
 
 e per chiudere la issue? cioe in realta attualmente vorrei direttamente chiuderla xk è gia stata fatta nel code che non ho ancora creato
 e come branch mentre sto creando questa Issues? finora ho solo branch main
 e poi la issue viene automaticamente chiusa da forgejo quando la PR viene mergiata?  
+e poi attualmente ho solo branch main
 
 tips:
 !-un branch dedicato per ogni Issue (feature/issue-<id>-<nome>). ed eliminare il branch feature dopo il merge. e.g.feature/issue-15-auth
+
+other:
+attualmente la mia Issues creata 'implement PDF ingestion...' è settata su branch main⚠️!!
+
 
 
 
