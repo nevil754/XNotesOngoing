@@ -106,7 +106,7 @@ ls -ld pathX   //per vedere chi ha i permessi (cioe chown e chmod) x questo path
 dpkg -l   //🔥🔥vedi tutti i programs installati!
 sudo ls /root    //legge cartella /root, ovviamente se attualmente non sei login admin user root, allora permesso denied
 sudo -i   //☄️⚠️ diventi utente admin 'root'!!MA DI SOLITO I PRO GIORNALMENTE LAVORANO COME UTENTE NORMALE, divento admin user root solo x update programs o casi speciali 
-su - X  //☄️diventi utente X
+su - deploy  //☄️diventi utente 'deploy'
 sudo su - docker   //🔥🔥switchi e diventi utente 'docker'
 passwd X   //☄️🔥RESETTI PSW USER 'X' da user root
 sexit   //esce dalla shell corrente
@@ -407,7 +407,7 @@ id deploy  //e.g.uid=1002(deploy) gid=1002(deploy) groups=1002(deploy)...
 chown -R 1002:1002 /srv/data/infrastructure/forgejo    //🔥🔥x i permessi! solo user 1002 cioe 'deploy' puo usare Forgejo!!
 cd /srv/infrastructure/forgejo
 docker compose up -d  //🔥avvia container
-//nome admin=forgejo-admin ,psw= Suap45skh!
+//nome admin= forgejo-admin ,psw= Suap45skh!
 http://192.168.113.52:3000  (DEVI ESSERE SU SUL SERVER COME user 'deploy'!!)
 
 Ora sei nella pagina web di settaggio finale di forgejo setta:  
@@ -551,7 +551,7 @@ se hai centinaia di issue, quali fai a sapere quali servono per arrivare alla pr
 quando tutte le issue della target milestone sono chiuse, Forgejo ti mostra per quel milestone '100% Completed' ora puoi rilasciare la version e.g. v1.0.0
 quindi le milestone è il gruppo di lavoro (che contiene N Issues) che serve ad arrivare a quella versione.
 
--Semantic versioning(SemVer):
+🔥-Semantic versioning(SemVer):
 MAJOR: cambiamenti che rompono la compatibilità (v1 → v2)
 MINOR: nuove funzionalità retrocompatibili (v1.2 → v1.3)
 PATCH: solo bugfix (v1.2.0 → v1.2.1)
@@ -922,6 +922,39 @@ Home
 //questo 'libro delle istruzioni' mantienilo sempre aggiornato mentre modifichi il code!
 
 -set Releases
+una release è una descrizione scritta a mano di un tag.
+e.g.
+Tag v1.0.0
+Release Version 1.0.0 con description e.g.'First production-ready release. Features ...'  //follow standart vMAJOR.MINOR.PATCH per numerare e.g.1.0.0
+target repo>releases>new release>
+//crei una release quando raggiungi un obbiettivo importante quindi il vMAJOR.MINOR.PATCH cambia
+
+⚡️⚡️⚡️flow
+1.Si sviluppa sulle branch feature/*.
+2.Si aprono Pull Request verso main.
+3.Le PR vengono revisionate e approvate.
+4.Si esegue il merge in main.
+5.Quando main raggiunge uno stato stabile, si crea un Tag (ad esempio v0.5.0).
+6.Dal Tag si crea una Release, con note che riassumono le novità, le correzioni e le eventuali incompatibilità.
+
+-set SSH key
+//senza ssh key ogni git push chiede la psw, e le automazioni ci/cd diventano scomode.
+//consigliato una key privata x il pc, e una key privata per forgejo runner
+remember con ssh key la private key rimane sul tuo pc e la public key va sul server su forgejo.
+ssh-keygen -t ed25519 -C "nelvison.benedetto2@gmail.com"   //sul tuo pc
+/home/tuo-utente/.ssh/id_ed25519   //dove verra salvata
+passphrase = none (molto comodo)
+ls ~/.ssh  //check che ci sono e.g.id_ed25519 e id_ed25519.pub
+cat ~/.ssh/id_ed25519.pub  //e copia l'output cioe la public key
+Forgejo → Settings → SSH Keys > add key> title: laptop personale, key: paste here the public key.
+ssh -T -p 222 git@192.168.113.52   //testa la connction
+git remote -v   //vedi cosa stai usando attualmente (probabilmente stai usando url e non ssh)
+git remote set-url origin ssh://git@192.168.113.52:222/owner/RAGsystem.git   //🔥update remote connection, vedi usa 'git remote...'
+ora puoi fare tranquillamente i push e non chiede piu la password!
+
+-ora fai git clone e scaricati il prj sul tuo pc.
+🔥🔥-setta i Branches 
+
 
 
 
