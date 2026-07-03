@@ -407,7 +407,7 @@ id deploy  //e.g.uid=1002(deploy) gid=1002(deploy) groups=1002(deploy)...
 chown -R 1002:1002 /srv/data/infrastructure/forgejo    //🔥🔥x i permessi! solo user 1002 cioe 'deploy' puo usare Forgejo!!
 cd /srv/infrastructure/forgejo
 docker compose up -d  //🔥avvia container
-//nome admin=forgejo-admin ,psw=Suap45skh!
+//nome admin=forgejo-admin ,psw= Suap45skh!
 http://192.168.113.52:3000  (DEVI ESSERE SU SUL SERVER COME user 'deploy'!!)
 
 Ora sei nella pagina web di settaggio finale di forgejo setta:  
@@ -815,15 +815,49 @@ psw: Utod83win!
 --explore>organizations>competesrl>teams:owners>add team member> search and find target accout to add (nelvison.benedetto)
 --organization>repositories>new repository: 
 name: rag-system (CONSIGLIATO NOMENCLATURA SEMPRE in minuscolo e con - per gli spazi), make repository private: check, default branch: main, initialize repo: gitignore python, advanced options labels: advanced(Kind/Bug,Kind/Feature,...), NON spuntare 'make this repo a template' xk attualemente il tuo rag system non è ancora ultimato final finito ma ancora in fase di evoluzione.
---repo target>settings>branches>branch protection rules:
+
+🔥-target repo>settings>branches>branch protection rules: 
+--protected branch name pattern: main
+--protected file patterns separated using semicolon ; : /infra/**;/config/**
+--unprotected file pattersn separated using semicolon ; : lascia blank
+--push: disable push (cosi nessuno puo pushare su direttamente su main, nemmeno te)
+--require signed commits: lascia blank
+--required approvals: 1 (almeno 1 review obbligatoria prima del merge)
+--restrict approvals to whitelisted users or teams: uncheck (per ora ok, poi in enterprise puoi restrict solo a certi teams)
+
+--dismiss stale approvals: check (se qualcuno approva una PR e poi cambi codice, l'approvazione vecchia viene annullata, cio evita ok vecchi su codice nuovo)
+--enable status check (require status checks to pass before merging. When enabled, commits must first be pushed to another branch, then merged or pushed directly to a branch that matches this rule after status checks have passed. If no contexts are matched, the last commit must be successful regardless of context.):  unchek (non hai ancroa forgejo runner x ci/cd, magari attivalo solo dopo che le pipeline sono funzionanti)
+--pull request merge (anyone with write access will be allowed to merge the pull requests into this branch.): enable merge on (ok per ora, in enterprise avanzato si limita a teams specifici)
+
+--block merge on rejected reviews: check
+--block merge on official review requests: check (evita merge 'frettolosi')
+--block merge if pull request is outdated: uncheck (se branch è indietro rispetto a main → blocca merge)
+--enforce this rule for repository admins: uncheck (quindi ora l'admin puo intervenire in emergenza)
+
+-set labels:
+issues>labels>
+//queste sono gia quelle create quando hai creato la repo
+Kind/*
+Priority/*
+Status/*
+Reviewed/*
+//crea manualmente queste nuove (NON checkare 'exclusive' quando crei la label)
+component/frontend
+component/backend
+component/rag-engine
+component/vector-db
+component/ci-cd
+component/infrastructure
+component/monitoring
 
 
 
-
-
-
-
-
+e.g.
+Title: Embedding pipeline fails on large documents
+Labels:
+- kind/bug
+- priority/high
+- component/rag-engine
 
 
 ##################
