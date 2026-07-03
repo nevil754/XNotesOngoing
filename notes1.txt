@@ -518,6 +518,10 @@ e go to url http://192.168.113.52:19999
 
 ##################FORGEJO GIT complete setup
 
+👥 Users credentials:
+-forgejo-admin, Suap45skh!, nelvison.benedetto2@gmail.com .
+-nelvison.benedetto, Utod83win!!, ssh key: nelvisonb-dev-laptop30 .
+
 i 3 ambienti (develop,testing,production) sono asettici l'uno dall'altro a livello di filesystem (se non possono essere in db separati, allora configura che siano in folders con permessi ect che siano al massimo isolati), di rete docker (network isolati), e db/volumi separati ovviamente.
 
 //forgejo-admin: da usare solo x amministrare forgejo (creare repos, creare organizations, gestire runne, gestire users, config forgejo), non per lavorare giornalmente!
@@ -809,9 +813,11 @@ STARTING SETUP
 --new organization: CompeteSrl
 --logo alto a dx >site administration> user accounts> create user account 
 
+CREATE USER 
 user: nelvison.benedetto
-psw: Utod83win!
+psw: Utod83win!!
 //questo è l'account che userai quotidianamente
+a questa poi aggiungerai la ssh key: nelvisonb-dev-laptop30
 
 --explore>organizations>competesrl>teams:owners>add team member> search and find target accout to add (nelvison.benedetto)
 --organization>repositories>new repository: 
@@ -941,19 +947,37 @@ target repo>releases>new release>
 //senza ssh key ogni git push chiede la psw, e le automazioni ci/cd diventano scomode.
 //consigliato una key privata x il pc, e una key privata per forgejo runner
 remember con ssh key la private key rimane sul tuo pc e la public key va sul server su forgejo.
-ssh-keygen -t ed25519 -C "nelvison.benedetto2@gmail.com"   //sul tuo pc
-/home/tuo-utente/.ssh/id_ed25519   //dove verra salvata
+ssh-keygen -t ed25519 -C "laptop pc30"   //sul tuo pc su powershell, ed25519 è l'algh, -C scrive il comment
+C:/Users/nelvisonb/.ssh/id_ed25519   //dove verra salvata (usa quella gia consigliata), id=indetity ed25519=tipo di algh utilizzato
 passphrase = none (molto comodo)
-ls ~/.ssh  //check che ci sono e.g.id_ed25519 e id_ed25519.pub
+ls ~/.ssh   //check che ci sono e.g.id_ed25519 e id_ed25519.pub
 cat ~/.ssh/id_ed25519.pub  //e copia l'output cioe la public key
-Forgejo → Settings → SSH Keys > add key> title: laptop personale, key: paste here the public key.
-ssh -T -p 222 git@192.168.113.52   //testa la connction
+login forgejo as user nelvison.benedetto> settings> SSH Keys > add key> title: [utente/team]-[ruolo]-[macchina]-[ambiente], key: paste here the public key.  //e.g.nelvisonb-dev-laptop30
+//ricorda OGNI UTENTE DEVE AVERE LA SUA SSH KEY (e.g.utente windows nelvisonb)
+ssh -T -p 222 git@192.168.113.52   //testa la connection, dovresti vedere 'Hi there, forgejo-admin! ...'
 git remote -v   //vedi cosa stai usando attualmente (probabilmente stai usando url e non ssh)
 git remote set-url origin ssh://git@192.168.113.52:222/owner/RAGsystem.git   //🔥update remote connection, vedi usa 'git remote...'
 ora puoi fare tranquillamente i push e non chiede piu la password!
 
+The key fingerprint is:
+SHA256:u0YHAGGR90aokMwCFxxWobVWjqrSwPUG8f4GGDycIIM laptop pc30
+The key's randomart image is:
++--[ED25519 256]--+
+|*==*O*..         |
+|E+X+==+ .        |
+| ..X++.+         |
+|. .oO   +        |
+|.... = .S.       |
+| +  . o ...      |
+|o .    +..       |
+|.     . ..       |
+|       ..        |
++----[SHA256]-----+
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOvhyX42ChaQBbdCyfP2220oFI9wZ/WuuXkWoWwZke1n laptop pc30   //questa è la key pubblica che aggiugerai a user forgejo nelvison.benedetto !
+
 -ora fai git clone e scaricati il prj sul tuo pc.
 🔥🔥-setta i Branches 
+
 
 
 
