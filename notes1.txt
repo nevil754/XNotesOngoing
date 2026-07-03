@@ -519,8 +519,9 @@ e go to url http://192.168.113.52:19999
 ##################FORGEJO GIT complete setup
 
 👥 Users credentials:
--forgejo-admin, Suap45skh!, nelvison.benedetto2@gmail.com .
--nelvison.benedetto, Utod83win!!, ssh key: nelvisonb-dev-laptop30 .
+-forgejo-admin, Suap45skh!, nelvison.benedetto2@gmail.com 
+-nelvison.benedetto, Utod83win!!, ssh key: nelvisonb-dev-laptop30 
+
 
 i 3 ambienti (develop,testing,production) sono asettici l'uno dall'altro a livello di filesystem (se non possono essere in db separati, allora configura che siano in folders con permessi ect che siano al massimo isolati), di rete docker (network isolati), e db/volumi separati ovviamente.
 
@@ -935,13 +936,14 @@ Release Version 1.0.0 con description e.g.'First production-ready release. Featu
 target repo>releases>new release>
 //crei una release quando raggiungi un obbiettivo importante quindi il vMAJOR.MINOR.PATCH cambia
 
-⚡️⚡️⚡️flow
+🔥🔥🔥flow
 1.Si sviluppa sulle branch feature/*.
 2.Si aprono Pull Request verso main.
 3.Le PR vengono revisionate e approvate.
 4.Si esegue il merge in main.
 5.Quando main raggiunge uno stato stabile, si crea un Tag (ad esempio v0.5.0).
 6.Dal Tag si crea una Release, con note che riassumono le novità, le correzioni e le eventuali incompatibilità.
+🔥🔥🔥
 
 -set SSH key
 //senza ssh key ogni git push chiede la psw, e le automazioni ci/cd diventano scomode.
