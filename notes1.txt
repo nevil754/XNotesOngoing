@@ -850,6 +850,13 @@ component/ci-cd
 component/infrastructure
 component/monitoring
 
+-target repo>issues>milestones>new milestone>
+MVP (Minimum Viable Product)
+Core RAG
+Frontend
+Infrastructure
+Production Ready
+v1.0 Release
 
 
 e.g.
