@@ -901,6 +901,28 @@ Assignees: nelvison.benedetto
 -set Wiki (per documentare tutto cioe che il nuovo sviluppatore dovrebbe sapere about il progetto):
 la wiki è un piccolo repository git separato, ogni file è un .md, quindi ogni modifica alla wiki ha cronologia/commit/versionamento/ect.
 (target repo>settings>units>wiki: verifica che sia abilitato)
+target repo>wiki>create new page>
+crea 1 pagina che è l'indice del 'libro' tecnico che spiega come funziona il prj, e crea i link ad altre pages
+Home
+│
+├── Architecture
+├── Deployment
+├── Infrastructure
+├── API
+├── Database
+├── Prompt Engineering
+├── Development Guidelines
+├── Coding Standards
+├── CI/CD
+├── Security
+├── Monitoring
+├── Backup & Restore
+└── Roadmap
+//e nella description della page Home, se fai  [Architecture](Architecture) allora gia linka alla pagina.
+//questo 'libro delle istruzioni' mantienilo sempre aggiornato mentre modifichi il code!
+
+-set Releases
+
 
 
 
