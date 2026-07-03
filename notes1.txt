@@ -816,7 +816,8 @@ psw: Utod83win!
 --organization>repositories>new repository: 
 name: rag-system (CONSIGLIATO NOMENCLATURA SEMPRE in minuscolo e con - per gli spazi), make repository private: check, default branch: main, initialize repo: gitignore python, advanced options labels: advanced(Kind/Bug,Kind/Feature,...), NON spuntare 'make this repo a template' xk attualemente il tuo rag system non è ancora ultimato final finito ma ancora in fase di evoluzione.
 
-🔥-target repo>settings>branches>branch protection rules: 
+🔥-set branch protection rules
+target repo>settings>branches>branch protection rules: 
 --protected branch name pattern: main
 --protected file patterns separated using semicolon ; : /infra/**;/config/**
 --unprotected file pattersn separated using semicolon ; : lascia blank
@@ -850,7 +851,8 @@ component/ci-cd
 component/infrastructure
 component/monitoring
 
--target repo>issues>milestones>new milestone>
+-set milestones
+target repo>issues>milestones>new milestone>
 MVP (Minimum Viable Product)
 Core RAG
 Frontend
@@ -858,13 +860,53 @@ Infrastructure
 Production Ready
 v1.0 Release
 
-
 e.g.
-Title: Embedding pipeline fails on large documents
+Fix embedding crash on large PDF
 Labels:
 - kind/bug
-- priority/high
 - component/rag-engine
+- priority/high
+Milestone:
+→ MVP
+
+🔥-set project board (è la production pipeline visiva del RAG system):
+target repo>projects>new project>
+title: RAG System Roadmap
+description: ...
+template: basic kanban
+card previews: text only
+> select target prj> 
+hai gia cols Backlog(tutto cio che potresti fare),To Do, In Progress(consigliato 🔥MAX 1-3 TASKS ATTIVI!!)🔥, Done.
+e aggiungi nuove cols Review, Testing, Blocked(dipendenze esterne bloccanti).
+ora crea le cards:
+issues>new issue> e crea 
+"Setup ingestion pipeline (PDF → chunks)"
+"Implement embeddings storage in Qdrant"
+"Create retrieval API endpoint"
+"Add reranking model"
+e.g.
+crea issue sets as
+branch:  target branch  🔥RICORDA IN ENTERPRISE 1 BRANCH X OGNI ISSUE DA RESOLVE!!🔥
+name: "Implement PDF ingestion pipeline (chunking + preprocessing)"
+description: ...
+Labels: Kind/feature
+Milestone: MVP (Minimum Value Product)
+Projects: RAG System Roadmap
+Assignees: nelvison.benedetto
+
+//🔥remember NON FARE MAI Issues troppo grandi e.g.'build RAG system'
+//appena crei la issue te la mette nella col 'backlog' del project target, se l'hai gia fatta (QUINDI ISSUES IS CLOSED successfully)puoi semplicemente trascinarla in col 'done'.
+
+
+e per chiudere la issue? cioe in realta attualmente vorrei direttamente chiuderla xk è gia stata fatta nel code che non ho ancora creato
+e come branch mentre sto creando questa Issues? finora ho solo branch main
+e poi la issue viene automaticamente chiusa da forgejo quando la PR viene mergiata?  
+
+tips:
+!-un branch dedicato per ogni Issue (feature/issue-<id>-<nome>). ed eliminare il branch feature dopo il merge. e.g.feature/issue-15-auth
+
+
+
 
 
 ##################
