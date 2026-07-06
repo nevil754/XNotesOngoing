@@ -1030,24 +1030,24 @@ git checkout main
 git pull origin main   //ora il tuo branch main locale è uguale a quello remoto
 
 git checkout develop
-git merge main
+git merge main   //meglio del rebase mantiene history (cmnq rebase è usato dai pro)
 git push   //invia i commits che hai fatto in locale al remoto
 //ora hai di nuovo tutto sincronizzato locale<-->remoto
+
+ORA APPLICA RULES DI BRANCH SECURITY anche a 'develop'
+ADD NEW FEATURE feature/xxx AL CODE
 
 
 
 git checkout -b feature/pdf-ingestion
 
+//x infos
 git branch  //vedi in che branch sei attualmente
 git branch -a   //vedi i branches che hai x this prj(where there is file .git)
 git log --oneline   //vedi history
 Remove-Item -Recurse -Force .git
 git remote -v
 
-git checkout -b develop   
-git add .
-git commit -m "Initial commit"
-git push -u origin develop   
 
 ora visto che hai creato gia anche settato le branch rules applicato sul branch 'main', tra qui anche che non puoi caricare direttamente su target branch ma devi passare da un merge.
 quindi apri una Pull Request develop → main > aggiungi descrizione> milestone e label se opportuno> fai la review> esegui il merge.
