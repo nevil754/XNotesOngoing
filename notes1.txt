@@ -999,14 +999,19 @@ robocopy C:\sviluppo\devops\prjRAG_AI\forgejo-test-repo `
          /MIR /XD .git
   //esclude file .git e copia tutto il content in forgejo-test-repo/ dentro repo-test/
 ora apri il target folder sul tuo pc
-git checkout -b develop   //w -b, CREI BRANCH 'develop'!! da qui da qui partiranno i branches features
-git push -u origin develop   //-u setta --set-upstream, cioe dice che questo branch locale (develop) è collegato al branch remoto origin/develop, 🔥COSI ORA FAI SOLO 'git push'/'git pull'(e basta) e git sa che deve inviare le modifiche a origin/develop!
-ora vedi che ha caricato su remoto il code, e ti da anche link per fare la PullRequest per mergiare branch develop su branch main, oppure (è stessa cosa) 🔥target repo su forgejo>pull request>new pull request> main -- develop , tile: 'Initial import of Develop branch', descriptions labels milestones project 
+git checkout -b develop   //w -b, CREI BRANCH 'develop'(e ci entri dentro)!! da qui da qui partiranno i branches features
+git push -u origin develop   //-u setta --set-upstream, cioe dice che questo branch locale (develop) è collegato al branch remoto origin/develop, 🔥COSI ORA FAI SOLO 🔥'git push'/'git pull'(e basta) e git sa che deve inviare le modifiche a origin/develop!
+ora vedi che ha caricato su remoto il code e ti da link per fare la PullRequest per mergiare branch develop su branch main, oppure (è stessa cosa) 🔥target repo su forgejo>pull request> main -- develop, click new pull request> tile: 'Initial import of Develop branch', assignees: nelvison.benedetto descriptions labels milestones project > create pull request.
 //ora hai origin/main e origin/develop 
-git checkout develop
+git checkout develop   //entra in questo branch, e git add git commit git push
+
+
+
+
 git checkout -b feature/pdf-ingestion
 
-git branch -a  // vedi i branches che hai
+git branch  //vedi in che branch sei attualmente
+git branch -a   //vedi i branches che hai x this prj(where there is file .git)
 git log --oneline   //vedi history
 Remove-Item -Recurse -Force .git
 git remote -v
