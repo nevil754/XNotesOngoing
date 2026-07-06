@@ -1071,7 +1071,7 @@ crea
 ssh://git@192.168.113.52:222/CompeteSrl/test-repo.git
 git remote -v
 ricordi come avevi settato i volumes del containerdocker Forgejo? avevi settato volumes: /srv/data/infrastructure/forgejo:/data  quindi li se controlli troverai anche tutti i repository che hai creato, trovi il file .git cioè quello che riceve i git push dal tuo pc!
-Allora A COSA SERVONO ESATTAMENTE GLI AMBIENTI /srv/environments (cioe dev/prod/staging)? questi sono 'working tree' cioe usate PER FAR GIRARE IL SOFTWARE (mentre forgejo serve a gestire il codice).
+gli ambienti /srv/environments (cioe dev/prod/staging)? questi sono 'working tree' cioe usate PER FAR GIRARE IL SOFTWARE (mentre forgejo serve a gestire il codice).
 questi environments vengono aggiornati all'inizio lo fai tu manualmente (POI AUTOMATIZZI CON forgejo runner CI/CD!! ⚠️ è brutto e puoi fare errori se fai manualmente!)
 //x development env
 cd /srv/environments/dev
@@ -1100,10 +1100,6 @@ tips:
 
 other:
 attualmente la mia Issues creata 'implement PDF ingestion...' è settata su branch main⚠️!!
-
-
-
-
 
 
 ##################
