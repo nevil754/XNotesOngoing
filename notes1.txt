@@ -997,16 +997,18 @@ main ------ develop ------ feature/chat
 create repo su forgejo (standart enterprise cosi hai readme.md .gitignore e lincense)
 git clone ssh://git@192.168.113.52:222/CompeteSrl/repo-test.git
 cd test-repo
-NOW COPY TUTTO IL CODE (classic copy&paste) che è all'interno di un altro folder, in questo folder 
-robocopy C:\sviluppo\devops\prjRAG_AI\forgejotest-mycode `
-         C:\sviluppo\devops\prjRAG_AI\repo-testt `
-         /MIR /XD .git
-  //esclude file .git e copia tutto il content in forgejo-test-repo/ dentro repo-test/
 ora apri il target folder sul tuo pc
 //git ls-tree -r main --name-only   ora vedi che cmnq hai realmente i files readme.md e .gitignore (anche se non li vedi ad occhio)
 git checkout main
 git pull   //!!perché il branch develop all'inizio DEVE ESSERE UGUALE AL BRANCH MAIN!! altrimenti e.g. sul main avevi .gitignore e il branch developer non c'è l'ha e quindi quando fai merge ti cancella dal risultato finale il .gitignore!!
 git checkout -b develop   //w -b, CREI BRANCH 'develop'(e ci entri dentro)!! da qui da qui partiranno i branches features
+NOW COPY TUTTO IL CODE che è all'interno di un altro folder, in questo folder scaricato da forgejo
+robocopy C:\sviluppo\devops\prjRAG_AI\forgejotest-mycode `
+         C:\sviluppo\devops\prjRAG_AI\repo-testt `
+         /MIR /XD .git
+  //esclude file .git e copia tutto il content in forgejo-test-repo/ dentro repo-test/
+git add .
+git commit -m "Initial import"
 git push -u origin develop   //-u setta --set-upstream, cioe dice che questo branch locale (develop) è collegato al branch remoto origin/develop, 🔥COSI ORA FAI SOLO 🔥'git push'/'git pull'(e basta) e git sa che deve inviare le modifiche a origin/develop!
 ora vedi che ha caricato su remoto il code e ti da link per fare la PullRequest per mergiare branch develop su branch main (PERO IN QUESTO CASO il branch main vs develop è uguale (xk branch develop è nato da branch main e poi non hai cambiato branch develop), quindi puoi cmnq creare pull request ma non hai btn di Merge) oppure meglio 🔥target repo su forgejo>pull request> main -- develop  new pull request> title: 'Initial import of Develop branch', 🔥assignees: nelvison.benedetto descriptions labels milestones project > create pull request.
 //ora hai origin/main e origin/develop 
@@ -1019,7 +1021,15 @@ di solito pero si hanno 3 figure intorno alla repo target
 ✔️ Another user approva (xxxreviewer)
 
 pero ora visto che lavori solo con user nelvison.benedetto. 
-target PR> files changed> review> approve> submit review> e dopo vedi che hai Merge abilitato (perche ricorda avevi messo delle barnch rules x branch 'main')
+target PR> files changed> review> approve> submit review> e dopo vedi che hai Merge abilitato (perche ricorda avevi messo delle barnch rules x branch 'main')> fai 🔥Merge (se il tuo branch è develop NON ELIMINARE IL BRANCH mentre invece se era un branch feature/xxx allora si clicca che vuoi eliminare quel branch).
+git checkout main
+git pull origin main   //ora il tuo branch main locale è uguale a quello remoto
+
+git checkout develop
+git merge main
+git push   //invia i commits che hai fatto in locale al remoto
+//ora hai di nuovo tutto sincronizzato locale<-->remoto
+
 
 
 git checkout -b feature/pdf-ingestion
