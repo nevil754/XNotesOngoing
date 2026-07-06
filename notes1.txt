@@ -977,7 +977,8 @@ The key's randomart image is:
 +----[SHA256]-----+
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOvhyX42ChaQBbdCyfP2220oFI9wZ/WuuXkWoWwZke1n laptop pc30   //questa è la key pubblica che aggiugerai a user forgejo nelvison.benedetto !
 
--ora fai git clone e scaricati il prj sul tuo pc.
+ora fai git clone e scaricati il prj sul tuo pc.
+
 🔥🔥-setta i BRANCHES 
                 feature/pdf-parser
                /
@@ -1038,6 +1039,8 @@ git pull
 quando hai fatto merge sul main branch allora aggiorni
 cd /srv/environments/prod
 git pull origin main
+
+
 
 
 e per chiudere la issue? cioe in realta attualmente vorrei direttamente chiuderla xk è gia stata fatta nel code che non ho ancora creato
