@@ -997,31 +997,35 @@ main ------ develop ------ feature/chat
 create repo su forgejo (standart enterprise cosi hai readme.md .gitignore e lincense)
 git clone ssh://git@192.168.113.52:222/CompeteSrl/repo-test.git
 cd test-repo
-ora apri il target folder sul tuo pc
-//git ls-tree -r main --name-only   ora vedi che cmnq hai realmente i files readme.md e .gitignore (anche se non li vedi ad occhio)
+ora apri il target folder sul tuo pc  'code .'
+//git ls-tree -r main --name-only   vedi che cmnq hai realmente i files readme.md e .gitignore (anche se non li vedi ad occhio)
+//git restore README.md .gitignore   non necessario, ma cmnq questi ti scrive su disco locale questi files presi dal remoto
+
 git checkout main
-git pull   //!!perché il branch develop all'inizio DEVE ESSERE UGUALE AL BRANCH MAIN!! altrimenti e.g. sul main avevi .gitignore e il branch developer non c'è l'ha e quindi quando fai merge ti cancella dal risultato finale il .gitignore!!
-git checkout -b develop   //w -b, CREI BRANCH 'develop'(e ci entri dentro)!! da qui da qui partiranno i branches features
-NOW COPY TUTTO IL CODE che è all'interno di un altro folder, in questo folder scaricato da forgejo
-robocopy C:\sviluppo\devops\prjRAG_AI\forgejotest-mycode `
-         C:\sviluppo\devops\prjRAG_AI\repo-testt `
-         /MIR /XD .git
-  //esclude file .git e copia tutto il content in forgejo-test-repo/ dentro repo-test/
+git pull   //!!perché il branch develop all'inizio DEVE ESSERE UGUALE AL BRANCH MAIN!! controlla i commits quello locale e quello remoto
+git checkout -b develop   //w -b, CREI BRANCH 'develop'(parte come base con il CONTENT DEL BRANCH SU CUI SEI ADESSO e ci entri dentro)!! da qui da qui partiranno i branches features
+NOW COPY TUTTO IL CODE che è all'interno di un altro folder, apri entrambi i folders (con windows explora risorse)(ovviamente select all tranne .git,.gitignore, readme.md e lincences) e copia&incolla (cosi se ci sono dei conflitti ti chiede cosa vuoi fare)
+//oppure, questo ma fa auto non ti chiede nulla e sovrascrive se trova match
+robocopy C:\sviluppo\devops\prjRAG_AI\testt-repoo `
+         C:\sviluppo\devops\prjRAG_AI\testtt-repooo `
+         /E `
+         /XD .git `
+         /XF README.md .gitignore LICENSE
+  //esclude file .git,.gitognore,readme.md e lincences e copia tutto il content in forgejo-test-repo/ dentro repo-test/
+
 git add .
 git commit -m "Initial import"
 git push -u origin develop   //-u setta --set-upstream, cioe dice che questo branch locale (develop) è collegato al branch remoto origin/develop, 🔥COSI ORA FAI SOLO 🔥'git push'/'git pull'(e basta) e git sa che deve inviare le modifiche a origin/develop!
 ora vedi che ha caricato su remoto il code e ti da link per fare la PullRequest per mergiare branch develop su branch main (PERO IN QUESTO CASO il branch main vs develop è uguale (xk branch develop è nato da branch main e poi non hai cambiato branch develop), quindi puoi cmnq creare pull request ma non hai btn di Merge) oppure meglio 🔥target repo su forgejo>pull request> main -- develop  new pull request> title: 'Initial import of Develop branch', 🔥assignees: nelvison.benedetto descriptions labels milestones project > create pull request.
-//ora hai origin/main e origin/develop 
-git checkout develop   now do entra in questo branch, modifica qualcosa piccolo e.g.un commento  e git add git commit 'git push'(senza nient'altro, intanto lo hai gia linkato grazie a -u) 
-ora vedi forgejo target repo>pull request mexage > hai una richiesta di merge.
+ora login forgejo con utente nelvison.benedetto> vedi che ti è chiesta la PR> file changes> 🔥approve la review della PR!
+ora hai abilitato la possibiliata finalmente di fare il Merge Commit (xk avevi un po settato delle branch rules x security)> Create Merge Commit (se il tuo branch è 'develop'NON ELIMINARE IL BRANCH (xk ricorda il le feats arrivano tutte al develop non direttamente al main) mentre invece se era un branch feature/xxx allora si clicca che vuoi eliminare quel branch).
 
 di solito pero si hanno 3 figure intorno alla repo target
 ✔️ Admin crea repo e regole (nelvison.benedetto)
 ✔️ Developer lavora (xx)
 ✔️ Another user approva (xxxreviewer)
 
-pero ora visto che lavori solo con user nelvison.benedetto. 
-target PR> files changed> review> approve> submit review> e dopo vedi che hai Merge abilitato (perche ricorda avevi messo delle barnch rules x branch 'main')> fai 🔥Merge (se il tuo branch è develop NON ELIMINARE IL BRANCH mentre invece se era un branch feature/xxx allora si clicca che vuoi eliminare quel branch).
+ora sincronizza anche il code locale, sincronizza sia i locals main e develop
 git checkout main
 git pull origin main   //ora il tuo branch main locale è uguale a quello remoto
 
