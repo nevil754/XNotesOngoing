@@ -1059,7 +1059,14 @@ cosi vedi la PR e fai la PR develop--feature/xxx e se la review viene approvata 
 git checkout develop
 git pull origin develop
 git branch -d feature/xxx   //ELIMINA branch locale feature/xxx (se git ti dice qualcosa allora git branch -D feature/xxx)
-
+ora il branch develop è aggiornato con il lavoro fatto nel branch feature/xxx, quindi poi quando sarai soddifatto del branch develop e vuoi caricare sul main, fai una Realease with Tag e.g.v1.0.0
+ORA FAI UNA RELEASE+TAG (per vedere come si fa, solitamente pero lo faresti solo quando sei soddisfatto con il develop e vuoi portare fuori il prodotto (che passera in staging e poi production))
+fai un merge commit (tramite PR) develop->main su forgejo
+git checkout main
+git pull origin main   //aggiorna locale main
+git tag -a v1.0.0 -m "First production release"
+git push origin v1.0.0   //push del tag al remoto
+forgejo>target repository > releases > new release> tag: v1.0.0 (quello appena pushato), target branch: main, title: "RAGsystem v1.0.0 Initial Production Release", description:..., > create release.  //ricardati usa sempre standart nomenclatura vMAJOR.MINOR.PATCH
 
 
 finora pero hai sempre e solo aggiornato branch 'develop', quando decidi "questa versione è pronta" di develop allora fai la Release e.g. release/1.0.0
