@@ -1004,7 +1004,7 @@ robocopy C:\sviluppo\devops\prjRAG_AI\forgejo-test-repo `
   //esclude file .git e copia tutto il content in forgejo-test-repo/ dentro repo-test/
 ora apri il target folder sul tuo pc
 git checkout main
-git pull   //!!perché il branch develop all'inizio DEVE ESSERE UGUALE AL BRANBCH MAIN!! altrimenti e.g. sul main avevi .gitignore e il branch developer non c'è l'ha e quindi quando fai merge ti cancella dal risultato finale il .gitignore!!
+git pull   //!!perché il branch develop all'inizio DEVE ESSERE UGUALE AL BRANCH MAIN!! altrimenti e.g. sul main avevi .gitignore e il branch developer non c'è l'ha e quindi quando fai merge ti cancella dal risultato finale il .gitignore!!
 git checkout -b develop   //w -b, CREI BRANCH 'develop'(e ci entri dentro)!! da qui da qui partiranno i branches features
 git push -u origin develop   //-u setta --set-upstream, cioe dice che questo branch locale (develop) è collegato al branch remoto origin/develop, 🔥COSI ORA FAI SOLO 🔥'git push'/'git pull'(e basta) e git sa che deve inviare le modifiche a origin/develop!
 ora vedi che ha caricato su remoto il code e ti da link per fare la PullRequest per mergiare branch develop su branch main (PERO IN QUESTO CASO il branch main vs develop è uguale, quindi puoi cmnq creare pull request ma non hai btn di Merge) oppure meglio 🔥target repo su forgejo>pull request> main -- develop  new pull request> title: 'Initial import of Develop branch', assignees: nelvison.benedetto descriptions labels milestones project > create pull request.
