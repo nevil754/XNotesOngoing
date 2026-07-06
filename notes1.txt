@@ -998,19 +998,20 @@ create repo su forgejo (standart enterprise cosi hai readme.md .gitignore e linc
 git clone ssh://git@192.168.113.52:222/CompeteSrl/repo-test.git
 cd test-repo
 NOW COPY TUTTO IL CODE (classic copy&paste) che è all'interno di un altro folder, in questo folder 
-robocopy C:\sviluppo\devops\prjRAG_AI\forgejo-test-repo `
-         C:\sviluppo\devops\prjRAG_AI\repo-test `
+robocopy C:\sviluppo\devops\prjRAG_AI\forgejotest-mycode `
+         C:\sviluppo\devops\prjRAG_AI\repo-testt `
          /MIR /XD .git
   //esclude file .git e copia tutto il content in forgejo-test-repo/ dentro repo-test/
 ora apri il target folder sul tuo pc
+//git ls-tree -r main --name-only   ora vedi che cmnq hai realmente i files readme.md e .gitignore (anche se non li vedi ad occhio)
 git checkout main
 git pull   //!!perché il branch develop all'inizio DEVE ESSERE UGUALE AL BRANCH MAIN!! altrimenti e.g. sul main avevi .gitignore e il branch developer non c'è l'ha e quindi quando fai merge ti cancella dal risultato finale il .gitignore!!
 git checkout -b develop   //w -b, CREI BRANCH 'develop'(e ci entri dentro)!! da qui da qui partiranno i branches features
 git push -u origin develop   //-u setta --set-upstream, cioe dice che questo branch locale (develop) è collegato al branch remoto origin/develop, 🔥COSI ORA FAI SOLO 🔥'git push'/'git pull'(e basta) e git sa che deve inviare le modifiche a origin/develop!
-ora vedi che ha caricato su remoto il code e ti da link per fare la PullRequest per mergiare branch develop su branch main (PERO IN QUESTO CASO il branch main vs develop è uguale, quindi puoi cmnq creare pull request ma non hai btn di Merge) oppure meglio 🔥target repo su forgejo>pull request> main -- develop  new pull request> title: 'Initial import of Develop branch', assignees: nelvison.benedetto descriptions labels milestones project > create pull request.
+ora vedi che ha caricato su remoto il code e ti da link per fare la PullRequest per mergiare branch develop su branch main (PERO IN QUESTO CASO il branch main vs develop è uguale (xk branch develop è nato da branch main e poi non hai cambiato branch develop), quindi puoi cmnq creare pull request ma non hai btn di Merge) oppure meglio 🔥target repo su forgejo>pull request> main -- develop  new pull request> title: 'Initial import of Develop branch', 🔥assignees: nelvison.benedetto descriptions labels milestones project > create pull request.
 //ora hai origin/main e origin/develop 
-git checkout develop   //now do entra in questo branch, modifica qualcosa piccolo e.g.un commento  e git add git commit 'git push'(senza nient'altro, intanto lo hai gia linkato grazie a -u) 
-ora vedi che hai forgejo>pull request mexage > hai una richiesta di merge.
+git checkout develop   now do entra in questo branch, modifica qualcosa piccolo e.g.un commento  e git add git commit 'git push'(senza nient'altro, intanto lo hai gia linkato grazie a -u) 
+ora vedi forgejo target repo>pull request mexage > hai una richiesta di merge.
 
 di solito pero si hanno 3 figure intorno alla repo target
 ✔️ Admin crea repo e regole (nelvison.benedetto)
