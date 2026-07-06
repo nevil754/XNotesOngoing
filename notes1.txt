@@ -1017,7 +1017,7 @@ git add .
 git commit -m "Initial import"
 git push -u origin develop   //-u setta --set-upstream, cioe dice che questo branch locale (develop) è collegato al branch remoto (che lo crea proprio ora) origin/develop, 🔥COSI ORA FAI SOLO 🔥'git push'/'git pull'(e basta) e git sa che deve inviare le modifiche a origin/develop! 
 ora vedi che ha caricato su remoto il code e ti da link per fare la PullRequest per mergiare branch develop su branch main (PERO IN QUESTO CASO il branch main vs develop è uguale (xk branch develop è nato da branch main e poi non hai cambiato branch develop), quindi puoi cmnq creare pull request ma non hai btn di Merge) oppure meglio 🔥target repo su forgejo>pull request> main -- develop  new pull request> title: 'Initial import of Develop branch', 🔥assignees: nelvison.benedetto descriptions labels milestones project > create pull request.
-ora login forgejo con utente nelvison.benedetto> vedi che ti è chiesta la PR> file changes> 🔥approve la review della PR!
+ora login forgejo con utente nelvison.benedetto> vedi che ti è chiesta la PR> 🔥file changes> 🔥approve la review della PR!
 ora hai abilitato la possibiliata finalmente di fare il Merge Commit (xk avevi un po settato delle branch rules x security)> Create Merge Commit (se il tuo branch è 'develop'NON ELIMINARE IL BRANCH (xk ricorda il le feats arrivano tutte al develop non direttamente al main) mentre invece se era un branch feature/xxx allora si clicca che vuoi eliminare quel branch).
 
 di solito pero si hanno 3 figure intorno alla repo target
@@ -1055,7 +1055,13 @@ e fa tranquillamente i commits e i pushes
 git add .
 git commit -m "pdf parser initial"
 git push -u origin feature/xxx
-cosi che arrivano le richieste di PR a branch 'develop' e se la review viene approvata allora avviene il merge.
+cosi vedi la PR e fai la PR develop--feature/xxx e se la review viene approvata allora fai il Merge Commit (spunta 'delete branch feature/xxx'), e sincronizza il locale
+git checkout develop
+git pull origin develop
+git branch -d feature/xxx   //ELIMINA branch locale feature/xxx (se git ti dice qualcosa allora git branch -D feature/xxx)
+
+
+
 finora pero hai sempre e solo aggiornato branch 'develop', quando decidi "questa versione è pronta" di develop allora fai la Release e.g. release/1.0.0
 poi passi la release a /srv/environments/staging e qui provi tutto fai tutti i tests
 quando è tutto ok passi la relase (sempre release/1.0.0) al branch 'main' tramite merge con Tag v1.0.0 e Notes, in questo modo ora il server /srv/environments/prod viene aggiornato.
