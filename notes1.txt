@@ -993,7 +993,7 @@ git commit -m "Initial commit"
 git push origin main
 
 git checkout main
-git checkout -b develop    //CREI BRANCH 'develop'
+git checkout -b develop    //CREI BRANCH 'develop'!! da qui da qui partiranno i branches features
 git push origin develop
 e poi subito su forgejo target repo>settings>branches>default branch: 'develop' (prima era 'main' PERCHE ORA OGNI NUOVA FEATURE PARTIRA DA 'develop' branch!! 'main' rimane solo x la prodizione!!)
 branch> rules branch> target branch 'develop'> rules niente push diretto, merge solo via PR, almeno 1 approval.
@@ -1019,7 +1019,25 @@ quindi ogni environment ha un branch diverso:
 /srv/environments/staging -> branch 'release/xyz'
 /srv/environments/prod -> branch 'main'
 
-
+crea 
+ssh://git@192.168.113.52:222/CompeteSrl/test-repo.git
+git remote -v
+ricordi come avevi settato i volumes del containerdocker Forgejo? avevi settato volumes: /srv/data/infrastructure/forgejo:/data  quindi li se controlli troverai anche tutti i repository che hai creato, trovi il file .git cioè quello che riceve i git push dal tuo pc!
+Allora A COSA SERVONO ESATTAMENTE GLI AMBIENTI /srv/environments (cioe dev/prod/staging)? questi sono 'working tree' cioe usate PER FAR GIRARE IL SOFTWARE (mentre forgejo serve a gestire il codice).
+questi environments vengono aggiornati all'inizio lo fai tu manualmente (POI AUTOMATIZZI CON forgejo runner CI/CD!! ⚠️ è brutto e puoi fare errori se fai manualmente!)
+//x development env
+cd /srv/environments/dev
+git pull origin develop
+docker compose up -d
+ //x staging env
+dopo che hai creato Release e.g. release/1.0.0 allora 
+cd /srv/environments/staging
+git checkout release/1.0.0
+git pull
+//x production env
+quando hai fatto merge sul main branch allora aggiorni
+cd /srv/environments/prod
+git pull origin main
 
 
 e per chiudere la issue? cioe in realta attualmente vorrei direttamente chiuderla xk è gia stata fatta nel code che non ho ancora creato
