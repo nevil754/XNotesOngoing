@@ -1061,6 +1061,7 @@ git pull origin develop
 git branch -d feature/xxx   //ELIMINA branch locale feature/xxx (se git ti dice qualcosa allora git branch -D feature/xxx)
 ora il branch develop è aggiornato con il lavoro fatto nel branch feature/xxx, quindi poi quando sarai soddifatto del branch develop e vuoi caricare sul main, fai una Realease with Tag e.g.v1.0.0
 ORA FAI UNA RELEASE+TAG (per vedere come si fa, solitamente pero lo faresti solo quando sei soddisfatto con il develop e vuoi portare fuori il prodotto (che passera in staging e poi production))
+[🔥🔥🔥🔥🔥🔥🔥🔥🔥TODO RESTART HERE NELSON!! TODO IN 7-7-2026🔥🔥🔥🔥🔥🔥🔥🔥🔥]
 fai un merge commit (tramite PR) develop->main su forgejo
 git checkout main
 git pull origin main   //aggiorna locale main
@@ -1146,6 +1147,9 @@ merge release/1.0.0 → main
 tag v1.0.0
 e poi
 main → /srv/environments/prod
+
+
+
 
 
 
