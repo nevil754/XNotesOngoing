@@ -987,15 +987,34 @@ main ------ develop ------ feature/chat
                 feature/reranker
                  \
                   feature/frontend
-git init
-git remote add origin git@192.168.113.52:ValtermLabs/rag-system.git
+//ricordati non fare quando crei repo su forgejo aggiungi readm.me e quindi fai il primo commit, e poi in locale nel tuo code fai 'git init' che crea un altro repository totalmente indipendente! quindi error i 2 cosi non hanno antenati in comune!!(potresti anche risolvere ma non è cosi che si fa)
+
+create repo su forgejo (standart enneterprise cosi hai readme.md .gitignore e lincenze)
+git clone ssh://git@192.168.113.52:222/CompeteSrl/test-repo.git
+cd test-repo
+NOW COPY TUTTO IL CODE (classic copy&paste) che è all'interno di un altro folder, in questo folder 
+git checkout -b develop
+git push -u origin develop
+//ora hai origin/main e origin/develop
+git checkout develop
+git checkout -b feature/pdf-ingestion
+
+git branch -a  // vedi i branches che hai
+git log --oneline   //vedi history
+Remove-Item -Recurse -Force .git
+
+
+git checkout -b develop   //w -b, CREI BRANCH 'develop'!! da qui da qui partiranno i branches features
 git add .
 git commit -m "Initial commit"
-git push origin main
+git push -u origin develop   //-u setta --set-upstream, cioe dice che questo branch locale (develop) è collegato al branch remoto origin/develop, 🔥COSI ORA FAI SOLO 'git push'/'git pull'(e basta) e git sa che deve inviare le modifiche a origin/develop!
+ora vedi che ha caricato su remoto il code, e ti da anche link per fare la PullRequest per mergiare branch develop su branch main, oppure (è stessa cosa) target repo su forgejo>pull request>new pull request> main -- develop , tile: 'Initial import of Develop branch', descriptions labels milestones project 
 
-git checkout main
-git checkout -b develop    //CREI BRANCH 'develop'!! da qui da qui partiranno i branches features
-git push origin develop
+ora visto che hai creato gia anche settato le branch rules applicato sul branch 'main' , tra qui anche che non puoi caricare direttamente su target branch ma devi passare da un merge.
+quindi apri una Pull Request develop → main > aggiungi descrizione> milestone e label se opportuno> fai la review> esegui il merge.
+
+//git checkout main
+
 e poi subito su forgejo target repo>settings>branches>default branch: 'develop' (prima era 'main' PERCHE ORA OGNI NUOVA FEATURE PARTIRA DA 'develop' branch!! 'main' rimane solo x la prodizione!!)
 branch> rules branch> target branch 'develop'> rules niente push diretto, merge solo via PR, almeno 1 approval.
 
