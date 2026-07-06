@@ -1073,6 +1073,7 @@ git remote -v
 ricordi come avevi settato i volumes del containerdocker Forgejo? avevi settato volumes: /srv/data/infrastructure/forgejo:/data  quindi li se controlli troverai anche tutti i repository che hai creato, trovi il file .git cioè quello che riceve i git push dal tuo pc!
 gli ambienti /srv/environments (cioe dev/prod/staging)? questi sono 'working tree' cioe usate PER FAR GIRARE IL SOFTWARE (mentre forgejo serve a gestire il codice).
 questi environments vengono aggiornati all'inizio lo fai tu manualmente (POI AUTOMATIZZI CON forgejo runner CI/CD!! ⚠️ è brutto e puoi fare errori se fai manualmente!)
+
 //x development env
 cd /srv/environments/dev
 git pull origin develop
@@ -1087,7 +1088,31 @@ quando hai fatto merge sul main branch allora aggiorni
 cd /srv/environments/prod
 git pull origin main
 
+-environment /srv/environments/dev
+cd /srv/environments/dev
+git fetch origin
+git checkout develop
+git reset --hard origin/develop
+docker compose up -d
+//cosi dev = sempre ALLINEATO a develop!
 
+-environment /srv/environments/staging
+cd /srv/environments/staging
+git fetch origin
+git checkout release/1.0.0
+git reset --hard origin/release/1.0.0
+docker compose up -d
+//cosi staging = release candidate stabile
+
+-environment /srv/environments/prod
+cd /srv/environments/prod
+git fetch origin
+git checkout main
+git reset --hard origin/main
+docker compose up -d
+//cosi prod = solo main stabile (taggato)
+
+//usi reset --hard xk cosi hai environment identico al repo, niente file sporchi, niente drift, è standard in deploy controllati.
 
 
 e per chiudere la issue? cioe in realta attualmente vorrei direttamente chiuderla xk è gia stata fatta nel code che non ho ancora creato
