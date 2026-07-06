@@ -827,7 +827,7 @@ name: rag-system (CONSIGLIATO NOMENCLATURA SEMPRE in minuscolo e con - per gli s
 🔥-set branch protection rules
 target repo>settings>branches>branch protection rules: 
 --protected branch name pattern: main
---protected file patterns separated using semicolon ; : /infra/**;/config/**
+--protected file patterns separated using semicolon ; : /infra/**;/config/**    //devi fare PullRequest per poter modificare questi files, no push diretto
 --unprotected file pattersn separated using semicolon ; : lascia blank
 --push: disable push (cosi nessuno puo pushare su direttamente su main, nemmeno te)
 --require signed commits: lascia blank
@@ -1030,32 +1030,21 @@ git checkout main
 git pull origin main   //ora il tuo branch main locale è uguale a quello remoto
 
 git checkout develop
-git merge main   //meglio del rebase mantiene history (cmnq rebase è usato dai pro)
-git push   //invia i commits che hai fatto in locale al remoto
+git merge main   //prende tutti i commit presenti in main e li integrali dentro develop, meglio del rebase mantiene history (cmnq rebase è usato dai pro)
+git push   //prende tutti i commit locali su 'develop' e li manda al remoto origin/develop, ora remoto e locale x branch 'develop' sono UGUALI!!
 //ora hai di nuovo tutto sincronizzato locale<-->remoto
 
-ORA APPLICA RULES DI BRANCH SECURITY anche a 'develop'
+🔥ORA APPLICA RULES DI BRANCH SECURITY anche a 'develop'
+🔥 target repo>settings>branches>default branch: 'develop' perché d'ora in poi le features/xxx devono generarsi a partire da branch 'develop'!!(branch 'main' rimane x la production)
 ADD NEW FEATURE feature/xxx AL CODE
 
-
-
-git checkout -b feature/pdf-ingestion
-
-//x infos
+---x infos
 git branch  //vedi in che branch sei attualmente
 git branch -a   //vedi i branches che hai x this prj(where there is file .git)
 git log --oneline   //vedi history
 Remove-Item -Recurse -Force .git
 git remote -v
-
-
-ora visto che hai creato gia anche settato le branch rules applicato sul branch 'main', tra qui anche che non puoi caricare direttamente su target branch ma devi passare da un merge.
-quindi apri una Pull Request develop → main > aggiungi descrizione> milestone e label se opportuno> fai la review> esegui il merge.
-
-//git checkout main
-
-e poi subito su forgejo target repo>settings>branches>default branch: 'develop' (prima era 'main' PERCHE ORA OGNI NUOVA FEATURE PARTIRA DA 'develop' branch!! 'main' rimane solo x la prodizione!!)
-branch> rules branch> target branch 'develop'> rules niente push diretto, merge solo via PR, almeno 1 approval.
+---
 
 ora puoi simulare che ogni persona del team lavora su un feature branch diversa, e.g. nelvison-> feature/rag-ingestion,  julia-> feature/reranker ect.
 ognuno quindi fa 
