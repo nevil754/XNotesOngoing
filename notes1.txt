@@ -978,9 +978,46 @@ The key's randomart image is:
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOvhyX42ChaQBbdCyfP2220oFI9wZ/WuuXkWoWwZke1n laptop pc30   //questa è la key pubblica che aggiugerai a user forgejo nelvison.benedetto !
 
 -ora fai git clone e scaricati il prj sul tuo pc.
-🔥🔥-setta i Branches 
+🔥🔥-setta i BRANCHES 
+                feature/pdf-parser
+               /
+main ------ develop ------ feature/chat
+               \
+                feature/reranker
+                 \
+                  feature/frontend
+git init
+git remote add origin git@192.168.113.52:ValtermLabs/rag-system.git
+git add .
+git commit -m "Initial commit"
+git push origin main
 
+git checkout main
+git checkout -b develop    //CREI BRANCH 'develop'
+git push origin develop
+e poi subito su forgejo target repo>settings>branches>default branch: 'develop' (prima era 'main' PERCHE ORA OGNI NUOVA FEATURE PARTIRA DA 'develop' branch!! 'main' rimane solo x la prodizione!!)
+branch> rules branch> target branch 'develop'> rules niente push diretto, merge solo via PR, almeno 1 approval.
 
+ora puoi simulare che ogni persona del team lavora su un feature branch diversa, e.g. nelvison-> feature/rag-ingestion,  julia-> feature/reranker ect.
+ognuno quindi fa 
+git checkout develop
+git pull   //scarica/aggiorna da remoto il locale
+git checkout -b feature/pdf-parser
+e fa tranquillamente i commits e i pushes
+cosi che arrivano le richieste di PR a branch 'develop' e se la review viene approvata allora avviene il merge.
+finora pero hai sempre e solo aggiornato branch 'develop', quando decidi "questa versione è pronta" allora fai la Release e.g. release/1.0.0
+poi passi la release a /srv/environments/staging e qui provi tutto fai tutti i tests
+quando è tutto ok passi la relase (sempre release/1.0.0) al branch 'main' tramite merge con Tag v1.0.0 e Notes, in questo modo ora il server /srv/environments/prod viene aggiornato.
+//continui cmnq sempre a sviluppare con le features branches e a ingigantire il branch develop.
+tu sul tuo server hai gia ambienti
+/srv/environments/
+    dev/
+    staging/
+    prod/
+quindi ogni environment ha un branch diverso: 
+/srv/environments/dev  -> branch 'develop'
+/srv/environments/staging -> branch 'release/xyz'
+/srv/environments/prod -> branch 'main'
 
 
 
