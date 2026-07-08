@@ -290,9 +290,9 @@ mkdir -p \
 /srv/scripts
 
 mkdir -p \
-/srv/data/dev/{sqlserver,qdrant,redis,uploads} \
-/srv/data/staging/{sqlserver,qdrant,redis,uploads} \
-/srv/data/prod/{sqlserver,qdrant,redis,uploads}
+/srv/data/dev/prjXXX/{sqlserver,qdrant,redis,uploads} \
+/srv/data/staging/prjXXX/{sqlserver,qdrant,redis,uploads} \
+/srv/data/prod/prjXXX/{sqlserver,qdrant,redis,uploads}
 
 mkdir -p \
 /srv/data/infrastructure/{forgejo,prometheus,grafana}
