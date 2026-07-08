@@ -1278,12 +1278,12 @@ volumes:
   - ${DATA_ROOT}/qdrant:/qdrant/storage
 
 poi hai 3 reti docker separate:
-rag-dev-network [che all''interno contiene e.g. rag-dev-qrant.. (quaindi anche chiaro il nome dei sottocontainers)]
-rag-staging-network [...]
+rag-dev-network [che all''interno contiene e.g. rag-dev-qrant.. (quaindi anche chiaro il nome dei sottocontainers)]  //LO SETTI NEL DOCKER-COMPOSE !
+rag-staging-network [...]  //LO SETTI NEL DOCKER-COMPOSE !
 rag-prod-network [...]
-//in questo modo anche a livello docker niente dns interno condiviso, niente collisioni nomi containers, niente comunicazioni accidentali.
+//in questo modo e.g. rag-dev-api non puo risolvere il nome rag-prod-redis o collegarsi ad esso, perfect, isolamento totale!!
 
-
+docker network ls  //vedi le reti network
 
 
 //SERVER (DON'T DELETE!!)
