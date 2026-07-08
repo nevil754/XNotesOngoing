@@ -1183,7 +1183,7 @@ main → /srv/environments/prod
 
 
 
-SET THE FIRST TIME THE ENV ON THE SERVER
+SET THE FIRST TIME THE CODE IN THE ENVS ON THE SERVER
 cd /srv/environments/dev    //sul server
 git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git .   //il '.' per scaricare nella cartella corrente (invece di creare un sottocartella!!)
 git branch -a
