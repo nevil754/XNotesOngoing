@@ -956,7 +956,7 @@ target repo>releases>new release>
 //senza ssh key ogni git push chiede la psw, e le automazioni ci/cd diventano scomode.
 //consigliato una key privata x il pc, e una key privata per forgejo runner
 remember con ssh key la private key rimane sul tuo pc e la public key va sul server su forgejo.
-ssh-keygen -t ed25519 -C "nelvisonb-dev-laptop30"   //sul tuo pc su powershell, ed25519 è l'algh, -C scrive il comment
+ssh-keygen -t ed25519 -C "nelvisonb-dev-laptop30"   //'hostname' x vedere il nome della tua macchina (se lo vuoi inserire nel nome della ssh key), sul tuo pc su powershell, ed25519 è l'algh, -C scrive il comment
 C:/Users/nelvisonb/.ssh/id_ed25519   //dove verra salvata (usa quella gia consigliata), id=indetity ed25519=tipo di algh utilizzato
 passphrase = none (molto comodo)
 ls ~/.ssh   //check che ci sono e.g.id_ed25519 e id_ed25519.pub
@@ -1059,9 +1059,14 @@ git branch -a   //vedi i branches che hai x this prj(where there is file .git)
 git log --oneline   //vedi history
 Remove-Item -Recurse -Force .git
 git remote -v
+git fetch origin  //non modifica il tuo codice locale aggiorna solo le informazioni sui branch remoti
+  git branch -vv   //ti dice se branch target locale<-->remoto sono sincronizzati oppure uno è piu avanti dell'altro ect, senza che devi fare 'git pull'(che modifica anche il code o return 'already up to date.') 
+  git log develop..origin/develop   //se non stampa nulla allora ok, ora 'develop' locale è sincronizzato al remoto
+  git log main..origin/main
 git ls-remote --heads origin  //controlla i branch attivi su forgejo
 git fetch --prune   //vai su forgejo/github e dimmi cosa è cambiato, cancella dal mio repository locale i riferimenti ai branch remoti che sul server non esistono più. molti developer settano che fa auto, git config --global fetch.prune true quando fai semplice 'git fetch'.
 git log --oneline
+cat hello.py   //🔥per print content file called hello.py (e.g.cosi vedi che è aggiornato)
 ---
 
 ora ogni persona del team lavora su un feature branch diversa, e.g. nelvison-> feature/rag-ingestion,  julia-> feature/reranker ect.
@@ -1082,7 +1087,7 @@ git fetch --prune   //🔥 x eliminare referenza vecchia al remote feature/xxx
 ora il branch develop è aggiornato con il lavoro fatto nel branch feature/xxx, quindi poi quando sarai soddifatto del branch develop e vuoi caricare sul main, fai una Realease with Tag e.g.v1.0.0
 
 🛫ORA FAI UNA RELEASE+TAG (per vedere come si fa, solitamente pero lo faresti solo quando sei soddisfatto con il develop e vuoi portare fuori il prodotto (che passera in staging e poi production))
-fai un merge commit (tramite PR) develop->main su forgejo
+ora fai un merge commit (tramite PR) develop->main su forgejo, e poi
 git checkout main  //SEMPRE CREARE I TAGS X LA RELASE DA MAIN branch!!
 git pull origin main   //aggiorna locale main, cosi allineato locale--remoto
 git tag -a v1.0.0 -m "First production release"   //tag crea reference v1.0.0-->commit a81f92d.. -a contiene metadata author/date/mexs 
@@ -1097,6 +1102,7 @@ Use the title and content of release as tag message: uncheck (intanto tu hai gia
 Mark as pre-release: se questa relase x testing (quindi e.g. si chiama 'v1.0.0-beta.1') allora si, ma se è direttamente x production allora uncheck.
 Hide automatically generated Archives: uncheck (forgejo crea automaticamente Source code (zip) e Source code (tar.gz) x chi vuole scaricare il codice della release)
 > create release.  //ricardati usa sempre standart nomenclatura vMAJOR.MINOR.PATCH
+//ora grazie alla Release puoi scaricarla tramite .zip e contiene tutto il code
 //⚠️errori sempre da evitare: NON creare tag da branch 'develop', NON fare release da feature/xxx branch, NON modificare codice dopo tag (🔥MAI!)
 
 
@@ -1183,21 +1189,25 @@ main → /srv/environments/prod
 
 
 
-SET THE FIRST TIME THE CODE IN THE ENVS ON THE SERVER
+
+⭐️SET THE FIRST TIME THE CODE IN THE ENVS ON THE SERVER
 cd /srv/environments/dev    //sul server
+mkdir testtt-repooo   //🔥🔥CREA FOLDER X IL TUO PRJ!!
+cd testtt-repooo
 git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git .   //il '.' per scaricare nella cartella corrente (invece di creare un sottocartella!!)
-git branch -a
+git branch -a   //sei sul server, non sul tuo pc
 git checkout develop
 git pull   //aggiorni il locale con il remoto
 docker compose up -d  //avvi la tua app
 //ora environment develop contiene code del branch 'develop' della repo scaricata
 
 cd /srv/environments/staging
+mkdir testtt-repooo   //🔥🔥CREA FOLDER X IL TUO PRJ!!
+cd testtt-repooo
 git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git .   //il '.' per scaricare nella cartella corrente (invece di creare un sottocartella!!)
 git checkout develop
-git checkout -b release/1.0.0
-git push origin release/1.0.0
-cd /srv/environments/staging
+git checkout -b release/1.0.0  //QUESTA E' UN RELEASETEMP(la prima che fai), cioe viene eliminata (non la prima che fai) poi quando hai finito i tests 
+git push -u origin release/1.0.0
 git fetch origin   //contatta il repository remoto chiamato origin, scarica tutte le novità, ma NON modifica i miei branch locali. 🔥è un 'git pull' ma senza la modifica ai miei files locali
 git checkout release/1.0.0
 git pull
