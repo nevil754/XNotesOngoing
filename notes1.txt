@@ -1238,7 +1238,7 @@ docker compose up -d
 //ora in futuro consigliato automatizzare con Forgejo Runner x ci/cd!!
 
 //SERVER (DON'T DELETE!!)
-/srv/
+/srv/    //quello che hai creato TE, dove metti le cose tue
 ├── backups
 │   ├── dev
 │   ├── forgejo
@@ -1295,14 +1295,22 @@ docker compose up -d
 │   ├── nginx
 │   ├── prod
 │   └── staging
-└── scripts
-    ├── deploy.sh
-    ├── healthcheck.sh
-    ├── new_environment.sh
-    └── promote.sh
+├── scripts
+│   ├── deploy.sh
+│   ├── healthcheck.sh
+│   ├── new_environment.sh
+│   └── promote.sh
 
-
-
+// tree -d -L 3 / -I "proc|sys|dev|run|tmp|snap" /    //vedi proprio intera struttura del server
+brothers of /srv/ is
+├── home
+│   ├── deploy
+│   ├── docker
+│   ├── runner  [error opening dir]
+│   └── valterm  [error opening dir]
+├── usr
+├── var
+...
 
 e per chiudere la issue? cioe in realta attualmente vorrei direttamente chiuderla xk è gia stata fatta nel code che non ho ancora creato
 e come branch mentre sto creando questa Issues? finora ho solo branch main
@@ -2762,6 +2770,9 @@ deploy@srvdocker01:/srv/infrastructure/monitoring/netdata$ tree -d -L 3 / -I "pr
         └── rsyslog
 
 1180 directories
+
+
+
 
 ##################################################################################
 
