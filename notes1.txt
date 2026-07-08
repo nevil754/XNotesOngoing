@@ -1237,6 +1237,7 @@ docker compose up -d
 
 //ora in futuro consigliato automatizzare con Forgejo Runner x ci/cd!!
 
+//SERVER (DON'T DELETE!!)
 /srv/
 ├── backups
 │   ├── dev
