@@ -271,6 +271,13 @@ usermod -aG docker deploy  //aggiungi user deploy a group
 usermod -aG srv-deploy deploy
 
 //ora crea struttura tree (remember 'tree mypath' x vedere grafico)
+//x convemzione Linux si usano 
+/usr → software installato dal sistema
+/etc → configurazioni
+/var → dati variabili del sistema
+/home → utenti
+/srv → servizi che tu stai offrendo
+
 mkdir -p \
 /srv/environments/{dev,staging,prod} \
 /srv/infrastructure/{nginx,forgejo,forgejo-runner,monitoring,certbot} \
@@ -521,7 +528,7 @@ e go to url http://192.168.113.52:19999
 👥 Users credentials:
 -forgejo-admin, Suap45skh!, nelvison.benedetto2@gmail.com 
 -nelvison.benedetto, Utod83win!!, ssh key: nelvisonb-dev-laptop30 
-
+http://192.168.113.52:3000   
 
 i 3 ambienti (develop,testing,production) sono asettici l'uno dall'altro a livello di filesystem (se non possono essere in db separati, allora configura che siano in folders con permessi ect che siano al massimo isolati), di rete docker (network isolati), e db/volumi separati ovviamente.
 
@@ -1044,6 +1051,9 @@ git branch -a   //vedi i branches che hai x this prj(where there is file .git)
 git log --oneline   //vedi history
 Remove-Item -Recurse -Force .git
 git remote -v
+git ls-remote --heads origin  //controlla i branch attivi su forgejo
+git fetch --prune   //vai su forgejo/github e dimmi cosa è cambiato, cancella dal mio repository locale i riferimenti ai branch remoti che sul server non esistono più. molti developer settano che fa auto, git config --global fetch.prune true quando fai semplice 'git fetch'.
+git log --oneline
 ---
 
 ora ogni persona del team lavora su un feature branch diversa, e.g. nelvison-> feature/rag-ingestion,  julia-> feature/reranker ect.
@@ -1055,19 +1065,32 @@ e fa tranquillamente i commits e i pushes
 git add .
 git commit -m "pdf parser initial"
 git push -u origin feature/xxx
-cosi vedi la PR e fai la PR develop--feature/xxx e se la review viene approvata allora fai il Merge Commit (spunta 'delete branch feature/xxx'), e sincronizza il locale
+cosi vedi la PR e fai la PR develop--feature/xxx e se la review viene approvata allora fai il Merge Commit (spunta 'delete branch feature/xxx'!), e infine sincronizza il locale
 git checkout develop
 git pull origin develop
 git branch -d feature/xxx   //ELIMINA branch locale feature/xxx (se git ti dice qualcosa allora git branch -D feature/xxx)
+git branch -a   //vedi pero che hai ancora in cache la reference a il branch remoto appena cancellato
+git fetch --prune   //🔥 x eliminare referenza vecchia al remote feature/xxx
 ora il branch develop è aggiornato con il lavoro fatto nel branch feature/xxx, quindi poi quando sarai soddifatto del branch develop e vuoi caricare sul main, fai una Realease with Tag e.g.v1.0.0
-ORA FAI UNA RELEASE+TAG (per vedere come si fa, solitamente pero lo faresti solo quando sei soddisfatto con il develop e vuoi portare fuori il prodotto (che passera in staging e poi production))
-[🔥🔥🔥🔥🔥🔥🔥🔥🔥TODO RESTART HERE NELSON!! TODO IN 7-7-2026🔥🔥🔥🔥🔥🔥🔥🔥🔥]
+
+🛫ORA FAI UNA RELEASE+TAG (per vedere come si fa, solitamente pero lo faresti solo quando sei soddisfatto con il develop e vuoi portare fuori il prodotto (che passera in staging e poi production))
 fai un merge commit (tramite PR) develop->main su forgejo
-git checkout main
-git pull origin main   //aggiorna locale main
-git tag -a v1.0.0 -m "First production release"
-git push origin v1.0.0   //push del tag al remoto
-forgejo>target repository > releases > new release> tag: v1.0.0 (quello appena pushato), target branch: main, title: "RAGsystem v1.0.0 Initial Production Release", description:..., > create release.  //ricardati usa sempre standart nomenclatura vMAJOR.MINOR.PATCH
+git checkout main  //SEMPRE CREARE I TAGS X LA RELASE DA MAIN branch!!
+git pull origin main   //aggiorna locale main, cosi allineato locale--remoto
+git tag -a v1.0.0 -m "First production release"   //tag crea reference v1.0.0-->commit a81f92d.. -a contiene metadata author/date/mexs 
+git tag   //vedi che c'è v1.0.0
+git push origin v1.0.0   //push del tag creato al remoto forgejo
+forgejo>target repository > releases > new release> 
+tag: v1.0.0 (quello appena pushato), 
+target branch: main, 
+title: "RAGsystem v1.0.0 Initial Production Release", 
+description:..., 
+Use the title and content of release as tag message: uncheck (intanto tu hai gia creato il titolo quando hai creato il tag!)
+Mark as pre-release: se questa relase x testing (quindi e.g. si chiama 'v1.0.0-beta.1') allora si, ma se è direttamente x production allora uncheck.
+Hide automatically generated Archives: uncheck (forgejo crea automaticamente Source code (zip) e Source code (tar.gz) x chi vuole scaricare il codice della release)
+> create release.  //ricardati usa sempre standart nomenclatura vMAJOR.MINOR.PATCH
+//⚠️errori sempre da evitare: NON creare tag da branch 'develop', NON fare release da feature/xxx branch, NON modificare codice dopo tag (🔥MAI!)
+
 
 
 finora pero hai sempre e solo aggiornato branch 'develop', quando decidi "questa versione è pronta" di develop allora fai la Release e.g. release/1.0.0
@@ -1149,6 +1172,17 @@ e poi
 main → /srv/environments/prod
 
 
+
+
+cd /srv/environments/dev
+git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git .
+git branch -a
+git checkout develop
+git pull
+docker compose up -d  //avvi la tua app
+
+cd /srv/environments/staging
+git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git .
 
 
 
