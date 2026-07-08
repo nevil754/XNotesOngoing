@@ -1112,7 +1112,7 @@ Hide automatically generated Archives: uncheck (forgejo crea automaticamente Sou
 
 
 
-
+//🔥🔥🔥🔥🔥🔥🔥🔥TODO HERE NELSON 09-07-2026, VEDI COSA PUOI ELIMINARE DI QUESTO BLOCCO
 finora pero hai sempre e solo aggiornato branch 'develop', quando decidi "questa versione è pronta" di develop allora fai la Release e.g. release/1.0.0
 poi passi la release a /srv/environments/staging e qui provi tutto fai tutti i tests
 quando è tutto ok passi la relase (sempre release/1.0.0) al branch 'main' tramite merge con Tag v1.0.0 e Notes, in questo modo ora il server /srv/environments/prod viene aggiornato.
@@ -1190,6 +1190,7 @@ merge release/1.0.0 → main
 tag v1.0.0
 e poi
 main → /srv/environments/prod
+
 
 
 
