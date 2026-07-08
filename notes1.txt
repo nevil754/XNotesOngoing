@@ -1056,7 +1056,7 @@ git push   //prende tutti i commit locali su 'develop' e li manda al remoto orig
 🔥 target repo>settings>branches>default branch: 'develop'>update  perché d'ora in poi le features/xxx devono generarsi a partire da branch 'develop'!!(branch 'main' rimane x la production)
 ADD NEW FEATURE feature/xxx AL CODE
 
----x infos
+📃📃📃📃📃---x infos
 git branch  //vedi in che branch sei attualmente (vedi solo branchs locali)
 git branch -a   //vedi branches locali&remoti che hai x this prj(where there is file .git)
 git log --oneline   //vedi history
@@ -1070,7 +1070,8 @@ git ls-remote --heads origin  //controlla i branch attivi su forgejo
 git fetch --prune   //vai su forgejo/github e dimmi cosa è cambiato, cancella dal mio repository locale i riferimenti ai branch remoti che sul server non esistono più. molti developer settano che fa auto, git config --global fetch.prune true quando fai semplice 'git fetch'.
 git log --oneline
 cat hello.py   //🔥per print content file called hello.py (e.g.cosi vedi che è aggiornato)
----
+ls -la /srv/environments/dev/testtt-repooo   //vedi anche i files che iniziano con .xxx (xk linux di default li nasconde) 
+📃📃📃📃📃---
 
 ora ogni persona del team lavora su un feature branch diversa, e.g. nelvison-> feature/rag-ingestion,  julia-> feature/reranker ect.
 ognuno quindi fa 
