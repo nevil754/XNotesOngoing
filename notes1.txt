@@ -1054,8 +1054,8 @@ git push   //prende tutti i commit locali su 'develop' e li manda al remoto orig
 ADD NEW FEATURE feature/xxx AL CODE
 
 ---x infos
-git branch  //vedi in che branch sei attualmente
-git branch -a   //vedi i branches che hai x this prj(where there is file .git)
+git branch  //vedi in che branch sei attualmente (vedi solo branchs locali)
+git branch -a   //vedi branches locali&remoti che hai x this prj(where there is file .git)
 git log --oneline   //vedi history
 Remove-Item -Recurse -Force .git
 git remote -v
@@ -1215,6 +1215,8 @@ git pull
 //in questo env fai test funzionali, integrazioni, test docker, test db, test api ect.
 
 cd /srv/environments/prod
+mkdir testtt-repooo   //🔥🔥CREA FOLDER X IL TUO PRJ!!
+cd testtt-repooo
 git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git .   //il '.' per scaricare nella cartella corrente (invece di creare un sottocartella!!)
 git checkout main 
 docker compose up -d
