@@ -1173,16 +1173,66 @@ main → /srv/environments/prod
 
 
 
-
+SET THE FIRST TIME THE ENV ON THE SERVER
 cd /srv/environments/dev
 git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git .
 git branch -a
 git checkout develop
-git pull
+git pull   //aggiorni il locale con il remoto
 docker compose up -d  //avvi la tua app
+//ora environment develop contiene code del branch 'develop' della repo scaricata
 
 cd /srv/environments/staging
 git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git .
+git checkout develop
+git checkout -b release/1.0.0
+git push origin release/1.0.0
+cd /srv/environments/staging
+git fetch origin
+git checkout release/1.0.0
+git pull
+//ora environment staging contiene code del branch 'release/1.0.0'
+//in questo env fai test funzionali, integrazioni, test docker, test db, test api ect.
+
+cd /srv/environments/prod
+git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git .
+git checkout main 
+docker compose up -d
+//ora env production -- main -- v1.0.0(oppure cmnq l'ultima RELEASE che hai fatto)
+
+☀️☀️ COME SI USA GIORNALMENTE
+//fase di sviluppo
+cd /srv/environments/dev
+git fetch origin
+git reset --hard origin/develop   //reset --hard xk un ambiente server NON deve avere modifiche locali!!
+docker compose up -d
+
+//quando vuoi fare una release (develop è stabile e sei soddifatto)
+git checkout develop
+git checkout -b release/2.0.0
+git push origin release/2.0.0
+cd /srv/environments/staging
+git fetch origin
+git checkout release/2.0.0
+git reset --hard origin/release/2.0.0
+docker compose up -d
+//e fai tutti i tests che vuoi
+
+//ora infine fai il merge 
+git checkout main
+git pull
+git tag -a v2.0.0 -m "Production release v2.0.0"
+git push origin v2.0.0
+
+cd /srv/environments/prod
+git fetch origin
+git checkout main
+git reset --hard origin/main
+docker compose up -d
+//quindi ora hai main--tag v2.0.0 -- dockercompose running
+
+//ora in futuro consigliato automatizzare con Forgejo Runner x ci/cd!!
+
 
 
 
