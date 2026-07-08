@@ -986,6 +986,14 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOvhyX42ChaQBbdCyfP2220oFI9wZ/WuuXkWoWwZke1n
 
 ora fai git clone e scaricati il prj sul tuo pc.
 
+//ora pero crea la ssh (sempre utente nelvison.benedetto) x poter fare 'git clone ssh...' nei 3 ambienti di sviluppo x scaricare il code.
+ssh-keygen -t ed25519 -C "serverlinux"
+/home/deploy/.ssh/id_ed25519   //dove verra salvata sul server (lascia il suggest di default)
+cat ~/.ssh/id_ed25519.pub   //e copia l'output cioe la public key
+forgejo>login nelvison.benedetto> settings > ssh keys> add key: paste here la key public.
+ssh -p 222 git@192.168.113.52   //test la connection, dovresti vedere 'hi there…'
+
+
 🔥🔥-setta i BRANCHES 
 //git lavora x differenza tra due snapshot completi del progetto!
 //merge è "integrazione tra due storie che devono avere base comune"
@@ -1175,10 +1183,9 @@ main → /srv/environments/prod
 
 
 
-
 SET THE FIRST TIME THE ENV ON THE SERVER
-cd /srv/environments/dev
-git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git
+cd /srv/environments/dev    //sul server
+git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git .   //il '.' per scaricare nella cartella corrente (invece di creare un sottocartella!!)
 git branch -a
 git checkout develop
 git pull   //aggiorni il locale con il remoto
@@ -1186,7 +1193,7 @@ docker compose up -d  //avvi la tua app
 //ora environment develop contiene code del branch 'develop' della repo scaricata
 
 cd /srv/environments/staging
-git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git
+git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git .   //il '.' per scaricare nella cartella corrente (invece di creare un sottocartella!!)
 git checkout develop
 git checkout -b release/1.0.0
 git push origin release/1.0.0
@@ -1198,7 +1205,7 @@ git pull
 //in questo env fai test funzionali, integrazioni, test docker, test db, test api ect.
 
 cd /srv/environments/prod
-git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git
+git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git .   //il '.' per scaricare nella cartella corrente (invece di creare un sottocartella!!)
 git checkout main 
 docker compose up -d
 //ora env production -- main -- v1.0.0(oppure cmnq l'ultima RELEASE che hai fatto)
