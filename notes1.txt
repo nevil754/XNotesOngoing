@@ -1093,6 +1093,7 @@ Hide automatically generated Archives: uncheck (forgejo crea automaticamente Sou
 
 
 
+
 finora pero hai sempre e solo aggiornato branch 'develop', quando decidi "questa versione è pronta" di develop allora fai la Release e.g. release/1.0.0
 poi passi la release a /srv/environments/staging e qui provi tutto fai tutti i tests
 quando è tutto ok passi la relase (sempre release/1.0.0) al branch 'main' tramite merge con Tag v1.0.0 e Notes, in questo modo ora il server /srv/environments/prod viene aggiornato.
@@ -1173,6 +1174,8 @@ main → /srv/environments/prod
 
 
 
+
+
 SET THE FIRST TIME THE ENV ON THE SERVER
 cd /srv/environments/dev
 git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git .
@@ -1188,7 +1191,7 @@ git checkout develop
 git checkout -b release/1.0.0
 git push origin release/1.0.0
 cd /srv/environments/staging
-git fetch origin
+git fetch origin   //contatta il repository remoto chiamato origin, scarica tutte le novità, ma NON modifica i miei branch locali. 🔥è un 'git pull' ma senza la modifica ai miei files locali
 git checkout release/1.0.0
 git pull
 //ora environment staging contiene code del branch 'release/1.0.0'
@@ -1204,13 +1207,13 @@ docker compose up -d
 //fase di sviluppo
 cd /srv/environments/dev
 git fetch origin
-git reset --hard origin/develop   //reset --hard xk un ambiente server NON deve avere modifiche locali!!
+git reset --hard origin/develop   //reset --hard perche un ambiente server NON deve avere modifiche locali!!
 docker compose up -d
 
 //quando vuoi fare una release (develop è stabile e sei soddifatto)
 git checkout develop
 git checkout -b release/2.0.0
-git push origin release/2.0.0
+git push origin release/2.0.0   //🔥prendi il mio branch locale release/2.0.0 e pubblicalo (o aggiornalo) sul repository remoto origin
 cd /srv/environments/staging
 git fetch origin
 git checkout release/2.0.0
@@ -1221,7 +1224,8 @@ docker compose up -d
 //ora infine fai il merge 
 git checkout main
 git pull
-git tag -a v2.0.0 -m "Production release v2.0.0"
+git tag -a v2.0.0 -m "Production release v2.0.0"   //tag crea reference v1.0.0-->commit a81f92d.. -a contiene metadata author/date/mexs
+git tag   //vedi che c'è v1.0.0
 git push origin v2.0.0
 
 cd /srv/environments/prod
@@ -1233,6 +1237,68 @@ docker compose up -d
 
 //ora in futuro consigliato automatizzare con Forgejo Runner x ci/cd!!
 
+/srv/
+├── backups
+│   ├── dev
+│   ├── forgejo
+│   ├── prod
+│   ├── scripts
+│   │   ├── backup_all.sh
+│   │   ├── backup_qdrant.sh
+│   │   ├── backup_sqlserver.sh
+│   │   ├── offsite_sync.sh
+│   │   └── restore.sh
+│   └── staging
+├── data  //x docker's persistent datas (volumes)
+│   ├── dev   //x volumes of environment Development code (xk ricorda hai spazi separati per i 3 environments)
+│   │   ├── qdrant
+│   │   ├── redis
+│   │   ├── sqlserver
+│   │   └── uploads
+│   ├── infrastructure   //x persistent datas (docker's volumes) di apps installate dentro srv/infrastructure/
+│   │   ├── forgejo /...
+│   │   ├── uptime-kuma / ...
+│   │   ├── netdata / ...
+│   ├── prod      //x volumes of environment Production code
+│   │   ├── qdrant
+│   │   ├── redis
+│   │   ├── sqlserver
+│   │   └── uploads
+│   └── staging    //x volumes of environment Staging code
+│       ├── qdrant
+│       ├── redis
+│       ├── sqlserver
+│       └── uploads
+├── environments   //environments per ospitare il code
+│   ├── dev
+│   ├── prod
+│   └── staging
+├── infrastructure
+│   ├── certbot
+│   ├── forgejo
+│   │   └── docker-compose.yml
+│   ├── forgejo-runner
+│   ├── monitoring
+│   │   ├── grafana
+│   │   │   └── provisioning
+│   │   ├── netdata
+│   │   │   └── docker-compose.yml
+│   │   ├── prometheus
+│   │   └── uptime-kuma
+│   │       └── docker-compose.yml
+│   └── nginx
+│       ├── conf.d
+│       └── ssl
+├── logs
+│   ├── dev
+│   ├── nginx
+│   ├── prod
+│   └── staging
+└── scripts
+    ├── deploy.sh
+    ├── healthcheck.sh
+    ├── new_environment.sh
+    └── promote.sh
 
 
 
