@@ -64,6 +64,9 @@ serv95psw!
 
 ssh docker@192.168.113.52  //da cmd, ACCEDI AL TUO SERVER🔥🔥
 Suit-Force-Card   //psw
+sudo -i  //diventa utente root (se chiede psw la psw è la stessa cioe Suit-Force-Card)
+su - deploy  //☄️diventi utente 'deploy'(xk per usare Forgejo puoi solo come utente 'deploy'!!)
+http://192.168.113.52:3000   //open Forgejo(è come GitLab cioe self-hosted ma moolto piu leggero)
 
 ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untente docker in /home/docker
 //quando fai comando 'sudo ...' allora dici al system di login come admin 'root' SOLO x questo comando, se fai invece 'sudo -i' diventi proprio admin root finche non logout.
@@ -1108,6 +1111,7 @@ Hide automatically generated Archives: uncheck (forgejo crea automaticamente Sou
 
 
 
+
 finora pero hai sempre e solo aggiornato branch 'develop', quando decidi "questa versione è pronta" di develop allora fai la Release e.g. release/1.0.0
 poi passi la release a /srv/environments/staging e qui provi tutto fai tutti i tests
 quando è tutto ok passi la relase (sempre release/1.0.0) al branch 'main' tramite merge con Tag v1.0.0 e Notes, in questo modo ora il server /srv/environments/prod viene aggiornato.
@@ -1222,7 +1226,7 @@ git checkout main
 docker compose up -d
 //ora env production -- main -- v1.0.0(oppure cmnq l'ultima RELEASE che hai fatto)
 
-☀️☀️ COME SI USA GIORNALMENTE
+☀️☀️ COME SI USA GIORNALMENTE X GLI ENVS SUL SERVER
 //fase di sviluppo
 cd /srv/environments/dev
 git fetch origin
@@ -1243,7 +1247,7 @@ docker compose up -d
 //ora infine fai il merge 
 git checkout main
 git pull
-git tag -a v2.0.0 -m "Production release v2.0.0"   //tag crea reference v1.0.0-->commit a81f92d.. -a contiene metadata author/date/mexs
+git tag -a v2.0.0 -m "Production release v2.0.0"   //DUNQUE SOLITAMENTE CREI RELEASE+TAG dall'interno del server dal tuo env di Staging!!, tag crea reference v1.0.0-->commit a81f92d.. -a contiene metadata author/date/mexs
 git tag   //vedi che c'è v1.0.0
 git push origin v2.0.0
 
@@ -1254,7 +1258,15 @@ git reset --hard origin/main
 docker compose up -d
 //quindi ora hai main--tag v2.0.0 -- dockercompose running
 
+//la prima volta che crei prj lo crei in locale e poi passi code&branches a repository remota, poi repo remota -> 3 environments sul server, e poi easy gestione...
+//🔥🔥🔥QUINDI: N devs --> GIT REMOTO(vedi here qua sotto ciascun branch dove è sul server)
+/srv/environments/dev/xxx     -> branch 'develop'
+/srv/environments/staging/xxx -> branch 'release/xyz'
+/srv/environments/prod/xxx    -> branch 'main'  e quando sei soddifatto del main, fai Realese+Tag !!
+
+
 //ora in futuro consigliato automatizzare con Forgejo Runner x ci/cd!!
+
 
 //SERVER (DON'T DELETE!!)
 /srv/    //quello che hai creato TE, dove metti le cose tue
