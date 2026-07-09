@@ -67,6 +67,7 @@ Suit-Force-Card   //psw
 sudo -i  //diventa utente root (se chiede psw la psw è la stessa cioe Suit-Force-Card)
 su - deploy  //☄️diventi utente 'deploy'(xk per usare Forgejo puoi solo come utente 'deploy'!!)
 http://192.168.113.52:3000   //open Forgejo(è come GitLab cioe self-hosted ma moolto piu leggero)
+forgejo nelvison.benedetto, Utod83win!!
 
 ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untente docker in /home/docker
 //quando fai comando 'sudo ...' allora dici al system di login come admin 'root' SOLO x questo comando, se fai invece 'sudo -i' diventi proprio admin root finche non logout.
@@ -1071,6 +1072,7 @@ git fetch --prune   //vai su forgejo/github e dimmi cosa è cambiato, cancella d
 git log --oneline
 cat hello.py   //🔥per print content file called hello.py (e.g.cosi vedi che è aggiornato)
 ls -la /srv/environments/dev/testtt-repooo   //vedi anche i files che iniziano con .xxx (xk linux di default li nasconde) 
+git log -1   //🔥vedi time dell'ultimo commit of this repo!!
 📃📃📃📃📃---
 
 ora ogni persona del team lavora su un feature branch diversa, e.g. nelvison-> feature/rag-ingestion,  julia-> feature/reranker ect.
