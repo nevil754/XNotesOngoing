@@ -1278,7 +1278,8 @@ DATA_ROOT=/srv/data/staging/rag-system
 DATA_ROOT=/srv/data/prod/rag-system
 e poi nei volumes setta
 volumes:
-  - ${DATA_ROOT}/qdrant:/qdrant/storage
+  - ${DATA_ROOT}/qdrant:/qdrant/storage    #LA PARTE A SX DI ':' è il percorso sul filesystem, la parte a dx di ':' è il path dentro il container docker 
+//togli tutta la sezione a fondo docker-compose con i volumes names, xk io intanto sto usando bind Mount verso directory specifiche del server
 
 poi hai 3 reti docker separate:
 rag-dev-network [che all''interno contiene e.g. rag-dev-qrant.. (quaindi anche chiaro il nome dei sottocontainers)]  //LO SETTI NEL DOCKER-COMPOSE !
@@ -1287,6 +1288,24 @@ rag-prod-network [...]
 //in questo modo e.g. rag-dev-api non puo risolvere il nome rag-prod-redis o collegarsi ad esso, perfect, isolamento totale!!
 
 docker network ls  //vedi le reti network
+dev → bind mount codice + hot reload ✅
+staging → immagine Docker immutabile ✅
+production → stessa immagine testata/promossa da staging ✅
+
+//avvio docker x development
+cd /srv/projects/dev/rag-system
+docker compose up -d    //or  docker compose up -d --build
+//docker leggera dockercompose+dockercomposeoverride+envfile di questo folder
+
+//avvio docker x staging
+cd /srv/projects/staging/rag-system
+docker compose up -d
+//this env no dockercomposeoverride, docker leggera dockercompose+envfile di questo folder
+
+//avvio docker x production
+cd /srv/projects/prod/rag-system
+docker compose up -d   //or  docker compose up -d --build
+//this env no dockercomposeoverride, docker leggera dockercompose+envfile di questo folder
 
 
 //SERVER (DON'T DELETE!!)
