@@ -355,6 +355,7 @@ chmod 2775 /srv/backups/scripts
 chmod 2775 /srv/logs
 chmod 2775 /srv/scripts
 chmod 2750 /srv/backups/prod
+//il bit '2' davanti (setgid) fa sì che ogni nuovo file creato erediti automaticamente il gruppo della cartella, fondamentale perché il team mantenga accesso senza dover correggere i permessi a mano ogni volta.
 
 tree -pug /srv   //x vedere permessi - owner - group  applicati
 //quindi per staging/dev -> 2775 e in production -> 2750 / 2770 cioè ancora piu chiuso.
@@ -1114,7 +1115,7 @@ Hide automatically generated Archives: uncheck (forgejo crea automaticamente Sou
 
 
 
-//🔥🔥🔥🔥🔥🔥🔥🔥TODO HERE NELSON 09-07-2026, VEDI COSA PUOI ELIMINARE DI QUESTO BLOCCO
+//🔥🔥🔥🔥🔥🔥🔥🔥TODO CLEAN HERE NELSON 09-07-2026, VEDI COSA PUOI ELIMINARE DI QUESTO BLOCCO
 crea 
 ssh://git@192.168.113.52:222/CompeteSrl/test-repo.git
 git remote -v
@@ -1257,15 +1258,19 @@ docker compose up -d   //or  docker compose up -d --build
 
 //🗄️🗄️🗄️SERVER (DON'T DELETE!!)
 /srv/    //quello che hai creato TE, dove metti le cose tue
-├── backups
-│   ├── dev
-│   ├── forgejo
-│   ├── prod
+├── backups     //backup automatici
+│   ├── dev     //settimanale
+│   ├── staging    //giornaliero
+│   ├── forgejo     //backup del git server stesso
+│   ├── prod        //ogni 6h + offsite
+│   │   ├── sqlserver/
+│   │   ├── qdrant/
+│   │   └── uploads/
 │   ├── scripts
 │   │   ├── backup_all.sh
 │   │   ├── backup_qdrant.sh
 │   │   ├── backup_sqlserver.sh
-│   │   ├── offsite_sync.sh
+│   │   ├── offsite_sync.sh   //rsync verso storage esterno
 │   │   └── restore.sh
 │   └── staging
 ├── data  //x docker's persistent datas (volumes)
@@ -1292,7 +1297,7 @@ docker compose up -d   //or  docker compose up -d --build
 │   ├── dev
 │   ├── prod
 │   └── staging
-├── infrastructure
+├── infrastructure  //servizi condivisi tra ambienti
 │   ├── certbot
 │   ├── forgejo
 │   │   └── docker-compose.yml
@@ -1308,31 +1313,34 @@ docker compose up -d   //or  docker compose up -d --build
 │   └── nginx
 │       ├── conf.d
 │       └── ssl
-├── logs
+├── logs    //log centralizzati
 │   ├── dev
 │   ├── nginx
 │   ├── prod
 │   └── staging
-├── scripts
-│   ├── deploy.sh
-│   ├── healthcheck.sh
-│   ├── new_environment.sh
-│   └── promote.sh
+└── scripts/                             //automazione operativa
+    ├── deploy.sh                        //deploy ambiente specifico
+    ├── promote.sh                       //promuove staging → prod
+    ├── healthcheck.sh                   //verifica salute tutti i servizi
+    └── new_environment.sh               //crea nuovo ambiente da template
 
 // tree -d -L 3 / -I "proc|sys|dev|run|tmp|snap" /    //🔥🔥vedi proprio intera struttura del server
 
 brothers of /srv/ is
-├── home
-│   ├── deploy
+├── home   //questi sono users linux
+│   ├── deploy  //UTENTE A CUI DEVO ACCEDERE SUL SERVER, E POI SOLO DOPO APRO FORGEJO(solo questo user puo aprire forgejo) //bot CI/CD Forgejo runner userà questo OPPURE user linux 'runner'?
+│   |	 └── .ssh/
 │   ├── docker
 │   ├── runner  [error opening dir]
-│   └── valterm  [error opening dir]
+│   └── valterm  [error opening dir]   //utente linux, che dovrei usare giornalmente se faccio qualcosa sul server, è 'l'admin fisico del server'
+│        └── scripts/
 ├── usr
 ├── var
 ...
 
 
-
+/opt/     //programs x everyone
+└── miniconda3/                          # Python globale (script utility fuori Docker)
 
 
 
@@ -1371,194 +1379,7 @@ id docker   //ora dovresti vedere null
 
 ################################################
 
-# Struttura Server Enterprise — RAG Enterprise Legal
 
-Server singolo, tre ambienti (dev/staging/prod), Forgejo CI/CD, nginx reverse proxy.
-Progettato per durare anni e scalare con il team.
-
----
-
-## Principio fondamentale: isolamento a 4 livelli
-
-I tre ambienti non sono solo cartelle diverse. Sono isolati a ogni livello:
-
-| Livello | Dev | Staging | Production |
-|---|---|---|---|
-| Filesystem | /srv/environments/dev | /srv/environments/staging | /srv/environments/prod |
-| Rete Docker | rag_dev_net | rag_staging_net | rag_prod_net |
-| Porte host | 8000-8099 | 8100-8199 | 8200-8299 |
-| Volumi dati | /srv/data/dev | /srv/data/staging | /srv/data/prod |
-| Branch Git | develop | staging | main (tag) |
-| Sottodominio | dev.dominio.it | staging.dominio.it | app.dominio.it |
-| Dati | finti/campione | copia anonimizzata | reali clienti |
-| Deploy | automatico | manuale su tag | manuale approvato |
-
----
-
-## Struttura ad albero completa
-
-```
-/srv/                                    # radice servizi — root:srv-deploy, 2775
-│
-├── environments/                        # CODICE dei tre ambienti
-│   │
-│   ├── dev/
-│   │   └── rag-enterprise/              # git clone, branch develop
-│   │       ├── app/
-│   │       ├── config/
-│   │       ├── docker/
-│   │       ├── docker-compose.yml
-│   │       ├── docker-compose.override.yml   # attivo in dev
-│   │       ├── .env                     # valori dev
-│   │       └── main.py
-│   │
-│   ├── staging/
-│   │   └── rag-enterprise/              # git clone, branch staging
-│   │       ├── ...
-│   │       └── .env                     # valori staging
-│   │
-│   └── prod/
-│       └── rag-enterprise/              # git clone, branch main (solo tag)
-│           ├── ...
-│           └── .env                     # valori prod — segreti reali
-│
-├── infrastructure/                      # servizi condivisi tra ambienti
-│   │
-│   ├── nginx/
-│   │   ├── docker-compose.yml
-│   │   ├── nginx.conf                   # config principale
-│   │   ├── conf.d/
-│   │   │   ├── dev.conf                 # dev.dominio.it → :8000
-│   │   │   ├── staging.conf             # staging.dominio.it → :8100
-│   │   │   └── prod.conf                # app.dominio.it → :8200
-│   │   └── ssl/                         # certificati Let's Encrypt
-│   │       └── (gestito da certbot)
-│   │
-│   ├── forgejo/                         # Git + CI/CD self-hosted, INSTALLATO COME DOCKERCONTAINER
-│   │   ├── docker-compose.yml
-│   │   └── .env
-│   │
-│   ├── forgejo-runner/                  # esegue le pipeline CI/CD, installato come dockercontainer
-│   │   ├── docker-compose.yml
-│   │   └── config.yml
-│   │
-│   ├── monitoring/                      # osservabilità, **
-│   │   ├── docker-compose.yml
-│   │   ├── prometheus/
-│   │   │   └── prometheus.yml
-│   │   └── grafana/
-│   │       └── provisioning/
-│   │
-│   └── certbot/                         # rinnovo automatico SSL, **
-│       └── docker-compose.yml
-│
-├── data/                                # DATI PERSISTENTI — mai versionati
-│   │
-│   ├── dev/
-│   │   ├── sqlserver/
-│   │   ├── qdrant/
-│   │   ├── redis/
-│   │   └── uploads/
-│   │
-│   ├── staging/
-│   │   ├── sqlserver/
-│   │   ├── qdrant/
-│   │   ├── redis/
-│   │   └── uploads/
-│   │
-│   ├── prod/
-│   │   ├── sqlserver/                   # DATI REALI — massima protezione
-│   │   ├── qdrant/
-│   │   ├── redis/
-│   │   └── uploads/
-│   │
-│   └── infrastructure/
-│       ├── forgejo/                     # repository git, issue, CI config
-│       ├── prometheus/
-│       └── grafana/
-│
-├── backups/                             # backup automatici
-│   ├── dev/                             # settimanale
-│   ├── staging/                         # giornaliero
-│   ├── prod/                            # ogni 6h + offsite
-│   │   ├── sqlserver/
-│   │   ├── qdrant/
-│   │   └── uploads/
-│   ├── forgejo/                         # backup del git server stesso
-│   └── scripts/
-│       ├── backup_all.sh
-│       ├── backup_sqlserver.sh
-│       ├── backup_qdrant.sh
-│       ├── restore.sh
-│       └── offsite_sync.sh              # rsync verso storage esterno
-│
-├── logs/                                # log centralizzati
-│   ├── dev/
-│   ├── staging/
-│   ├── prod/
-│   └── nginx/
-│
-└── scripts/                             # automazione operativa
-    ├── deploy.sh                        # deploy ambiente specifico
-    ├── promote.sh                       # promuove staging → prod
-    ├── healthcheck.sh                   # verifica salute tutti i servizi
-    └── new_environment.sh               # crea nuovo ambiente da template
-
-
-/opt/     //programs x everyone
-└── miniconda3/                          # Python globale (script utility fuori Docker)
-
-
-/home/
-├── valterm/                             # TU — admin
-│   ├── .ssh/
-│   └── scripts/                         # script personali
-├── deploy/                              # bot CI/CD (Forgejo runner usa questo)
-│   └── .ssh/
-└── docker/                              # utente esistente — tool docker locali
-```
-
----
-
-## Utenti e gruppi
-
-### Gruppi da creare
-
-```
-srv-deploy    # chi può fare deploy (deploy, valterm)
-srv-read      # chi può leggere il codice (team developer)
-docker        # chi può usare docker (già esiste)
-```
-
-### Utenti
-
-| Utente | Scopo | Gruppi | sudo |
-|---|---|---|---|
-| root | emergenze sistema | root | — |
-| valterm | admin quotidiano (tu) | sudo, docker, srv-deploy | sì |
-| deploy | bot CI/CD Forgejo | docker, srv-deploy | solo docker |
-| forgejo | servizio git (creato da Docker) | — | no |
-| dev1, dev2... | membri team | srv-read, docker | no |
-
----
-
-## Permessi /srv
-
-```
-/srv                          root:srv-deploy    2775   (setgid: nuovi file ereditano gruppo)
-/srv/environments/dev         deploy:srv-deploy  2775
-/srv/environments/staging     deploy:srv-deploy  2775
-/srv/environments/prod        deploy:srv-deploy  2750   (più restrittivo)
-/srv/data/dev                 deploy:docker      2775
-/srv/data/staging             deploy:docker      2775
-/srv/data/prod                deploy:docker      2770   (solo deploy + docker)
-/srv/backups/prod             deploy:srv-deploy  2750
-/srv/infrastructure           deploy:srv-deploy  2750
-```
-
-Il bit `2` davanti (setgid) fa sì che ogni nuovo file creato erediti automaticamente il gruppo della cartella — fondamentale perché il team mantenga accesso senza dover correggere i permessi a mano ogni volta.
-```
-```
 
 
 ################################################
