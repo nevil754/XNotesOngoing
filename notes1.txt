@@ -1115,7 +1115,7 @@ Hide automatically generated Archives: uncheck (forgejo crea automaticamente Sou
 
 
 
-//🔥🔥🔥🔥🔥🔥🔥🔥TODO CLEAN HERE NELSON 09-07-2026, VEDI COSA PUOI ELIMINARE DI QUESTO BLOCCO
+//🔥🔥🔥🔥TODO CLEAN HERE NELSON 09-07-2026, VEDI COSA PUOI ELIMINARE DI QUESTO BLOCCO
 crea 
 ssh://git@192.168.113.52:222/CompeteSrl/test-repo.git
 git remote -v
