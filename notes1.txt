@@ -1287,11 +1287,27 @@ rag-staging-network [...]  //LO SETTI NEL DOCKER-COMPOSE !
 rag-prod-network [...]
 //in questo modo e.g. rag-dev-api non puo risolvere il nome rag-prod-redis o collegarsi ad esso, perfect, isolamento totale!!
 
-docker network ls  //vedi le reti network
-dev → bind mount codice + hot reload ✅
-staging → immagine Docker immutabile ✅
-production → stessa immagine testata/promossa da staging ✅
+//nel file .env
+-DOCKER_NETWORK=xxx  #rag-dev-network, rag-staging-network, rag-prod-network
+//e cosi quando avvi il docker-compose docker creera automaticamente la rete indicata
+-DATA_ROOT=xxx   #/srv/data/dev/rag-system, /srv/data/staging/rag-system , /srv/data/prod/rag-system
+-COMPOSE_PROJECT_NAME=xxx   #rag-system-dev, rag-system-staging, rag-system-prod
+//nel file docker-compose
+-name: ${COMPOSE_PROJECT_NAME}
+-#container_name: fastapi  !non specificare il nome, xk tu hai 1 solo server quindi ci sarebbe conflitto nome container e.g.fastapi di dev env -- fastapi staging env. senza sepcificare docker crea automaticamente e.g. <project_name>-<service_name>-<index> cioe <nome_prj>-fastapi-1
+-volumes:- ${DATA_ROOT}/qdrant:/qdrant/storage  //🔥la parte a sx di ':' è path filesystem, mentre la parte a dx è il path all'interno del docker container, in questo caso stai speficicando esattamente dove vuoi che vengano salvati i file persistenti  //se avevi qdrant_data:/qdrant/storage e a fondo file volumes: qdrant_data: driver: local allora docker avrebbe salvato il volume in e.g./var/lib/docker/volumes/qdrant_data/_data  (ovviamente persistente quindi fuori dal docker container)
+-sempre nel docker-compose.yml, per ogni container aggiungi  networks: - rag-network  e poi a fondo file
+networks:
+  rag-network:
+    name: ${DOCKER_NETWORK}
+    driver: bridge
 
+
+
+
+
+//docker network ls  vedi le reti network
+COME AVVIARE I DOCKERS NEI 3 ENVS
 //avvio docker x development
 cd /srv/projects/dev/rag-system
 docker compose up -d    //or  docker compose up -d --build
