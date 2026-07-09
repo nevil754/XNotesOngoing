@@ -1271,21 +1271,11 @@ docker compose up -d
 //ora in futuro consigliato automatizzare con Forgejo Runner x ci/cd!!
 
 
-DOCKER NETWORK & LAST THINGS
-nei 3 .env file setta 
-DATA_ROOT=/srv/data/dev/rag-system
-DATA_ROOT=/srv/data/staging/rag-system
-DATA_ROOT=/srv/data/prod/rag-system
-e poi nei volumes setta
-volumes:
-  - ${DATA_ROOT}/qdrant:/qdrant/storage    #LA PARTE A SX DI ':' è il percorso sul filesystem, la parte a dx di ':' è il path dentro il container docker 
-//togli tutta la sezione a fondo docker-compose con i volumes names, xk io intanto sto usando bind Mount verso directory specifiche del server
-
-poi hai 3 reti docker separate:
-rag-dev-network [che all''interno contiene e.g. rag-dev-qrant.. (quaindi anche chiaro il nome dei sottocontainers)]  //LO SETTI NEL DOCKER-COMPOSE !
-rag-staging-network [...]  //LO SETTI NEL DOCKER-COMPOSE !
-rag-prod-network [...]
-//in questo modo e.g. rag-dev-api non puo risolvere il nome rag-prod-redis o collegarsi ad esso, perfect, isolamento totale!!
+DOCKER NETWORK COMPLETE ISOLATIONS X THE 3 ENVS (bc remember on the server u have 1 docer engine)
+//remember on server u already setted the spaces x the persistent data (volumes) x the 3 envs:
+/srv/data/dev/rag-system[e here folders qdrant,redis,sqlserver,upload]
+/srv/data/prod/rag-system(e here folders qdrant,redis,sqlserver,upload]
+/srv/data/staging/rag-system(e here folders qdrant,redis,sqlserver,upload]
 
 //nel file .env
 -DOCKER_NETWORK=xxx  #rag-dev-network, rag-staging-network, rag-prod-network
@@ -1295,17 +1285,14 @@ rag-prod-network [...]
 //nel file docker-compose
 -name: ${COMPOSE_PROJECT_NAME}
 -#container_name: fastapi  !non specificare il nome, xk tu hai 1 solo server quindi ci sarebbe conflitto nome container e.g.fastapi di dev env -- fastapi staging env. senza sepcificare docker crea automaticamente e.g. <project_name>-<service_name>-<index> cioe <nome_prj>-fastapi-1
--volumes:- ${DATA_ROOT}/qdrant:/qdrant/storage  //🔥la parte a sx di ':' è path filesystem, mentre la parte a dx è il path all'interno del docker container, in questo caso stai speficicando esattamente dove vuoi che vengano salvati i file persistenti  //se avevi qdrant_data:/qdrant/storage e a fondo file volumes: qdrant_data: driver: local allora docker avrebbe salvato il volume in e.g./var/lib/docker/volumes/qdrant_data/_data  (ovviamente persistente quindi fuori dal docker container)
+-volumes:- ${DATA_ROOT}/qdrant:/qdrant/storage  //🔥LA PARTE A SX di ':' è path nel filesystem, la parte a dx di ':' è il path dentro il container docker, in questo caso stai speficicando esattamente dove vuoi che vengano salvati i file persistenti  //se avevi qdrant_data:/qdrant/storage e a fondo file volumes: qdrant_data: driver: local allora docker avrebbe salvato il volume in e.g./var/lib/docker/volumes/qdrant_data/_data  (ovviamente persistente quindi fuori dal docker container)
 -sempre nel docker-compose.yml, per ogni container aggiungi  networks: - rag-network  e poi a fondo file
 networks:
   rag-network:
     name: ${DOCKER_NETWORK}
     driver: bridge
 
-
-
-
-
+🔥🔥HOW RUN CONTAINERS DOCKER IN ENVS!!
 //docker network ls  vedi le reti network
 COME AVVIARE I DOCKERS NEI 3 ENVS
 //avvio docker x development
