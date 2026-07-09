@@ -1310,7 +1310,7 @@ docker compose up -d   //or  docker compose up -d --build
 //this env no dockercomposeoverride, docker leggera dockercompose+envfile di questo folder
 
 
-//SERVER (DON'T DELETE!!)
+//🗄️🗄️🗄️SERVER (DON'T DELETE!!)
 /srv/    //quello che hai creato TE, dove metti le cose tue
 ├── backups
 │   ├── dev
