@@ -1268,10 +1268,10 @@ docker compose up -d
 /srv/environments/staging/xxx -> branch 'release/xyz'
 /srv/environments/prod/xxx    -> branch 'main'  e quando sei soddifatto del main, fai Realese+Tag !!
 
-//ora in futuro consigliato automatizzare con Forgejo Runner x ci/cd!!
+//ora in futuro consigliato automatizzare con 🦿🦿Forgejo Runner x ci/cd!!
 
 
-DOCKER NETWORK COMPLETE ISOLATIONS X THE 3 ENVS (bc remember on the server u have 1 docer engine)
+🐳🐳🐳DOCKER NETWORK COMPLETE ISOLATIONS X THE 3 ENVS (bc remember on the server u have 1 docer engine)
 //remember on server u already setted the spaces x the persistent data (volumes) x the 3 envs:
 /srv/data/dev/rag-system[e here folders qdrant,redis,sqlserver,upload]
 /srv/data/prod/rag-system(e here folders qdrant,redis,sqlserver,upload]
@@ -1292,9 +1292,8 @@ networks:
     name: ${DOCKER_NETWORK}
     driver: bridge
 
-🔥🔥HOW RUN CONTAINERS DOCKER IN ENVS!!
+▶️▶️🐳HOW RUN CONTAINERS DOCKER IN 3 ENVS!!
 //docker network ls  vedi le reti network
-COME AVVIARE I DOCKERS NEI 3 ENVS
 //avvio docker x development
 cd /srv/projects/dev/rag-system
 docker compose up -d    //or  docker compose up -d --build
