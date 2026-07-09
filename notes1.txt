@@ -1115,66 +1115,12 @@ Hide automatically generated Archives: uncheck (forgejo crea automaticamente Sou
 
 
 //🔥🔥🔥🔥🔥🔥🔥🔥TODO HERE NELSON 09-07-2026, VEDI COSA PUOI ELIMINARE DI QUESTO BLOCCO
-finora pero hai sempre e solo aggiornato branch 'develop', quando decidi "questa versione è pronta" di develop allora fai la Release e.g. release/1.0.0
-poi passi la release a /srv/environments/staging e qui provi tutto fai tutti i tests
-quando è tutto ok passi la relase (sempre release/1.0.0) al branch 'main' tramite merge con Tag v1.0.0 e Notes, in questo modo ora il server /srv/environments/prod viene aggiornato.
-//continui cmnq sempre a sviluppare con le features branches e a ingigantire il branch develop.
-tu sul tuo server hai gia ambienti
-/srv/environments/
-    dev/
-    staging/
-    prod/
-quindi ogni environment ha un branch diverso: 
-/srv/environments/dev  -> branch 'develop'
-/srv/environments/staging -> branch 'release/xyz'
-/srv/environments/prod -> branch 'main'
-
 crea 
 ssh://git@192.168.113.52:222/CompeteSrl/test-repo.git
 git remote -v
 ricordi come avevi settato i volumes del containerdocker Forgejo? avevi settato volumes: /srv/data/infrastructure/forgejo:/data  quindi li se controlli troverai anche tutti i repository che hai creato, trovi il file .git cioè quello che riceve i git push dal tuo pc!
-gli ambienti /srv/environments (cioe dev/prod/staging)? questi sono 'working tree' cioe usate PER FAR GIRARE IL SOFTWARE (mentre forgejo serve a gestire il codice).
+gli ambienti /srv/environments (cioe dev/prod/staging) sono 'working tree' cioe usate PER FAR GIRARE IL SOFTWARE (mentre forgejo serve a gestire il codice).
 questi environments vengono aggiornati all'inizio lo fai tu manualmente (POI AUTOMATIZZI CON forgejo runner CI/CD!! ⚠️ è brutto e puoi fare errori se fai manualmente!)
-
-//x development env
-cd /srv/environments/dev
-git pull origin develop
-docker compose up -d
- //x staging env
-dopo che hai creato Release e.g. release/1.0.0 allora 
-cd /srv/environments/staging
-git checkout release/1.0.0
-git pull
-//x production env
-quando hai fatto merge sul main branch allora aggiorni
-cd /srv/environments/prod
-git pull origin main
-
--environment /srv/environments/dev
-cd /srv/environments/dev
-git fetch origin
-git checkout develop
-git reset --hard origin/develop
-docker compose up -d
-//cosi dev = sempre ALLINEATO a develop!
-
--environment /srv/environments/staging
-cd /srv/environments/staging
-git fetch origin
-git checkout release/1.0.0
-git reset --hard origin/release/1.0.0
-docker compose up -d
-//cosi staging = release candidate stabile
-
--environment /srv/environments/prod
-cd /srv/environments/prod
-git fetch origin
-git checkout main
-git reset --hard origin/main
-docker compose up -d
-//cosi prod = solo main stabile (taggato)
-
-//usi reset --hard xk cosi hai environment identico al repo, niente file sporchi, niente drift, è standard in deploy controllati.
 
 quindi in fase developing
 feature/* → PR → develop
@@ -1192,7 +1138,6 @@ merge release/1.0.0 → main
 tag v1.0.0
 e poi
 main → /srv/environments/prod
-
 
 
 
@@ -1234,7 +1179,7 @@ docker compose up -d
 //fase di sviluppo
 cd /srv/environments/dev
 git fetch origin
-git reset --hard origin/develop   //reset --hard perche un ambiente server NON deve avere modifiche locali!!
+git reset --hard origin/develop   //reset --hard perche un ambiente server NON deve avere modifiche locali!! cosi hai environment identico al repo, è standard in deploy controllati.
 docker compose up -d
 
 //quando vuoi fare una release (develop è stabile e sei soddifatto)
