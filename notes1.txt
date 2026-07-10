@@ -824,6 +824,7 @@ main ------ develop ------ feature/chat
                 feature/reranker
                  \
                   feature/frontend
+//🐞🐞 hotfix/xxx   ← fix urgenti, partono da main. pero dopo che poi l'hai mergiato al main (e cosi ora production non ha errori) allora applica il fix anche a env stagine e developing (altrimenti perderesti il fix alla prossima relase in v2.0.0)
 
 //ricordati non fare quando crei repo su forgejo aggiungi readm.me e quindi fai il primo commit, e poi in locale nel tuo code fai 'git init' che crea un altro repository totalmente indipendente! quindi error i 2 sono 2 tree completamente diversi non hanno antenati in comune!!(potresti anche risolvere ma non è cosi che si fa)
 
