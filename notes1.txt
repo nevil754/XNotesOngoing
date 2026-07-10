@@ -900,14 +900,14 @@ card previews: text only
 hai gia cols Backlog(tutto cio che potresti fare),To Do, In Progress(consigliato 🔥MAX 1-3 TASKS ATTIVI!!)🔥, Done.
 e aggiungi nuove cols Review, Testing, Blocked(dipendenze esterne bloccanti).
 ora crea le cards:
-issues>new issue> e crea     //🔥CREA NUOVA ISSUE (cioè qualcosa che dovrebbe essere fatto ASAP!)
+issues>new issue> e crea     //🔥🔥🔥 CREA NUOVA ISSUE (cioè qualcosa che dovrebbe essere fatto ASAP!)
 "Setup ingestion pipeline (PDF → chunks)"
 "Implement embeddings storage in Qdrant"
 "Create retrieval API endpoint"
 "Add reranking model"
 e.g.
 crea issue sets as
-branch:  target branch  🔥RICORDA IN ENTERPRISE 1 BRANCH X OGNI ISSUE DA RESOLVE!!🔥
+branch:  target branch  🔥⚡️RICORDA IN ENTERPRISE 1 BRANCH X OGNI ISSUE DA RESOLVE!!🔥 di solito ad un developer viene assegnato un Issue(con descrizione cosa c'è dafare)->il developer sulla issue la chiama 'SWI:..' cioe sognifica workinginprogress (altrimenti per esempio qualcun altro puo mergare questo branch pensando che la issue è completata!)->il developer si crea un branch separato e lavora alla sua issue.🔥 
 name: "Implement PDF ingestion pipeline (chunking + preprocessing)"
 description: ...
 Labels: Kind/feature
@@ -1351,32 +1351,42 @@ e come branch mentre sto creando questa Issues? finora ho solo branch main
 e poi la issue viene automaticamente chiusa da forgejo quando la PR viene mergiata?  
 e poi attualmente ho solo branch main
 
-tips:
-!-un branch dedicato per ogni Issue (feature/issue-<id>-<nome>). ed eliminare il branch feature dopo il merge. e.g.feature/issue-15-auth
-
-other:
-attualmente la mia Issues creata 'implement PDF ingestion...' è settata su branch main⚠️!!
 
 
-##################
 
-
-naming branch standard
-auto link issue (#12)
-PR template
-release v0.1 / v1.0
-semantic versioning reale
-milestone automation
-
-Questa è la parte che trasforma Forgejo in una vera piattaforma aziendale.
-
-
+FINALY FORGEJO AS REAL FINAL ENTERPRISE SETUP
 -forgejo runner x ci/cd automation
--
+-tutte le PR dovreebbero avere lo stesso formato cosi tutte le PR sono uguali, quindi usare un template
+e.g.
+## Description
+Describe the change.
+---
+## Related Issue
+Closes #
+---
+## Checklist
+- [ ] Tested
+- [ ] Documentation updated
+- [ ] No breaking changes
+---
+## Screenshots
+(optional)
+-ricordati di usare standart vMAJOR.MINOR.PATCH (major=breaking change, minor=nuova feat, patch=bug fix) per nomenclature e.g v1.0.0
+-una Release di solito possiede:  Release v1.2.0, Assets, docker image, changelog, tag
+-scrivi sempre changelog.md  e.g.
+# Changelog
+## v1.2.0
+Added
+- OCR pipeline
+- Tenant isolation
+Changed
+- Redis caching
+Fixed
+- SQL timeout
 
+!-usa sempre per i commits le conventions: feat:xxx, fix:xxx, docs:xxx, refactor:xxx, style:xxx, perf:xxx, test:xxx, ci:xxx, build:xxx, chore:xxx .
+e.g. fix(redis): fix connection leak
 
-
-
-
+-others are: codeowners avanzato (e.g./frontend/ @frontend-team) 
 
 
