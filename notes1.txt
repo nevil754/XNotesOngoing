@@ -907,7 +907,7 @@ issues>new issue> e crea     //🔥🔥🔥 CREA NUOVA ISSUE (cioè qualcosa che
 "Add reranking model"
 e.g.
 crea issue sets as
-branch:  target branch  🔥⚡️RICORDA IN ENTERPRISE 1 BRANCH X OGNI ISSUE DA RESOLVE!!🔥 di solito ad un developer viene assegnato un Issue(con descrizione cosa c'è dafare)->il developer sulla issue la chiama 'SWI:..' cioe sognifica workinginprogress (altrimenti per esempio qualcun altro puo mergare questo branch pensando che la issue è completata!)->il developer si crea un branch separato e lavora alla sua issue.🔥 
+branch:  target branch  🔥⚡️RICORDA IN ENTERPRISE 1 BRANCH X OGNI ISSUE DA RESOLVE!!e.g. viene creata issue '#142 Add JWT refresh token support' e assegnata a target developer (o 2 devs se è grande) > il dev crea un branch git per lavorare a questa issue e.g.feature/142-jwt-refresh-token (SEMPRE feature/<issue-id>-<slug>)> colleghi il branch all'Issue grazie al commit e.g.'refs #142' (con #142 forgejo capisce e assegna il branch all'issue) > quando il dev ha finito il lavoro fa un PR(pull request)(oppure la apre all'inizio e scrive dentro '🚧 Work in Progress') x mergiare questa sua branch con branch 'develop'. 🔥
 name: "Implement PDF ingestion pipeline (chunking + preprocessing)"
 description: ...
 Labels: Kind/feature
@@ -1116,7 +1116,7 @@ Hide automatically generated Archives: uncheck (forgejo crea automaticamente Sou
 
 
 
-//🔥🔥🔥🔥TODO CLEAN HERE NELSON 09-07-2026, VEDI COSA PUOI ELIMINARE DI QUESTO BLOCCO
+//TODO CLEAN HERE NELSON 09-07-2026, VEDI COSA PUOI ELIMINARE DI QUESTO BLOCCO
 crea 
 ssh://git@192.168.113.52:222/CompeteSrl/test-repo.git
 git remote -v
@@ -1343,18 +1343,7 @@ brothers of /srv/ is
 └── miniconda3/                          #python globale (script utility fuori Docker)
 
 
-
-
-
-e per chiudere la issue? cioe in realta attualmente vorrei direttamente chiuderla xk è gia stata fatta nel code che non ho ancora creato
-e come branch mentre sto creando questa Issues? finora ho solo branch main
-e poi la issue viene automaticamente chiusa da forgejo quando la PR viene mergiata?  
-e poi attualmente ho solo branch main
-
-
-
-
-FINALY FORGEJO AS REAL FINAL ENTERPRISE SETUP
+⚡️FORGEJO LAST THINGS X REAL FINAL ENTERPRISE SETUP
 -forgejo runner x ci/cd automation
 -tutte le PR dovreebbero avere lo stesso formato cosi tutte le PR sono uguali, quindi usare un template
 e.g.
