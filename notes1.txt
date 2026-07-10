@@ -636,97 +636,6 @@ quando hai completato la feature e vai raggiungere il 'develop' branch allora us
 -licenze per la repo: MIT(dice "Fai quello che vuoi col codice, ma non mi puoi denunciare e devi mantenere il mio copyright."), Apache2.0(dice "Puoi usare il codice anche in aziende grandi, e sei protetto legalmente da problemi di brevetti.").
 
 
-
-
-Idea
-    ↓
-Crei una Issue
-    ↓
-Assegni la Issue a una Milestone
-    ↓
-Crei un branch dedicato
-    ↓
-Sviluppi la funzionalità
-    ↓
-Apri una Pull Request
-    ↓
-Review del codice
-    ↓
-Merge nel branch principale
-    ↓
-Chiudi automaticamente la Issue
-    ↓
-La Milestone avanza verso il 100%
-    ↓
-Quando la Milestone è completa, crei una Release (es. v1.0.0)
-
-
--flow:
-sviluppatore crea feature/xxx da develop
-         ↓
-lavora, commit frequenti, rebase su develop se serve
-         ↓
-push + Pull Request verso develop
-         ↓
-code review + CI (test automatici)
-         ↓
-merge commit in develop
-         ↓
-deploy automatico in DEV → si testa
-         ↓
-merge develop → staging
-         ↓
-deploy in STAGING → test con dati realistici
-         ↓
-merge staging → main + TAG vX.Y.Z
-         ↓
-deploy manuale approvato in PROD
-         ↓
-Release notes su Forgejo
-
-
--the final flow is:
-feature
-↓
-develop
-↓
-deploy DEV
-↓
-test
-↓
-merge su main
-↓
-deploy STAGING
-↓
-test
-↓
-deploy PROD 
-
-
-feature
-↓
-Pull Request
-↓
-develop
-↓
-CI
-↓
-staging
-↓
-Merge
-↓
-main
-↓
-Tag
-↓
-Release
-↓
-production
-
-
-
-
-
 STARTING SETUP
 --new organization: CompeteSrl
 --logo alto a dx >site administration> user accounts> create user account 
@@ -776,7 +685,7 @@ component/ci-cd
 component/infrastructure
 component/monitoring
 
--set milestones
+-set milestones   //🔥DI SOLITO QUANDO LA MILESTONE(che contine X cose da fare) è completata, allora fai la Realese!
 target repo>issues>milestones>new milestone>
 MVP (Minimum Viable Product)
 Core RAG
