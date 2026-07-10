@@ -1114,38 +1114,7 @@ Hide automatically generated Archives: uncheck (forgejo crea automaticamente Sou
 //⚠️errori sempre da evitare: NON creare tag da branch 'develop', NON fare release da feature/xxx branch, NON modificare codice dopo tag (🔥MAI!)
 
 
-
-
-//TODO CLEAN HERE NELSON 09-07-2026, VEDI COSA PUOI ELIMINARE DI QUESTO BLOCCO
-crea 
-ssh://git@192.168.113.52:222/CompeteSrl/test-repo.git
-git remote -v
-ricordi come avevi settato i volumes del containerdocker Forgejo? avevi settato volumes: /srv/data/infrastructure/forgejo:/data  quindi li se controlli troverai anche tutti i repository che hai creato, trovi il file .git cioè quello che riceve i git push dal tuo pc!
-gli ambienti /srv/environments (cioe dev/prod/staging) sono 'working tree' cioe usate PER FAR GIRARE IL SOFTWARE (mentre forgejo serve a gestire il codice).
-questi environments vengono aggiornati all'inizio lo fai tu manualmente (POI AUTOMATIZZI CON forgejo runner CI/CD!! ⚠️ è brutto e puoi fare errori se fai manualmente!)
-
-quindi in fase developing
-feature/* → PR → develop
-develop → /srv/environments/dev
-
-quindi in fase di staging 
-git checkout develop
-git checkout -b release/1.0.0
-git push origin release/1.0.0
-e poi
-release/1.0.0 → /srv/environments/staging
-
-quindi in produzione quando approvi
-merge release/1.0.0 → main
-tag v1.0.0
-e poi
-main → /srv/environments/prod
-
-
-
-
-
-⭐️SET THE FIRST TIME THE CODE IN THE ENVS ON THE SERVER
+⭐️⭐️⭐️SET THE FIRST TIME THE CODE IN THE ENVS ON THE SERVER
 cd /srv/environments/dev    //sul server
 mkdir testtt-repooo   //🔥🔥CREA FOLDER X IL TUO PRJ!!
 cd testtt-repooo
