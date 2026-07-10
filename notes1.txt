@@ -601,7 +601,7 @@ refactor/retriever-cleanup      # refactor, refactoring senza nuove feature
 docs/api-documentation          # docs, solo documentazione
 chore/update-dependencies       # chore, manutenzione
 
--naming dei commit
+!-naming dei commit
 feat:... e.g. aggiunge reranking cross-encoder al retriever
 fix:... e.g. corregge timeout connessione Qdrant su documenti grandi
 docs:... e.g. aggiorna README con istruzioni deploy
@@ -636,105 +636,6 @@ quando hai completato la feature e vai raggiungere il 'develop' branch allora us
 -licenze per la repo: MIT(dice "Fai quello che vuoi col codice, ma non mi puoi denunciare e devi mantenere il mio copyright."), Apache2.0(dice "Puoi usare il codice anche in aziende grandi, e sei protetto legalmente da problemi di brevetti.").
 
 
-//in futuro installerai anche Forgejo Runner per avere anche CI/CD (cioe automazione di flussi)
-//GitFlow completo (con develop + feature + release + hotfix) è considerato vecchio oggi
-
-
-## Il flusso completo di una feature
-```bash
-# 1. Parti sempre da develop aggiornato
-git checkout develop
-git pull origin develop
-
-# 2. Crea la feature branch
-git checkout -b feature/rag-web-search
-
-# 3. Lavori, fai commit piccoli e frequenti
-git add app/rag/agents/web_agent.py
-git commit -m "feat: aggiunge web agent con Tavily"
-git add tests/unit/test_web_agent.py
-git commit -m "test: aggiunge test per web agent"
-
-# 4. develop è andato avanti? Aggiorna con rebase
-git fetch origin
-git rebase origin/develop
-
-# 5. Push della feature
-git push origin feature/rag-web-search
-
-# 6. Su Forgejo: apri Pull Request feature/rag-web-search → develop
-#    Il team fa code review, la CI gira i test
-
-# 7. Merge approvato → "Create merge commit"
-#    develop ora contiene la feature
-
-# 8. develop viene deployato automaticamente in DEV dal runner
-
-# 9. Cancella la feature branch (locale e remota)
-git branch -d feature/rag-web-search
-git push origin --delete feature/rag-web-search
-```
-
-## Da develop a produzione
-# Quando develop è stabile e testato in DEV:
-
-# 1. Merge develop → staging
-git checkout staging
-git pull origin staging
-git merge develop
-git push origin staging
-# → deploy automatico in STAGING, si testa con dati realistici
-
-# 2. Staging validato? Merge staging → main
-git checkout main
-git pull origin main
-git merge staging
-git push origin main
-
-# 3. Tag della release
-git tag -a v1.2.0 -m "Release 1.2.0: web search + memoria long-term"
-git push origin v1.2.0
-
-# 4. Deploy manuale approvato in PRODUCTION
-#    (sul server: /srv/scripts/deploy.sh prod)
-
-
-## Hotfix — bug urgente in produzione
-# Un bug critico è in produzione. NON passi da develop.
-
-# 1. Parti da main (= produzione)
-git checkout main
-git pull origin main
-git checkout -b hotfix/auth-token-leak
-
-# 2. Correggi
-git commit -m "fix: corregge leak token JWT nei log"
-
-# 3. Merge diretto in main
-git checkout main
-git merge hotfix/auth-token-leak
-git tag -a v1.2.1 -m "Hotfix: security token leak"
-git push origin main --tags
-
-# 4. IMPORTANTE: porta il fix anche in develop e staging
-git checkout develop
-git merge hotfix/auth-token-leak
-git push origin develop
-
-git checkout staging
-git merge hotfix/auth-token-leak
-git push origin staging
-# Così il fix non si perde al prossimo rilascio
-
-
-main            ← sempre stabile, = ciò che gira in PRODUCTION
-  ↑ merge (solo da staging testato, con tag)
-staging         ← = ciò che gira in STAGING (testing)
-  ↑ merge (da develop quando pronto per test)
-develop         ← = ciò che gira in DEV, integrazione continua
-  ↑ merge (main request (cioe Pull Request) da feature)
-feature/xxx     ← una branch per ogni nuova funzionalità
-hotfix/xxx      ← fix urgenti, partono da main
 
 
 Idea
@@ -821,6 +722,9 @@ Tag
 Release
 ↓
 production
+
+
+
 
 
 STARTING SETUP
@@ -1145,6 +1049,9 @@ git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git .   //il '.'
 git checkout main 
 docker compose up -d
 //ora env production -- main -- v1.0.0(oppure cmnq l'ultima RELEASE che hai fatto)
+
+
+//🐞🐞 hotfix/xxx   ← fix urgenti, partono da main. pero dopo che poi l'hai mergiato al main (e cosi ora production non ha errori) allora applica il fix anche a env stagine e developing (altrimenti perderesti il fix alla prossima relase in v2.0.0)
 
 ☀️☀️ COME SI USA GIORNALMENTE X GLI ENVS SUL SERVER
 //fase di sviluppo
