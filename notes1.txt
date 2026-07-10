@@ -731,6 +731,11 @@ Assignees: nelvison.benedetto
 //🔥remember NON FARE MAI Issues troppo grandi e.g.'build RAG system'
 //appena crei la issue te la mette nella col 'backlog' del project target, se l'hai gia fatta (QUINDI ISSUES IS CLOSED successfully) puoi semplicemente trascinarla in col 'done'.
 
+⛓️‍💥-link Issue -- commit / PR con chiusura Issue automatica
+quando fai e.g.git commit -m "Add JWT authentication #12" allora forgejo crea reference targetcommit--issue#12 (lo capisce leggendo il mex)
+quando però usi keywords nel mex del commit e.g. 'Add JWT authentication Closes #12' 'Fix login bug Fixes #12' allora quando questo commit arriva nel branch target(gia settato dentro la issue) grazie ad un merge (e nella PR scrivi mex esplicito e.g.'...Closes #12'), allora la issue #12 VIENE CHIUSA AUTOMATICAMENTE.
+
+
 -set Wiki (per documentare tutto cioe che il nuovo sviluppatore dovrebbe sapere about il progetto):
 la wiki è un piccolo repository git separato, ogni file è un .md, quindi ogni modifica alla wiki ha cronologia/commit/versionamento/ect.
 (target repo>settings>units>wiki: verifica che sia abilitato)
@@ -1130,6 +1135,7 @@ brothers of /srv/ is
 
 
 ⚡️FORGEJO LAST THINGS X REAL FINAL ENTERPRISE SETUP
+-🔥 UNDERSTAND BETTER /srv/backups/  !!
 -forgejo runner x ci/cd automation
 -tutte le PR dovreebbero avere lo stesso formato cosi tutte le PR sono uguali, quindi usare un template
 e.g.
@@ -1163,5 +1169,8 @@ Fixed
 e.g. fix(redis): fix connection leak
 
 -others are: codeowners avanzato (e.g./frontend/ @frontend-team) 
+
+
+
 
 
