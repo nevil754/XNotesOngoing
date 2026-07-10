@@ -67,7 +67,8 @@ Suit-Force-Card   //psw
 sudo -i  //diventa utente root (se chiede psw la psw è la stessa cioe Suit-Force-Card)
 su - deploy  //☄️diventi utente 'deploy'(xk per usare Forgejo puoi solo come utente 'deploy'!!)
 http://192.168.113.52:3000   //open Forgejo(è come GitLab cioe self-hosted ma moolto piu leggero)
-forgejo nelvison.benedetto, Utod83win!!
+nelvison.benedetto, Utod83win!!
+forgejo-admin, Suap45skh!, nelvison.benedetto2@gmail.com
 
 ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untente docker in /home/docker
 //quando fai comando 'sudo ...' allora dici al system di login come admin 'root' SOLO x questo comando, se fai invece 'sudo -i' diventi proprio admin root finche non logout.
@@ -251,7 +252,7 @@ sudo -i
 whoami
 tree /home/docker   //questo utente e questo folder in realta anche non serve conteneva i volumes di qdrant ma io intanto uso mia struttura 
 
-//🔥crea gli utenti (dovresti gia aver 'valterm' creato durante installazione linux ubuntu, e 'docker' che non utilizzo ma che era creato & settato x usare docker engine (ma intanto io uso tutto nei containers) )
+//🔥crea gli utenti (dovresti gia aver 'valterm' creato durante installazione linux ubuntu, e 'docker' che non utilizzo ma che era creato & settato x usare docker engine (quindi user linux da NON cancellare)
 adduser deploy   //crea user deploy (psw 12345678)
 adduser --disabled-password --gecos "" runner   //crea user runner (psw disabilitata x è per ci/cd), x runnare comandi di forgejo, non chiamarlo runner-forgejo perché quello è il nome del servizio docker
   usermod -s /usr/sbin/nologin runner   //runner non deve avere shell pura xk è solo ci/cd
@@ -263,7 +264,7 @@ adduser --disabled-password --gecos "" runner   //crea user runner (psw disabili
 //ora crea i groups
 getent group  //vedi tutti i grups
 getent group X   //vedi chi c'è dentro X group
-getent group docker   //🔥DONT DELETE è creato da DockerEngine e tutti gli users all'interno possono usare DockerEngine!
+getent group docker   //🔥DONT DELETE è stato creato da DockerEngine e SOLO tutti gli users all'interno possono usare DockerEngine (quindi commands 'docker...')!
 groupadd srv-deploy
 groupadd srv-read
 
@@ -1359,24 +1360,6 @@ attualmente la mia Issues creata 'implement PDF ingestion...' è settata su bran
 
 ##################
 
-TODO
--ora pensa a Forgejo CI/CD come installare, e poi setta con Git i branchs (il branch 'main' ha anche tag della version e.g.v1.0.0) e clona il prj dentro cd /srv/environments/dev cd /srv/environments/staging cd /srv/environments/prod.
-
-##x delete user X, CMNQ USER 'docker' NON è da cancellare viene ancora usato da qualcosa
-id docker
-ps -u docker   //vedi processi attivi che lo utilizzano (se ce ne sono fermali)
-docker ps -a  //non dipende da user 'docker', ma cmnq check containers running on docker engine
-pkill -u docker   //ferma eventuali processi
-deluser --remove-home docker  //elimina user & home/myusertarget
-rm -rf /home/docker
-rm -rf /home/docker_backup
-id docker   //ora dovresti vedere null
-##
-
-##install docker engine docker compose docker cli
-//quando installi docker, viene creato group linux 'docker' DA NON CANCELLARE e solo gli users all'interno possono usare Docker Engine. e.g.docker:x:999:  quindi 999 o 998
-...
-##
 
 naming branch standard
 auto link issue (#12)
@@ -1386,6 +1369,13 @@ semantic versioning reale
 milestone automation
 
 Questa è la parte che trasforma Forgejo in una vera piattaforma aziendale.
+
+
+-forgejo runner x ci/cd automation
+-
+
+
+
 
 
 
