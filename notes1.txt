@@ -17,9 +17,7 @@ bpeb93tecm!
 task: CF_2026_0259 - PROGETTO CON SFEL Sviluppo
 text: Inizio test caricamento e settaggio Server per ospitare & runnare il RAG system.
 
-####TODO:
--install on server: docker engine, docker compose, miniconda, cerbot(more info), Forgejo(self-hosting github),  
-//TODOe poi spiegami bene come vado avanti con Git & Forgejo con i branches rules,ect. 
+CODE VERRA CARICATO REALMENTE SU 'Azure DevOps Services | Sign In'(see link in mexs w mauro)(here magari dovra essere replicata infrastruttura a environments come ho gia fatto in /srv/)
 
 #######################################
 
