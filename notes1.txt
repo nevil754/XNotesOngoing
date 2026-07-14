@@ -531,7 +531,7 @@ e go to url http://192.168.113.52:19999
 
 ##################FORGEJO GIT complete setup
 
-👥 Users credentials:
+👥 Users credentials 👥:
 -forgejo-admin, Suap45skh!, nelvison.benedetto2@gmail.com 
 -nelvison.benedetto, Utod83win!!, ssh key: nelvisonb-dev-laptop30 
 http://192.168.113.52:3000   
@@ -685,7 +685,7 @@ component/ci-cd
 component/infrastructure
 component/monitoring
 
--set milestones   //🔥DI SOLITO QUANDO LA MILESTONE(che contine X cose da fare) è completata, allora fai la Realese!
+-set milestones   //🔥DI SOLITO QUANDO LA MILESTONE(che contiene X cose da fare) è completata, allora fai la RealeseWithTag!
 target repo>issues>milestones>new milestone>
 MVP (Minimum Viable Product)
 Core RAG
@@ -720,7 +720,7 @@ issues>new issue> e crea     //🔥🔥🔥 CREA NUOVA ISSUE (cioè qualcosa che
 "Add reranking model"
 e.g.
 crea issue sets as
-branch:  target branch  🔥⚡️RICORDA IN ENTERPRISE 1 BRANCH X OGNI ISSUE DA RESOLVE!!e.g. viene creata issue '#142 Add JWT refresh token support' e assegnata a target developer (o 2 devs se è grande) > il dev crea un branch git per lavorare a questa issue e.g.feature/142-jwt-refresh-token (SEMPRE feature/<issue-id>-<slug>)> colleghi il branch all'Issue grazie al commit e.g.'refs #142' (con #142 forgejo capisce e assegna il branch all'issue) > quando il dev ha finito il lavoro fa un PR(pull request)(oppure la apre all'inizio e scrive dentro '🚧 Work in Progress') x mergiare questa sua branch con branch 'develop'. 🔥
+branch:  target branch  🔥🔥⚡️⚡️RICORDA IN ENTERPRISE 1 BRANCH X OGNI ISSUE DA RESOLVE!!e.g. viene creata issue '#142 Add JWT refresh token support' e assegnata a target developer (o 2 devs se è grande) > il dev crea un branch git per lavorare a questa issue e.g.feature/142-jwt-refresh-token (SEMPRE feature/<issue-id>-<slug>)> colleghi il branch all'Issue grazie al commit e.g.'refs #142' (con #142 forgejo capisce e assegna il branch all'issue) > quando il dev ha finito il lavoro fa un PR(pull request)(oppure la apre all'inizio e scrive dentro '🚧 Work in Progress') x mergiare questa sua branch con branch 'develop'. 🔥
 name: "Implement PDF ingestion pipeline (chunking + preprocessing)"
 description: ...
 Labels: Kind/feature
