@@ -1191,7 +1191,7 @@ e.g. fix(redis): fix connection leak
 
 -others are: codeowners avanzato (e.g./frontend/ @frontend-team) 
 
-
+  
 
 
 
