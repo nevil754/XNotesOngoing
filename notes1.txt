@@ -654,7 +654,7 @@ name: rag-system (CONSIGLIATO NOMENCLATURA SEMPRE in minuscolo e con - per gli s
 target repo>settings>branches>branch protection rules: 
 --protected branch name pattern: main
 --protected file patterns separated using semicolon ; : /infra/**;/config/**    //devi fare PullRequest per poter modificare questi files, no push diretto
---unprotected file pattersn separated using semicolon ; : lascia blank
+--unprotected file patterns separated using semicolon ; : lascia blank
 --push: disable push (cosi nessuno puo pushare su direttamente su main, nemmeno te)
 --require signed commits: lascia blank
 --required approvals: 1 (almeno 1 review obbligatoria prima del merge)
@@ -858,7 +858,7 @@ git commit -m "Initial import"
 git push -u origin develop   //-u setta --set-upstream, cioe dice che questo branch locale (develop) è collegato al branch remoto (che lo CREA PROPRIO ORA) origin/develop, 🔥COSI ORA FAI SOLO 🔥'git push'/'git pull'(e basta) e git sa che deve inviare le modifiche a origin/develop! 
 ora vedi che ha caricato su remoto il code e ti da link per fare la PullRequest per mergiare branch develop su branch main (PERO IN QUESTO CASO il branch main vs develop è uguale (xk branch develop è nato da branch main e poi non hai cambiato branch develop), quindi puoi cmnq creare pull request ma non hai btn di Merge) oppure meglio 🔥target repo su forgejo>pull request> main -- develop  new pull request> title: 'Initial import of Develop branch', 🔥assignees: nelvison.benedetto (attualemente non sei loggato come nelviso.benedetto) descriptions labels milestones project > create pull request.
 ora login forgejo con utente nelvison.benedetto> vedi che ti è chiesta la PR> 🔥file changes> 🔥approve la review della PR!
-ora hai abilitato la possibiliata finalmente di fare il Merge Commit (xk avevi un po settato delle branch rules x security)> Create Merge Commit (se il tuo branch è 'develop'NON ELIMINARE IL BRANCH (xk ricorda il le feats arrivano tutte al develop non direttamente al main) mentre invece se era un branch feature/xxx allora si clicca che vuoi eliminare quel branch).
+ora hai abilitato la possibiliata finalmente di fare il Merge Commit (xk avevi un po settato delle branch rules x security)> Create Merge Commit (se il tuo branch è 'develop' ⚠️NON ELIMINARE IL BRANCH (xk ricorda il le feats arrivano tutte al develop non direttamente al main) mentre invece se era un branch feature/xxx allora si clicca che vuoi eliminare quel branch).
 
 di solito pero si hanno 3 figure intorno alla repo target
 ✔️ Admin crea repo e regole (nelvison.benedetto)
