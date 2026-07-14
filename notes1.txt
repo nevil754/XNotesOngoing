@@ -949,6 +949,8 @@ git pull   //aggiorni il locale con il remoto
 docker compose up -d  //avvi la tua app
 //ora environment develop contiene code del branch 'develop' della repo scaricata
 
+
+
 cd /srv/environments/staging
 mkdir testtt-repooo   //🔥🔥CREA FOLDER X IL TUO PRJ!!
 cd testtt-repooo
@@ -1008,11 +1010,16 @@ git status   //check che sia tutto ok allineato
 docker compose up -d
 //quindi ora hai main--tag v2.0.0 -- dockercompose running
 
+Ora nel code nei 3 envs avrai file .env.example (serve solo x layout no values veri), 🔥ora DEVI ENTRARE IN CIASCUN ENVIRONMENT SUL SERVER ed aggiungi .env file (PER CISCUN ENVIRONMENT)
+cp .env.example .env   //crea nuovo file called '.env' che è un clone di .env.example
+nano .env   //entra dentro
+
 //riassunto: la prima volta che crei prj lo crei in locale e poi passi code&branches a repository remota, poi repo remota -> 3 environments sul server, e poi easy gestione...
 //🔥🔥🔥QUINDI: N devs --> GIT REMOTO(vedi here qua sotto ciascun branch dove è sul server)
 /srv/environments/dev/xxx     -> branch 'develop'
 /srv/environments/staging/xxx -> branch 'release/xyz'
 /srv/environments/prod/xxx    -> branch 'main'  e quando sei soddifatto del main, fai Realese+Tag !!
+
 
 -una stessa repo locale, puo avere multiple connessioni con remoto e.g.
 forgejo   -> repository aziendale
@@ -1029,7 +1036,7 @@ crei su forgejo repo con readme.md/.gitignore./licenses settate > git clone e sc
 /srv/data/prod/rag-system(e here folders qdrant,redis,sqlserver,upload]
 /srv/data/staging/rag-system(e here folders qdrant,redis,sqlserver,upload]
 
-//nel file .env
+//nel file .env (🔥🔥QUINDI AVRAI 3 VERSIONI DIFFERENTI DI file .env: 1 in environment dev, 1 in environment staging, 1 in environment production)(il file )
 -DOCKER_NETWORK=xxx  #rag-dev-network, rag-staging-network, rag-prod-network
 //e cosi quando avvi il docker-compose docker creera automaticamente la rete indicata
 -DATA_ROOT=xxx   #/srv/data/dev/rag-system, /srv/data/staging/rag-system , /srv/data/prod/rag-system
@@ -1048,7 +1055,7 @@ networks:
 //docker network ls  vedi le reti network
 //avvio docker x development
 cd /srv/projects/dev/rag-system
-docker compose up -d    //or  docker compose up -d --build
+docker compose up -d    //or  docker compose up -d --build   (--build ricostruisce l'img)
 //docker leggera dockercompose+dockercomposeoverride+envfile di questo folder
 
 //avvio docker x staging
