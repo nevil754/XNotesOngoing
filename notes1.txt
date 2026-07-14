@@ -763,9 +763,13 @@ Home
 una release è una descrizione scritta a mano di un tag.
 e.g.
 Tag v1.0.0
-Release Version 1.0.0 con description e.g.'First production-ready release. Features ...'  //follow standart vMAJOR.MINOR.PATCH per numerare e.g.1.0.0
+Release Version 1.0.0 con description e.g.'First production-ready release. Features ...'  Always follow standart vMAJOR.MINOR.PATCH 
+MAJOR → cambiamenti incompatibili (breaking changes)
+MINOR → nuove funzionalità compatibili
+PATCH → bug fix
 target repo>releases>new release>
-//crei una release quando raggiungi un obbiettivo importante quindi il vMAJOR.MINOR.PATCH cambia
+//crei una release quando raggiungi un obbiettivo importante quindi il vMAJOR.MINOR.PATCH cambia.
+//la relase x staging si chiama senza la 'v' iniziale, la Release+Tag (quindi quella finale x il client) si chiama con la 'v' iniziale.
 
 🔥🔥🔥flow
 1.Si sviluppa sulle branch feature/*.
