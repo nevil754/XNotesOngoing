@@ -949,8 +949,6 @@ git pull   //aggiorni il locale con il remoto
 docker compose up -d  //avvi la tua app
 //ora environment develop contiene code del branch 'develop' della repo scaricata
 
-
-
 cd /srv/environments/staging
 mkdir testtt-repooo   //🔥🔥CREA FOLDER X IL TUO PRJ!!
 cd testtt-repooo
@@ -1010,7 +1008,7 @@ git status   //check che sia tutto ok allineato
 docker compose up -d
 //quindi ora hai main--tag v2.0.0 -- dockercompose running
 
-Ora nel code nei 3 envs avrai file .env.example (serve solo x layout no values veri), 🔥ora DEVI ENTRARE IN CIASCUN ENVIRONMENT SUL SERVER ed aggiungi .env file (PER CISCUN ENVIRONMENT)
+!Ora nel code nei 3 envs avrai file .env.example (serve solo x layout no values veri), 🔥ora DEVI ENTRARE IN CIASCUN ENVIRONMENT SUL SERVER ed aggiungi .env file (PER CISCUN ENVIRONMENT)
 cp .env.example .env   //crea nuovo file called '.env' che è un clone di .env.example
 nano .env   //entra dentro
 
