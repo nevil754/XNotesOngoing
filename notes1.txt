@@ -818,7 +818,7 @@ forgejo>login nelvison.benedetto> settings > ssh keys> add key: paste here la ke
 ssh -p 222 git@192.168.113.52   //test la connection, dovresti dire 'yes' e poi vedere 'hi there…'
 
 
-🔥🔥-setta i BRANCHES 
+🔥🔥🪾-setta i BRANCHES 
 //git lavora x differenza tra due snapshot completi del progetto!
 //merge è "integrazione tra due storie che devono avere base comune"
 
@@ -833,11 +833,11 @@ main ------ develop ------ feature/chat
 
 //ricordati non fare quando crei repo su forgejo aggiungi readm.me e quindi fai il primo commit, e poi in locale nel tuo code fai 'git init' che crea un altro repository totalmente indipendente! quindi error i 2 sono 2 tree completamente diversi non hanno antenati in comune!!(potresti anche risolvere ma non è cosi che si fa)
 
-//RICORDATI DI ENTRARE COME user nelvison.benedetto! intanto fogejo-admin(dovrebbe essere usato solo in casi advvero speciali) ti ha dato tutti i permessi 
+//RICORDATI DI ENTRARE COME user nelvison.benedetto! intanto fogejo-admin(dovrebbe essere usato solo in casi davvero speciali) ti ha dato tutti i permessi 
 create repo su forgejo (standart enterprise cosi hai readme.md .gitignore e lincense)
 git clone ssh://git@192.168.113.52:222/CompeteSrl/repo-test.git
 cd test-repo
-ora apri il target folder sul tuo pc  'code .'
+code .  apri il target folder sul tuo pc
 //git ls-tree -r main --name-only   vedi che cmnq hai realmente i files readme.md e .gitignore (anche se non li vedi ad occhio)
 //git restore README.md .gitignore   non necessario, ma cmnq questi ti scrive su disco locale questi files presi dal remoto
 
@@ -1009,6 +1009,11 @@ docker compose up -d
 /srv/environments/staging/xxx -> branch 'release/xyz'
 /srv/environments/prod/xxx    -> branch 'main'  e quando sei soddifatto del main, fai Realese+Tag !!
 
+-una stessa repo locale, puo avere piu connessioni con remoto e.g.
+forgejo   -> repository aziendale
+github    -> mirror personale/pubblico
+quindi fai 'git remote rename origin github' e quando ne hai bisogno fai 'git push github main' //cosi nomenclatura locale 'origin' diventa nomeclatura 'github'
+e poi puoi add forgejo
 //ora in futuro consigliato automatizzare con 🦿🦿Forgejo Runner x ci/cd!!
 
 
