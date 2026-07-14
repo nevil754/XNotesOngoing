@@ -948,17 +948,23 @@ git checkout develop
 git pull   //aggiorni il locale con il remoto
 docker compose up -d  //avvi la tua app
 //ora environment develop contiene code del branch 'develop' della repo scaricata
+//successivamente creerai anche branch reease/1.0.0 nel env di staging, cmnq il code di questo env development deve conoscere quel branch ma mai usarlo, quindi fai solo here 'git fetch origin'.
 
 cd /srv/environments/staging
 mkdir testtt-repooo   //🔥🔥CREA FOLDER X IL TUO PRJ!!
 cd testtt-repooo
 git clone ssh://git@192.168.113.52:222/CompeteSrl/testtt-repooo.git .   //il '.' per scaricare nella cartella corrente (invece di creare un sottocartella!!)
+//sul tuo pc
 git checkout develop
+git pull
 git checkout -b release/1.0.0  //QUESTA E' UN RELEASETEMP(la prima che fai), cioe viene eliminata (non la prima che fai) poi quando hai finito i tests 
 git push -u origin release/1.0.0
+//sul server
+cd /srv/environments/staging/testtt-repooo
 git fetch origin   //contatta il repository remoto chiamato origin, scarica tutte le novità, ma NON modifica i miei branch locali. 🔥è un 'git pull' ma senza la modifica ai miei files locali
 git checkout release/1.0.0
 git pull
+docker compose up -d
 //ora environment staging contiene code del branch 'release/1.0.0'
 //in questo env fai test funzionali, integrazioni, test docker, test db, test api ect.
 
