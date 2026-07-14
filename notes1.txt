@@ -970,19 +970,21 @@ docker compose up -d
 
 ☀️☀️ COME SI USA GIORNALMENTE X GLI ENVS SUL SERVER
 //fase di sviluppo
-cd /srv/environments/dev
-git fetch origin
-git reset --hard origin/develop   //reset --hard perche un ambiente server NON deve avere modifiche locali!! cosi hai environment identico al repo, è standard in deploy controllati.
+cd /srv/environments/dev/testtt-repooo
+git fetch origin   //scarica gli aggiornamenti sul locale, ma non modifica il code locale coma fa invece 'git pull'
+git reset --hard origin/develop   //reset --hard perche un ambiente server NON deve avere modifiche locali!! cosi hai environment identico al repo remoto, è standard in deploy controllati.
+git status  //check tutto ok allineato, ti dice ur branch is up to date e nothing to commit tree clean
 docker compose up -d
 
 //quando vuoi fare una release (develop è stabile e sei soddifatto)
 git checkout develop
-git checkout -b release/2.0.0
+git checkout -b release/2.0.0   //release x i tests!
 git push origin release/2.0.0   //🔥prendi il mio branch locale release/2.0.0 e pubblicalo (o aggiornalo) sul repository remoto origin
-cd /srv/environments/staging
+cd /srv/environments/staging/testtt-repooo
 git fetch origin
 git checkout release/2.0.0
 git reset --hard origin/release/2.0.0
+git status  //check che sia tutto ok allineato
 docker compose up -d
 //e fai tutti i tests che vuoi
 
@@ -993,14 +995,15 @@ git tag -a v2.0.0 -m "Production release v2.0.0"   //DUNQUE SOLITAMENTE CREI REL
 git tag   //vedi che c'è v1.0.0
 git push origin v2.0.0
 
-cd /srv/environments/prod
+cd /srv/environments/prod/testtt-repooo
 git fetch origin
 git checkout main
 git reset --hard origin/main
+git status   //check che sia tutto ok allineato
 docker compose up -d
 //quindi ora hai main--tag v2.0.0 -- dockercompose running
 
-//la prima volta che crei prj lo crei in locale e poi passi code&branches a repository remota, poi repo remota -> 3 environments sul server, e poi easy gestione...
+//riassunto: la prima volta che crei prj lo crei in locale e poi passi code&branches a repository remota, poi repo remota -> 3 environments sul server, e poi easy gestione...
 //🔥🔥🔥QUINDI: N devs --> GIT REMOTO(vedi here qua sotto ciascun branch dove è sul server)
 /srv/environments/dev/xxx     -> branch 'develop'
 /srv/environments/staging/xxx -> branch 'release/xyz'
