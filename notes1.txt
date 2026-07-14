@@ -881,7 +881,7 @@ git push   //prende tutti i commit locali su 'develop' e li manda al remoto orig
 ADD NEW FEATURE feature/xxx AL CODE
 
 📃📃📃📃📃---x infos
-git log -1   //VEDI LAST COMMIT(snapshot img of the code) IN LOCALE
+git log -1   //🔥VEDI LAST COMMIT(snapshot img of the code)(e anche sua date) IN LOCALE
 git branch  //vedi in che branch sei attualmente (vedi solo branchs locali)
 git branch -a   //vedi branches locali&remoti che hai x this prj(where there is file .git)
 git log --oneline   //vedi history
@@ -896,7 +896,7 @@ git fetch --prune   //vai su forgejo/github e dimmi cosa è cambiato, cancella d
 git log --oneline
 cat hello.py   //🔥per print content file called hello.py (e.g.cosi vedi che è aggiornato)
 ls -la /srv/environments/dev/testtt-repooo   //vedi anche i files che iniziano con .xxx (xk linux di default li nasconde) 
-git log -1   //🔥vedi time dell'ultimo commit of this repo!!
+git branch -vv  //
 📃📃📃📃📃---
 
 ora ogni persona del team lavora su un feature branch diversa, e.g. nelvison-> feature/rag-ingestion,  julia-> feature/reranker ect.
@@ -1016,6 +1016,10 @@ docker compose up -d
 cp .env.example .env   //crea nuovo file called '.env' che è un clone di .env.example
 nano .env   //entra dentro
 
+
+git checkout -b release/1.0.0 origin/release/1.0.0   //crea branch in locale sul pc linkato a branch remoto origin/release/1.0.0
+
+
 //riassunto: la prima volta che crei prj lo crei in locale e poi passi code&branches a repository remota, poi repo remota -> 3 environments sul server, e poi easy gestione...
 //🔥🔥🔥QUINDI: N devs --> GIT REMOTO(vedi here qua sotto ciascun branch dove è sul server)
 /srv/environments/dev/xxx     -> branch 'develop'
@@ -1027,9 +1031,8 @@ nano .env   //entra dentro
 forgejo   -> repository aziendale
 github    -> mirror personale/pubblico
 crei su forgejo repo con readme.md/.gitignore./licenses settate > git clone e scarica in locale questo folder forgejo > ora nel folder code che hai in locale copy all the content (ctrl+c) go in folder windows scaricato da forgejo, e paste ctrl+v (windows se ci sono conflitti ti fa decidere quale tenere!) > ⭐️ ora il tuo folder è collegato al remoto e contiene anche tutto il code! e in locale 'origin'->è legato al forgejo > ora puoi collegare anche remote GitHub con 'git remote add github https://github.com/utente/progetto.git' (uso 'github' cosi ora se vuoi fare i pushes a questo remoto repo allora fai 'git push github main') 
-
-
-//ora in futuro consigliato automatizzare con 🦿🦿Forgejo Runner x ci/cd!!
+!-scegli sempre correttamente la guusta img docker del target service: e.g. su https://hub.docker.com/r/qdrant/qdrant/tags  vedi le versions (cioe i tags) di images docker di qdrant, da aggiungerla nel tuo docker-compose per creare l'img, SOLITAMENTE NON SCEGLIERE LATEST ma scegli una versione e.g. v1.18.2 (cosi questo prj è riproducibile per sempre perché usa versione fissa no problems di incompatibilita)
+-ora in futuro consigliato automatizzare con 🦿🦿Forgejo Runner x ci/cd!!
 
 
 🐳🐳🐳DOCKER NETWORK COMPLETE ISOLATIONS X THE 3 ENVS (bc remember on the server u have 1 docer engine)
