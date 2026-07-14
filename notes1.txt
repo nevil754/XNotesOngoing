@@ -888,7 +888,7 @@ git log --oneline   //vedi history
 Remove-Item -Recurse -Force .git
 git remote -v
 git fetch origin  //non modifica il tuo codice locale aggiorna solo le informazioni sui branch remoti
-  git branch -vv   //ti dice se branch target locale<-->remoto sono sincronizzati oppure uno è piu avanti dell'altro ect, senza che devi fare 'git pull'(che modifica anche il code o return 'already up to date.') 
+git branch -vv   //ti dice se branch target locale<-->remoto sono sincronizzati oppure uno è piu avanti dell'altro ect, senza che devi fare 'git pull'(che modifica anche il code o return 'already up to date.') 
   git log develop..origin/develop   //se non stampa nulla allora ok, ora 'develop' locale è sincronizzato al remoto
   git log main..origin/main
 git ls-remote --heads origin  //controlla i branch attivi su forgejo
@@ -1016,8 +1016,14 @@ docker compose up -d
 cp .env.example .env   //crea nuovo file called '.env' che è un clone di .env.example
 nano .env   //entra dentro
 
-
+###
 git checkout -b release/1.0.0 origin/release/1.0.0   //crea branch in locale sul pc linkato a branch remoto origin/release/1.0.0
+//merge main->develop
+git checkout develop
+git pull origin develop   //🔥🔥significa  origin → il repository remoto (Forgejo nel tuo caso), develop → il branch remoto dove vuoi caricare
+git merge main
+git push origin develop
+###
 
 
 //riassunto: la prima volta che crei prj lo crei in locale e poi passi code&branches a repository remota, poi repo remota -> 3 environments sul server, e poi easy gestione...
