@@ -855,8 +855,8 @@ robocopy C:\sviluppo\devops\prjRAG_AI\testt-repoo `
 
 git add .
 git commit -m "Initial import"
-git push -u origin develop   //-u setta --set-upstream, cioe dice che questo branch locale (develop) è collegato al branch remoto (che lo crea proprio ora) origin/develop, 🔥COSI ORA FAI SOLO 🔥'git push'/'git pull'(e basta) e git sa che deve inviare le modifiche a origin/develop! 
-ora vedi che ha caricato su remoto il code e ti da link per fare la PullRequest per mergiare branch develop su branch main (PERO IN QUESTO CASO il branch main vs develop è uguale (xk branch develop è nato da branch main e poi non hai cambiato branch develop), quindi puoi cmnq creare pull request ma non hai btn di Merge) oppure meglio 🔥target repo su forgejo>pull request> main -- develop  new pull request> title: 'Initial import of Develop branch', 🔥assignees: nelvison.benedetto descriptions labels milestones project > create pull request.
+git push -u origin develop   //-u setta --set-upstream, cioe dice che questo branch locale (develop) è collegato al branch remoto (che lo CREA PROPRIO ORA) origin/develop, 🔥COSI ORA FAI SOLO 🔥'git push'/'git pull'(e basta) e git sa che deve inviare le modifiche a origin/develop! 
+ora vedi che ha caricato su remoto il code e ti da link per fare la PullRequest per mergiare branch develop su branch main (PERO IN QUESTO CASO il branch main vs develop è uguale (xk branch develop è nato da branch main e poi non hai cambiato branch develop), quindi puoi cmnq creare pull request ma non hai btn di Merge) oppure meglio 🔥target repo su forgejo>pull request> main -- develop  new pull request> title: 'Initial import of Develop branch', 🔥assignees: nelvison.benedetto (attualemente non sei loggato come nelviso.benedetto) descriptions labels milestones project > create pull request.
 ora login forgejo con utente nelvison.benedetto> vedi che ti è chiesta la PR> 🔥file changes> 🔥approve la review della PR!
 ora hai abilitato la possibiliata finalmente di fare il Merge Commit (xk avevi un po settato delle branch rules x security)> Create Merge Commit (se il tuo branch è 'develop'NON ELIMINARE IL BRANCH (xk ricorda il le feats arrivano tutte al develop non direttamente al main) mentre invece se era un branch feature/xxx allora si clicca che vuoi eliminare quel branch).
 
@@ -874,11 +874,12 @@ git merge main   //prende tutti i commit presenti in main e li integrali dentro 
 git push   //prende tutti i commit locali su 'develop' e li manda al remoto origin/develop, ora remoto e locale x branch 'develop' sono UGUALI!!
 //ora hai di nuovo tutto sincronizzato locale<-->remoto
 
-🔥ORA APPLICA RULES DI BRANCH SECURITY anche a 'develop'
+🔥SOLO ORA APPLICA RULES DI BRANCH SECURITY anche a 'develop' (altrimenti dovresti creare un nuovo branch solo per poi aggiornare 'develop'😮‍💨)
 🔥 target repo>settings>branches>default branch: 'develop'>update  perché d'ora in poi le features/xxx devono generarsi a partire da branch 'develop'!!(branch 'main' rimane x la production)
 ADD NEW FEATURE feature/xxx AL CODE
 
 📃📃📃📃📃---x infos
+git log -1   //VEDI LAST COMMIT(snapshot img of the code) IN LOCALE
 git branch  //vedi in che branch sei attualmente (vedi solo branchs locali)
 git branch -a   //vedi branches locali&remoti che hai x this prj(where there is file .git)
 git log --oneline   //vedi history
@@ -1009,11 +1010,12 @@ docker compose up -d
 /srv/environments/staging/xxx -> branch 'release/xyz'
 /srv/environments/prod/xxx    -> branch 'main'  e quando sei soddifatto del main, fai Realese+Tag !!
 
--una stessa repo locale, puo avere piu connessioni con remoto e.g.
+-una stessa repo locale, puo avere multiple connessioni con remoto e.g.
 forgejo   -> repository aziendale
 github    -> mirror personale/pubblico
-quindi fai 'git remote rename origin github' e quando ne hai bisogno fai 'git push github main' //cosi nomenclatura locale 'origin' diventa nomeclatura 'github'
-e poi puoi add forgejo
+crei su forgejo repo con readme.md/.gitignore./licenses settate > git clone e scarica in locale questo folder forgejo > ora nel folder code che hai in locale copy all the content (ctrl+c) go in folder windows scaricato da forgejo, e paste ctrl+v (windows se ci sono conflitti ti fa decidere quale tenere!) > ⭐️ ora il tuo folder è collegato al remoto e contiene anche tutto il code! e in locale 'origin'->è legato al forgejo > ora puoi collegare anche remote GitHub con 'git remote add github https://github.com/utente/progetto.git' (uso 'github' cosi ora se vuoi fare i pushes a questo remoto repo allora fai 'git push github main') 
+
+
 //ora in futuro consigliato automatizzare con 🦿🦿Forgejo Runner x ci/cd!!
 
 
