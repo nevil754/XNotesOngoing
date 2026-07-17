@@ -1111,11 +1111,10 @@ docker buildx prune -af   //cancella layers creati dal docker build (xk se ne fa
 
 ###TO FIX TO DEBUG
 //testa chainlit che funzioni ok,resetta il daemon (quianndo builda chainlit some errors) e resetta all
-sudo systemctl restart docker
-docker compose down
-docker system prune -af          # rimuove immagini unused + build cache
-docker compose build --no-cache chainlit
-
+sudo systemctl restart dockern   //riavvia il Docker daemon
+docker compose down    //abbatte tutto cio che è stato creato (containers/networks, ovviamente no i volumes persistenti) da dockercompose presente in THIS PATH (non cancella e.g container forgejo se non sei here nel suo path)
+docker system prune -af          #🔥🔥rimuove immagini unused, build cache, network inutilizzati, imgs inutilizzate,ect è il comando clean piu aggressivo
+docker compose build --no-cache chainlit    //no-cache non riutilizza nulla, ricostruisce tutto!!
 
 
 ###
