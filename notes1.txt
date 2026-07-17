@@ -63,7 +63,7 @@ serv95psw!
 ssh docker@192.168.113.52  //da cmd, ACCEDI AL TUO SERVER🔥🔥
 Suit-Force-Card   //psw
 sudo -i  //diventa utente root (se chiede psw la psw è la stessa cioe Suit-Force-Card)
-su - deploy  //☄️diventi utente 'deploy'(xk per usare Forgejo puoi solo come utente 'deploy'!!)
+su - deploy  //☄️diventi utente 'deploy'(password 12345678)(xk per usare Forgejo puoi solo come utente 'deploy'!!)
 http://192.168.113.52:3000   //open Forgejo(è come GitLab cioe self-hosted ma moolto piu leggero)
 nelvison.benedetto, Utod83win!!
 forgejo-admin, Suap45skh!, nelvison.benedetto2@gmail.com
@@ -1085,6 +1085,9 @@ networks:
 cd /srv/projects/dev/rag-system
 docker compose up -d    //docker compose up -d --build   x ricostruire anche le images
 //docker leggera dockercompose+dockercomposeoverride+envfile di questo folder
+//oppure fai in maniera separata (xk magari 5 servizi che usano stesso layer python:3.11-slim-bookworm quindi fare tutti è 5 insieme non è top)
+docker compose build         # prima builda tutto in sequenza, ricostruisce le imgs, non avvia pero nessun container
+docker compose up -d         # poi avvia
 
 //avvio docker x staging
 cd /srv/projects/staging/rag-system
@@ -1096,14 +1099,28 @@ cd /srv/projects/prod/rag-system
 docker compose up -d   //or  docker compose up -d --build
 //this env no dockercomposeoverride, docker leggera dockercompose+envfile di questo folder
 
+//check che spazio su disco non sia vicino al 100%
+df -h /var/lib/docker
+docker system df
 
 ###
 docker compose down   //abbatte tutto cio che è stato creato (containers/networks, ovviamente no i volumes persistenti) da dockercompose presente in THIS PATH (non cancella e.g container forgejo se non sei here nel suo path)
 docker compose ls   //vedi tutti i dockercompose sul server
 docker compose up -d --build  //rebuild le imgs then run
+docker buildx prune -af   //cancella layers creati dal docker build (xk se ne fai tanti puo corrompersi)
+
+###TO FIX TO DEBUG
+//testa chainlit che funzioni ok,resetta il daemon (quianndo builda chainlit some errors) e resetta all
+sudo systemctl restart docker
+docker compose down
+docker system prune -af          # rimuove immagini unused + build cache
+docker compose build --no-cache chainlit
+
 
 
 ###
+
+
 
 
 //🗄️🗄️🗄️SERVER (DON'T DELETE!!)
