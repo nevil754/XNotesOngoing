@@ -1,3 +1,5 @@
+C:\Users\nelvisonb\Desktop\RAGprj\myNotesRAG.txt
+
 
 srvai2k22 -> desktop installato su server (che ha installato sora ollama e gli LLMs0)
 OLLAMA INTERNO → http://srvai2k22:11434/
