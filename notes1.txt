@@ -867,7 +867,7 @@ di solito pero si hanno 3 figure intorno alla repo target
 ✔️ Developer lavora (xx)
 ✔️ Another user approva (xxxreviewer)
 
-ora sincronizza anche il code locale, sincronizza sia i locals main e develop
+ora 🕰SINCRONIZZA anche il code locale, sincronizza sia i locals main e develop
 git checkout main
 git pull origin main   //ora il tuo branch main locale è uguale a quello remoto
 
@@ -897,6 +897,7 @@ git log --oneline
 cat hello.py   //🔥per print content file called hello.py (e.g.cosi vedi che è aggiornato)
 ls -la /srv/environments/dev/testtt-repooo   //vedi anche i files che iniziano con .xxx (xk linux di default li nasconde) 
 git branch -vv  //
+🔥FARE IL MERGE CON e.g. git checkout develop git merge main INVECE CHE MERGE SU PIATTAFORMA FORGEJO, entrambi fanno merge ma sulla piattaforma rimane storico/commenti/ect QUINDI E' STANDART ENTERPRISE (in enterprise quasi vietato fare merge tramite riga di comando xk non hai metadati!!)
 📃📃📃📃📃---
 
 ora ogni persona del team lavora su un feature branch diversa, e.g. nelvison-> feature/rag-ingestion,  julia-> feature/reranker ect.
@@ -983,7 +984,7 @@ cd /srv/environments/dev/testtt-repooo
 git fetch origin   //scarica gli aggiornamenti sul locale, ma non modifica il code locale coma fa invece 'git pull'
 git reset --hard origin/develop   //reset --hard perche un ambiente server NON deve avere modifiche locali!! cosi hai environment identico al repo remoto, è standard in deploy controllati.
 git status  //check tutto ok allineato, ti dice ur branch is up to date e nothing to commit tree clean
-docker compose up -d
+docker compose up -d  //docker compose up -d --build  //x ricreare anche le images
 
 //quando vuoi fare una release (develop è stabile e sei soddifatto)
 git checkout develop
