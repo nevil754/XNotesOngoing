@@ -1112,7 +1112,7 @@ docker compose build celery-worker-high   //questo occupa 20%
 docker compose build celery-worker-default
 docker compose build celery-beat
 docker compose build --no-cache chainlit   //bypassa la cache avvelenata
-docker compose up -d
+docker compose up -d   //AVVIA!!
 df -h /   //vedi ora quanto spazio su disk hai, prima di all ero al 22% ora sono al 72%
 
 ###to know
@@ -1147,13 +1147,14 @@ set -a; source .env; set +a
 echo "DATA_ROOT=$DATA_ROOT"
 ls -lan "$DATA_ROOT/sqlserver" 2>/dev/null || echo "non esiste"
 
-
 docker logs -f rag-system-dev-fastapi-1
 
+❗️# dentro il container fastapi, prova a importare l'app e vedi dove si ferma, ti fa vedere il prossimo errore senza dover ribuildare, se è un errore di codice/import puro
+docker compose exec fastapi python -c "from main import create_app; create_app()"
+
 ###TO DO AFTER ALL WORKS
-MSSQL_SA_PASSWORD  questo è nuovo SA_PASSWORD sara deprecata a breve(ma attualmente ancora x poco supportata)
-
-
+-MSSQL_SA_PASSWORD  questo è nuovo SA_PASSWORD sara deprecata a breve(ma attualmente ancora x poco supportata)
+❗️-rifare la generazione di requirements.txt sul server, xk in requirements ho cambiato pydantic>=2.10.3,<3.0.0 -> pydantic[email]>=2.10.3,<3.0.0
 ##
 
 
