@@ -534,6 +534,21 @@ e go to url http://192.168.113.52:19999
 -nelvison.benedetto, Utod83win!!, ssh key: nelvisonb-dev-laptop30 
 http://192.168.113.52:3000   
 
+
+accounts .git (di forgejo) legati ad ogni environment (puoi anche NON farlo subito, ma e.g. a me serve xk ho generato i files requirements.txt e requirements-dev.txt e li devo fare su server linux (esattemente runno il docker compose target) e poi devo fare il push di questi files su forgejo)
+ /srv/environments/dev/rag-system/.git/config
+    git config user.name "deploy dev"
+    git config user.email "deploy-dev@srvdocker01.local"
+
+ /srv/environments/staging/rag-system/.git/config
+    git config user.name "deploy staging"
+    git config user.email "deploy-staging@srvdocker01.local"
+
+ /srv/environments/production/rag-system/.git/config
+    git config user.name "deploy production"
+    git config user.email "deploy-production@srvdocker01.local"
+
+
 i 3 ambienti (develop,testing,production) sono asettici l'uno dall'altro a livello di filesystem (se non possono essere in db separati, allora configura che siano in folders con permessi ect che siano al massimo isolati), di rete docker (network isolati), e db/volumi separati ovviamente.
 
 //forgejo-admin: da usare solo x amministrare forgejo (creare repos, creare organizations, gestire runne, gestire users, config forgejo), non per lavorare giornalmente!
@@ -867,12 +882,12 @@ di solito pero si hanno 3 figure intorno alla repo target
 ✔️ Developer lavora (xx)
 ✔️ Another user approva (xxxreviewer)
 
-ora 🕰SINCRONIZZA anche il code locale, sincronizza sia i locals main e develop
+ora 🕰SINCRONIZZA🕰 anche il code locale, sincronizza sia i locals main e develop
 git checkout main
 git pull origin main   //ora il tuo branch main locale è uguale a quello remoto
 
 git checkout develop
-git merge main   //prende tutti i commit presenti in main e li integrali dentro develop, meglio del rebase mantiene history (cmnq rebase è usato dai pro)
+git merge main   //(in locale) prende tutti i commit presenti in main e li integrali dentro develop, meglio del rebase mantiene history (cmnq rebase è usato dai pro)
 git push   //prende tutti i commit locali su 'develop' e li manda al remoto origin/develop, ora remoto e locale x branch 'develop' sono UGUALI!!
 //ora hai di nuovo tutto sincronizzato locale<-->remoto
 
@@ -881,6 +896,7 @@ git push   //prende tutti i commit locali su 'develop' e li manda al remoto orig
 ADD NEW FEATURE feature/xxx AL CODE
 
 📃📃📃📃📃---x infos
+QUANDO FAI 'git push' SE IL BRANCH è STATO CREATO with '-u ..' ALLORA TOPTOP XK COSI è GIA LEGATO e git push pusha 100% in destinatione corretta!!
 git log -1   //🔥VEDI LAST COMMIT(snapshot img of the code)(e anche sua date) IN LOCALE
 git branch  //vedi in che branch sei attualmente (vedi solo branchs locali)
 git branch -a   //vedi branches locali&remoti che hai x this prj(where there is file .git)
@@ -1022,7 +1038,7 @@ git checkout -b release/1.0.0 origin/release/1.0.0   //crea branch in locale sul
 //merge main->develop
 git checkout develop
 git pull origin develop   //🔥🔥significa  origin → il repository remoto (Forgejo nel tuo caso), develop → il branch remoto dove vuoi caricare
-git merge main
+git merge main    //sei in branch X, allora merge main->X
 git push origin develop
 ###
 
