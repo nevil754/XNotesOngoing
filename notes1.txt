@@ -1067,7 +1067,7 @@ networks:
 //docker network ls  vedi le reti network
 //avvio docker x development
 cd /srv/projects/dev/rag-system
-docker compose up -d    //or  docker compose up -d --build   (--build ricostruisce l'img)
+docker compose up -d    //docker compose up -d --build   x ricostruire anche le images
 //docker leggera dockercompose+dockercomposeoverride+envfile di questo folder
 
 //avvio docker x staging
@@ -1082,7 +1082,8 @@ docker compose up -d   //or  docker compose up -d --build
 
 
 ###
-docker compose down
+docker compose down   //abbatte tutto cio che è stato creato (containers/networks, ovviamente no i volumes persistenti) da dockercompose presente in THIS PATH (non cancella e.g container forgejo se non sei here nel suo path)
+docker compose ls   //vedi tutti i dockercompose sul server
 docker compose up -d --build  //rebuild le imgs then run
 
 
