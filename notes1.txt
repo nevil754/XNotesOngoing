@@ -1160,6 +1160,8 @@ docker system prune -af          #🔥🔥rimuove immagini unused, build cache, 
 
 
 chmod -R 777 chainlit_app/.chainlit  //⚠️dai i permessi linux a user usato da chainlit sul server! altrimenti error no permessi!!
+rm chainlit_app/.chainlit/config.toml  //cancella old .toml
+git add, git commit 
 
 //Always to do on the server, x permessi Microsoft di sqlserver (ora che sei su server linux)
 # fix permesso + line endings (li hai editati su Windows)
