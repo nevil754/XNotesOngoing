@@ -1109,9 +1109,8 @@ docker compose build celery-worker-high   //questo occupa 20%
 docker compose build celery-worker-default
 docker compose build celery-beat
 docker compose build --no-cache chainlit   //bypassa la cache avvelenata
-docker compose build redis
-docker compose build qdrant 
-docker compose build flower  //è dashboard x monitoring celery, prj funziona anche se non avvi this
+//qdrant/qdrant:v1.18.2, redis:7.0-alpine, mher/flower:2.0 nel dockercompose non hanno una sezione build, quindi al massimo in anticipo puoi solo scaricare le imgs 
+docker compose pull qdrant redis flower sqlserver
 docker compose up -d   //AVVIA!! cmnq avvia tutti i services del docker-compose, rispettando l'ordine
 df -h /   //vedi ora quanto spazio su disk hai (oppure better check on NetData http://192.168.113.52:19999), primaa di al ero al 22% ora sono al 72%
 
