@@ -885,6 +885,13 @@ di solito pero si hanno 3 figure intorno alla repo target
 ✔️ Developer lavora (xx)
 ✔️ Another user approva (xxxreviewer)
 
+X INVIARE SINCRONIZZATO VERSO IL REMOTO
+git checkout develop  //in questo branch fai SEMPRE le edits al code
+git add ., git commit -m"...", git push
+git checkout main
+git merge develop
+git push  //utilizza stesso commit che hai gia!
+
 ora 🕰SINCRONIZZA🕰 anche il code locale, sincronizza sia i locals main e develop
 git checkout main
 git pull origin main   //ora il tuo branch main locale è uguale a quello remoto
@@ -921,6 +928,13 @@ git branch -vv  //
 git log origin/develop..develop --oneline   //commits che esistono su locale
 git log develop..origin/develop --oneline   //commits che esistono su remoto
 -se in locale ti apre editor Vim quando fai un merge in locale, è xk git non riesce a fare un semplice fast-forward, quindi git vuole un commit in locale (che resta nel locale). nell'editor 'i' per write commento -> esc -> ':wq' per invio.
+git status --short chainlit_app/.chainlit/   //view stato git del target folder, 
+	M file.py	file modificato ma non in staging
+	M file.py	file modificato e già in staging (git add)
+	MM file.py	modificato sia in staging che dopo
+	?? file.py	file nuovo non tracciato
+	D file.py	file eliminato nello staging
+	D file.py	file eliminato ma non ancora in staging
 
 📃📃📃📃📃---
 
