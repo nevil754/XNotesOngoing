@@ -1120,7 +1120,7 @@ docker compose down   //abbatte tutto cio che è stato creato (containers/networ
 docker buildx prune -af   //usa Buildx (usa il moderno BuildKit, oggi si fa cosi),cancella layers creati dal docker build (xk se ne fai tanti puo corrompersi)
 docker compose ls   //vedi tutti i dockercompose sul server
 docker compose up -d --build  //rebuild le imgs then run
-docker compose up -d fastapi   //avvia solo target service + services dipendenze (scritte nel dockercompose)
+docker compose up -d fastapi   //🔥avvia solo target service + services dipendenze (scritte nel dockercompose)
 
 //check che spazio su disco non sia vicino al 100%
 df -h /     //🔥🔥CHECK QUANTO SPAZIO SUL DISCO HAI!!
@@ -1147,6 +1147,9 @@ http://192.168.113.52:6379  //redis
 http://192.168.113.52:1433  //sqlserver
 
 docker logs -f rag-system-dev-sqlserver-1  
+docker logs -f rag-system-dev-fastapi-1 
+docker logs -f rag-system-dev-chainlit-1 
+docker logs --tail 50 rag-system-dev-chainlit-1
 
 ###TO FIX TO DEBUG
 //reset all docker containers/ect all
@@ -1154,6 +1157,9 @@ sudo systemctl restart dockern   //riavvia il Docker daemon
 docker compose down    //abbatte tutto cio che è stato creato (containers/networks, ovviamente no i volumes persistenti) da dockercompose presente in THIS PATH (non cancella e.g container forgejo se non sei here nel suo path)
 docker system prune -af          #🔥🔥rimuove immagini unused, build cache, network inutilizzati, imgs inutilizzate,ect è il comando clean piu aggressivo
 //docker compose build --no-cache chainlit    //no-cache non riutilizza nulla, ricostruisce tutto!! cmnq ora chainlit è ok
+
+
+chmod -R 777 chainlit_app/.chainlit  //⚠️dai i permessi linux a user usato da chainlit sul server! altrimenti error no permessi!!
 
 //Always to do on the server, x permessi Microsoft di sqlserver (ora che sei su server linux)
 # fix permesso + line endings (li hai editati su Windows)
