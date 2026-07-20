@@ -1126,7 +1126,12 @@ df -h /var/lib/docker
 docker system df   //quanto occupano davvero su disk i services
 free -h   //check free ram
 
+docker compose restart sqlserver
+docker logs -f rag-system-dev-sqlserver-1   //see logs of this service
+docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P "$SQLSERVER_PASSWORD" -C -Q "USE RAGChat; SELECT name FROM sys.schemas WHERE name LIKE 'tenant_%' OR name = 'shared';"
+
 ###TO KNOW 
+-su https://hub.docker.com/r/qdrant/qdrant/tags  vedi le versions (cioe i tags) di images docker di qdrant, da aggiungerla nel tuo docker-compose per creare l'img, SOLITAMENTE NON SCEGLIERE LATEST ma scegli una versione e.g. v1.18.2 (cosi questo prj è riproducibile per sempre perché usa versione fissa no problems di incompatibilita).
 -quando macina ingestion rag, occupa in memoria RAM +-2gb (ancora senza ingestion invece consuma 680mb).
 -ottimo che usi stesso python:3.11-slim-bookworm per piu services (fastapi, e i celeries) cosi riutilizzano stessi packs ect!
 
