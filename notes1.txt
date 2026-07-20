@@ -1001,6 +1001,7 @@ docker compose up -d
 //fase di sviluppo
 cd /srv/environments/dev/testtt-repooo
 git fetch origin   //scarica gli aggiornamenti sul locale, ma non modifica il code locale coma fa invece 'git pull'
+git checkout develop
 git reset --hard origin/develop   //reset --hard perche un ambiente server NON deve avere modifiche locali!! cosi hai environment identico al repo remoto, è standard in deploy controllati.
 git status  //check tutto ok allineato, ti dice ur branch is up to date e nothing to commit tree clean
 docker compose up -d  //docker compose up -d --build  //x ricreare anche le images
@@ -1108,7 +1109,7 @@ docker compose build fastapi    //questo occupa 25%
 docker compose build celery-worker-high   //questo occupa 20%
 docker compose build celery-worker-default
 docker compose build celery-beat
-docker compose build --no-cache chainlit   //bypassa la cache avvelenata
+docker compose build --no-cache chainlit   //bypassa la cache avvelenata TODO IST TRICKY WORKS NOW BUT FIX ASAP
 //qdrant/qdrant:v1.18.2, redis:7.0-alpine, mher/flower:2.0 nel dockercompose non hanno una sezione build, quindi al massimo in anticipo puoi solo scaricare le imgs 
 docker compose pull qdrant redis flower sqlserver
 docker compose up -d   //AVVIA!! cmnq avvia tutti i services del docker-compose, rispettando l'ordine
@@ -1119,6 +1120,7 @@ docker compose down   //abbatte tutto cio che è stato creato (containers/networ
 docker buildx prune -af   //usa Buildx (usa il moderno BuildKit, oggi si fa cosi),cancella layers creati dal docker build (xk se ne fai tanti puo corrompersi)
 docker compose ls   //vedi tutti i dockercompose sul server
 docker compose up -d --build  //rebuild le imgs then run
+docker compose up -d fastapi   //avvia solo target service + services dipendenze (scritte nel dockercompose)
 
 //check che spazio su disco non sia vicino al 100%
 df -h /     //🔥🔥CHECK QUANTO SPAZIO SUL DISCO HAI!!
@@ -1128,6 +1130,7 @@ free -h   //check free ram
 
 docker compose restart sqlserver
 docker logs -f rag-system-dev-sqlserver-1   //see logs of this service
+docker logs -f rag-system-dev-fastapi-1
 docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P "$SQLSERVER_PASSWORD" -C -Q "USE RAGChat; SELECT name FROM sys.schemas WHERE name LIKE 'tenant_%' OR name = 'shared';"
 
 ###TO KNOW 
@@ -1135,7 +1138,15 @@ docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -
 -quando macina ingestion rag, occupa in memoria RAM +-2gb (ancora senza ingestion invece consuma 680mb).
 -ottimo che usi stesso python:3.11-slim-bookworm per piu services (fastapi, e i celeries) cosi riutilizzano stessi packs ect!
 
+192.168.113.52
+http://192.168.113.52:8000  //fastapi
+http://192.168.113.52:5555  //flower (admin, beaflwer93!)
+http://192.168.113.52:8080  //chainlit
+http://192.168.113.52:6333  //qdrant
+http://192.168.113.52:6379  //redis
+http://192.168.113.52:1433  //sqlserver
 
+docker logs -f rag-system-dev-sqlserver-1  
 
 ###TO FIX TO DEBUG
 //reset all docker containers/ect all
