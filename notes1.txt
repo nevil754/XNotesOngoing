@@ -917,6 +917,11 @@ cat hello.py   //🔥per print content file called hello.py (e.g.cosi vedi che �
 ls -la /srv/environments/dev/testtt-repooo   //vedi anche i files che iniziano con .xxx (xk linux di default li nasconde) 
 git branch -vv  //
 🔥FARE IL MERGE CON e.g. git checkout develop git merge main INVECE CHE MERGE SU PIATTAFORMA FORGEJO, entrambi fanno merge ma sulla piattaforma rimane storico/commenti/ect QUINDI E' STANDART ENTERPRISE (in enterprise quasi vietato fare merge tramite riga di comando xk non hai metadati!!)
+
+git log origin/develop..develop --oneline   //commits che esistono su locale
+git log develop..origin/develop --oneline   //commits che esistono su remoto
+-se in locale ti apre editor Vim quando fai un merge in locale, è xk git non riesce a fare un semplice fast-forward, quindi git vuole un commit in locale (che resta nel locale). nell'editor 'i' per write commento -> esc -> ':wq' per invio.
+
 📃📃📃📃📃---
 
 ora ogni persona del team lavora su un feature branch diversa, e.g. nelvison-> feature/rag-ingestion,  julia-> feature/reranker ect.
@@ -1137,11 +1142,16 @@ docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -
 -su https://hub.docker.com/r/qdrant/qdrant/tags  vedi le versions (cioe i tags) di images docker di qdrant, da aggiungerla nel tuo docker-compose per creare l'img, SOLITAMENTE NON SCEGLIERE LATEST ma scegli una versione e.g. v1.18.2 (cosi questo prj è riproducibile per sempre perché usa versione fissa no problems di incompatibilita).
 -quando macina ingestion rag, occupa in memoria RAM +-2gb (ancora senza ingestion invece consuma 680mb).
 -ottimo che usi stesso python:3.11-slim-bookworm per piu services (fastapi, e i celeries) cosi riutilizzano stessi packs ect!
+-chainlit_app/requirements.txt (disponibile solo sul server, è di chainlit non c'entra niente con i files creati da te), setta  chainlit==2.11.1  httpx>=0.27.0, poi sempre sul server
+rm -f chainlit_app/.chainlit/config.toml
+chmod -R 777 chainlit_app/.chainlit
+e poi push su forgejo (xk hai rigenerato il file .toml di chainlit)
+
 
 192.168.113.52
 http://192.168.113.52:8000  //fastapi
 http://192.168.113.52:5555  //flower (admin, beaflwer93!)
-http://192.168.113.52:8080  //chainlit
+http://192.168.113.52:8080  //chainlit (admin, admin)
 http://192.168.113.52:6333  //qdrant
 http://192.168.113.52:6379  //redis
 http://192.168.113.52:1433  //sqlserver
@@ -1149,7 +1159,7 @@ http://192.168.113.52:1433  //sqlserver
 docker logs -f rag-system-dev-sqlserver-1  
 docker logs -f rag-system-dev-fastapi-1 
 docker logs -f rag-system-dev-chainlit-1 
-docker logs --tail 50 rag-system-dev-chainlit-1
+docker logs --tail 50 rag-system-dev-chainlit-1  //see last 50mexs logs
 
 ###TO FIX TO DEBUG
 //reset all docker containers/ect all
