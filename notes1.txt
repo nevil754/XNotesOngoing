@@ -69,6 +69,7 @@ su - deploy  //☄️diventi utente 'deploy'(password 12345678)(xk per usare For
 http://192.168.113.52:3000   //open Forgejo(è come GitLab cioe self-hosted ma moolto piu leggero)
 nelvison.benedetto, Utod83win!!
 forgejo-admin, Suap45skh!, nelvison.benedetto2@gmail.com
+http://192.168.113.52:19999   //netdata x vedere ram & disk in tempo reale anche x i containers
 
 ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untente docker in /home/docker
 //quando fai comando 'sudo ...' allora dici al system di login come admin 'root' SOLO x questo comando, se fai invece 'sudo -i' diventi proprio admin root finche non logout.
@@ -1101,25 +1102,36 @@ cd /srv/projects/prod/rag-system
 docker compose up -d   //or  docker compose up -d --build
 //this env no dockercomposeoverride, docker leggera dockercompose+envfile di questo folder
 
-//check che spazio su disco non sia vicino al 100%
-df -h /     //🔥🔥CHECK QUANTO SPAZIO SUL DISCO HAI!!
-df -h /var/lib/docker
-docker system df
 
-//BUILDA 1 COMPONENT ALLA VOLTA, XK THIS PRJ E' ENORME (e se spuntano bugs li vedi da dove vengono)
+//🔥🔥⚠️BUILDA ALWAYS ONLY 1 COMPONENT ALLA VOLTA, XK THIS PRJ E' ENORME (se spuntano bugs vedi dove sono, e non finisci lo spazio su disk)
 docker compose build fastapi    //questo occupa 25%
 docker compose build celery-worker-high   //questo occupa 20%
 docker compose build celery-worker-default
 docker compose build celery-beat
 docker compose build --no-cache chainlit   //bypassa la cache avvelenata
-docker compose up -d   //AVVIA!!
-df -h /   //vedi ora quanto spazio su disk hai, prima di all ero al 22% ora sono al 72%
+docker compose build redis
+docker compose build qdrant 
+docker compose build flower  //è dashboard x monitoring celery, prj funziona anche se non avvi this
+docker compose up -d   //AVVIA!! cmnq avvia tutti i services del docker-compose, rispettando l'ordine
+df -h /   //vedi ora quanto spazio su disk hai (oppure better check on NetData http://192.168.113.52:19999), primaa di al ero al 22% ora sono al 72%
 
-###to know
+###tips
 docker compose down   //abbatte tutto cio che è stato creato (containers/networks, ovviamente no i volumes persistenti) da dockercompose presente in THIS PATH (non cancella e.g container forgejo se non sei here nel suo path)
+docker buildx prune -af   //usa Buildx (usa il moderno BuildKit, oggi si fa cosi),cancella layers creati dal docker build (xk se ne fai tanti puo corrompersi)
 docker compose ls   //vedi tutti i dockercompose sul server
 docker compose up -d --build  //rebuild le imgs then run
-docker buildx prune -af   //cancella layers creati dal docker build (xk se ne fai tanti puo corrompersi)
+
+//check che spazio su disco non sia vicino al 100%
+df -h /     //🔥🔥CHECK QUANTO SPAZIO SUL DISCO HAI!!
+df -h /var/lib/docker
+docker system df   //quanto occupano davvero su disk i services
+free -h   //check free ram
+
+###TO KNOW 
+-quando macina ingestion rag, occupa in memoria RAM +-2gb (ancora senza ingestion invece consuma 680mb).
+-ottimo che usi stesso python:3.11-slim-bookworm per piu services (fastapi, e i celeries) cosi riutilizzano stessi packs ect!
+
+
 
 ###TO FIX TO DEBUG
 //reset all docker containers/ect all
@@ -1156,6 +1168,9 @@ docker compose exec fastapi python -c "from main import create_app; create_app()
 -MSSQL_SA_PASSWORD  questo è nuovo SA_PASSWORD sara deprecata a breve(ma attualmente ancora x poco supportata)
 ❗️-rifare la generazione di requirements.txt sul server, xk in requirements ho cambiato pydantic>=2.10.3,<3.0.0 -> pydantic[email]>=2.10.3,<3.0.0
 ##
+
+
+
 
 
 //🗄️🗄️🗄️SERVER (DON'T DELETE!!)
