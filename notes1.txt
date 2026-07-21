@@ -70,7 +70,7 @@ cd /srv/environments/dev/rag-system
 http://192.168.113.52:3000   //open Forgejo(è come GitLab cioe self-hosted ma moolto piu leggero)
 nelvison.benedetto, Utod83win!!
 forgejo-admin, Suap45skh!, nelvison.benedetto2@gmail.com
-http://192.168.113.52:19999   //netdata x vedere ram & disk in tempo reale anche x i containers
+http://192.168.113.52:19999   //Netdata x vedere ram & disk in tempo reale anche x i containers
 
 ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untente docker in /home/docker
 //quando fai comando 'sudo ...' allora dici al system di login come admin 'root' SOLO x questo comando, se fai invece 'sudo -i' diventi proprio admin root finche non logout.
@@ -1187,6 +1187,7 @@ docker logs --tail 50 rag-system-dev-chainlit-1  //see last 50mexs logs
  ✔ Container rag-system-dev-celery-beat-1           Running                                                                                             0.0s
  ✔ Container rag-system-dev-chainlit-1              Started   
 
+docker ps  //tutti i containers devono RUNNARE & HEALTHY(se no edit test of target service in dockercompose)
 curl -f http://localhost:6333/healthz   //IL CONTAINER RUNNA OK, ma assicurati che sia Helthy!!!
 docker inspect rag-system-dev-chainlit-1 --format='{{json .State.Health}}' | python3 -m json.tool
 
