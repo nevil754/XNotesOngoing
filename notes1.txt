@@ -66,6 +66,7 @@ ssh docker@192.168.113.52  //da cmd, ACCEDI AL TUO SERVER🔥🔥
 Suit-Force-Card   //psw
 sudo -i  //diventa utente root (se chiede psw la psw è la stessa cioe Suit-Force-Card)
 su - deploy  //☄️diventi utente 'deploy'(password 12345678)(xk per usare Forgejo puoi solo come utente 'deploy'!!)
+cd /srv/environments/dev/rag-system
 http://192.168.113.52:3000   //open Forgejo(è come GitLab cioe self-hosted ma moolto piu leggero)
 nelvison.benedetto, Utod83win!!
 forgejo-admin, Suap45skh!, nelvison.benedetto2@gmail.com
@@ -1164,16 +1165,32 @@ e poi push su forgejo (xk hai rigenerato il file .toml di chainlit)
 
 192.168.113.52
 http://192.168.113.52:8000  //fastapi
-http://192.168.113.52:5555  //flower (admin, beaflwer93!)
+http://192.168.113.52:5555  //flower (admin, beaflwer93!, )
 http://192.168.113.52:8080  //chainlit (admin, admin)
-http://192.168.113.52:6333  //qdrant
+http://192.168.113.52:6333  //qdrant (http://192.168.113.52:6333/dashboard)
 http://192.168.113.52:6379  //redis
 http://192.168.113.52:1433  //sqlserver
 
 docker logs -f rag-system-dev-sqlserver-1  
 docker logs -f rag-system-dev-fastapi-1 
-docker logs -f rag-system-dev-chainlit-1 
+docker logs -f rag-system-dev-chainlit-1  //🔥🔥-f segue anche i logs in tempo reale(now) del target container
 docker logs --tail 50 rag-system-dev-chainlit-1  //see last 50mexs logs
+//e magari gurada anche gli ultimi logs di anche tutti gli altri containers x check all OK!
+
+ ✔ Container rag-system-dev-fastapi-1               Healthy                                                                                             5.1s
+ ✔ Container rag-system-dev-celery-worker-high-1    Running                                                                                             0.0s
+ ✔ Container rag-system-dev-sqlserver-1             Healthy                                                                                             4.6s
+ ✔ Container rag-system-dev-qdrant-1                Running                                                                                             0.0s
+ ✔ Container rag-system-dev-flower-1                Running                                                                                             0.0s
+ ✔ Container rag-system-dev-redis-1                 Running                                                                                             0.0s
+ ✔ Container rag-system-dev-celery-worker-default-1 Running                                                                                             0.0s
+ ✔ Container rag-system-dev-celery-beat-1           Running                                                                                             0.0s
+ ✔ Container rag-system-dev-chainlit-1              Started   
+
+curl -f http://localhost:6333/healthz   //IL CONTAINER RUNNA OK, ma assicurati che sia Helthy!!!
+docker inspect rag-system-dev-chainlit-1 --format='{{json .State.Health}}' | python3 -m json.tool
+
+
 
 ###TO FIX TO DEBUG
 //reset all docker containers/ect all
