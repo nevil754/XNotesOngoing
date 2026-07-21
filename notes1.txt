@@ -1195,6 +1195,26 @@ docker inspect rag-system-dev-chainlit-1 --format='{{json .State.Health}}' | pyt
 set -a; source .env; set +a   //carica le tue vars env presenti dentro file .env le rende disponibili su shell di linux (prima erano avaible solo all'interno della rete docker), utile se vuoi lanciare manualmente programmi (e.g.FastAPI)
 grep -n "@router" app/api/routes/auth.py   //è come il search on vscode, return rows finding str '@router'
 
+//CREATE user x chainlit login
+- docker compose exec fastapi python -c "
+from passlib.context import CryptContext
+print(CryptContext(schemes=['bcrypt']).hash('CompeteRag2026'))"
+- ora copia l'hash creato ($2b$12$7S2s4uu9zbRohES.z2AF0OYvmJSNSCbnFVWF7oJSWnn1CZU3Et1.O), poi 
+- set -a; source .env; set +a   //copia vars anche nella shell linux corrente, ora nel python puoi fare e.g.  import os; print(os.getenv("DATABASE_URL"))
+- docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P "$SQLSERVER_PASSWORD" -C \
+  -Q "USE RAGChat; INSERT INTO tenant_demo_corp.users (email, full_name, role, password_hash) VALUES ('admin@competesrl.it', 'Admin', 'admin', '\$2b\$12\$7S2s4uu9zbRohES.z2AF0OYvmJSNSCbnFVWF7oJSWnn1CZU3Et1.O');"
+//deve return '1 rows affected'
+- docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P "$SQLSERVER_PASSWORD" -C \
+  -Q "USE RAGChat; SELECT email, role, password_hash FROM tenant_demo_corp.users;"
+-assicurati che hai la CHAINLIT_AUTH_SECRET nel .env file
+docker compose up -d chainlit
+docker logs -f rag-system-dev-fastapi-1
+infine su dashboard chainlit http://192.168.113.52:8080 
+username: admin@competesrl.it
+password: CompeteRag2026
+
+
+
 ###TO FIX TO DEBUG
 //reset all docker containers/ect all
 sudo systemctl restart dockern   //riavvia il Docker daemon
