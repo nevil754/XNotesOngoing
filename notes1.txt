@@ -1155,7 +1155,7 @@ docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -
 
 ###TO KNOW 
 -su https://hub.docker.com/r/qdrant/qdrant/tags  vedi le versions (cioe i tags) di images docker di qdrant, da aggiungerla nel tuo docker-compose per creare l'img, SOLITAMENTE NON SCEGLIERE LATEST ma scegli una versione e.g. v1.18.2 (cosi questo prj è riproducibile per sempre perché usa versione fissa no problems di incompatibilita).
--quando macina ingestion rag, occupa in memoria RAM +-2gb (ancora senza ingestion invece consuma 680mb).
+-quando macina ingestion rag, occupa in memoria RAM +-2gb (ancora senza ingestion invece consuma 680mb)(cmnq run 'free -h' e guarda available (attualmente +-5gb ram ok)).
 -ottimo che usi stesso python:3.11-slim-bookworm per piu services (fastapi, e i celeries) cosi riutilizzano stessi packs ect!
 -chainlit_app/requirements.txt (disponibile solo sul server, è di chainlit non c'entra niente con i files creati da te), setta  chainlit==2.11.1  httpx>=0.27.0, poi sempre sul server
 rm -f chainlit_app/.chainlit/config.toml
@@ -1192,6 +1192,8 @@ curl -f http://localhost:6333/healthz   //IL CONTAINER RUNNA OK, ma assicurati c
 docker inspect rag-system-dev-chainlit-1 --format='{{json .State.Health}}' | python3 -m json.tool
 
 
+set -a; source .env; set +a   //carica le tue vars env presenti dentro file .env le rende disponibili su shell di linux (prima erano avaible solo all'interno della rete docker), utile se vuoi lanciare manualmente programmi (e.g.FastAPI)
+grep -n "@router" app/api/routes/auth.py   //è come il search on vscode, return rows finding str '@router'
 
 ###TO FIX TO DEBUG
 //reset all docker containers/ect all
