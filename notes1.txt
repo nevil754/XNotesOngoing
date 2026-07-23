@@ -1130,7 +1130,7 @@ docker compose build celery-worker-default
 docker compose build celery-beat
 docker compose build --no-cache chainlit   //bypassa la cache avvelenata TODO IST TRICKY WORKS NOW BUT FIX ASAP
 //qdrant/qdrant:v1.18.2, redis:7.0-alpine, mher/flower:2.0 nel dockercompose non hanno una sezione build, quindi al massimo in anticipo puoi solo scaricare le imgs 
-docker compose pull qdrant redis flower sqlserver
+docker compose pull qdrant redis flower sqlserver  //scarica imgs docker da online (x questi services non devo buildare nulla in anticipo xk non hanno nulla da buildare), non crea nessun container ne avvia nulla. cmnq anche se non lo fai manualmente succede cmnq quando fai dockercomposeup 
 docker compose up -d   //AVVIA!! cmnq avvia tutti i services del docker-compose, rispettando l'ordine
 df -h /   //vedi ora quanto spazio su disk hai (oppure better check on NetData http://192.168.113.52:19999), primaa di al ero al 22% ora sono al 72%
 
@@ -1175,6 +1175,8 @@ e poi commit&push su forgejo (xk hai rigenerato il file .toml di chainlit)
 -usa sempre per i commits le conventions: feat:xxx, fix:xxx, docs:xxx, refactor:xxx, style:xxx, perf:xxx, test:xxx, ci:xxx, build:xxx, chore:xxx .
 e.g. fix(redis): fix connection leak
 -ricordati di usare standart vMAJOR.MINOR.PATCH (major=breaking change, minor=nuova feat, patch=bug fix) per nomenclature e.g v1.0.0
+-Merge vs Rebase quando usarli: duranto lo sviluppo della feature usa 'rebase'(cosi non crei commit inutili di merge), quando integri una feature allora usa 'merge commit'(perché questo MANTIENE LA HISTORY!! anche fra anni)(non usare 'squash' xk perdi la history).  
+-nella Realase e.g.v1.0.0 (proprio come fanno in enterprise) avere  Tag Git (v1.0.0), Release Notes(elenca novità, bug fix e breaking changes), Docker Image(artefatto da distribuire in produzione), Binary/Executable(per app desktop, CLI o mobile), Changelog(storico delle modifiche), Migration SQL(aggiornamento dello schema), File di configurazione(.env.example, valori richiesti), Test report(dimostra che la release è stata verificata), SBOM / Security scan (inventario dipendenze e sicurezza).
 
 192.168.113.52
 http://192.168.113.52:8000  //fastapi
