@@ -21,8 +21,8 @@ http://192.168.113.52:5555  //flower (admin, beaflwer93!, )
 http://192.168.113.52:8080  //chainlit (admin, admin)
 http://192.168.113.52:6333  //qdrant (http://192.168.113.52:6333/dashboard)
 
-docker logs --tail 50 rag-system-dev-sqlserver-1   //deve dire tutto ok
 docker logs --tail 50 rag-system-dev-fastapi-1   //deve dire tutto ok all connected
+docker logs --tail 50 rag-system-dev-sqlserver-1   //deve dire tutto ok
 docker logs rag-system-dev-fastapi-1 2>&1 | grep -E "Avvio|connesso|non raggiungibile|Startup"   //x logs di loguru nel container
 
 docker compose logs -f fastapi   //see in realtime logs x fastapi
@@ -39,29 +39,49 @@ curl -N -X POST http://localhost:8000/api/v1/chat/stream \
 
 ########################################################
 
+
+
 //generazione hash code 
 docker compose exec fastapi python -c "
 from passlib.context import CryptContext
 print(CryptContext(schemes=['bcrypt']).hash('CompeteRag2026'))"
 
-//info & take the ACCESS TOKEN of this user!!
+//oppure better generazione che ti assicuri combaci con verify_password
+docker compose exec fastapi python -c "
+from app.core.security import hash_password
+print(hash_password('CompeteRag2026'))"
+
+//create new user admin and insert in tables
+docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P "$SQLSERVER_PASSWORD" -C \
+  -Q "USE RAGChat; INSERT INTO tenant_demo_corp.users (email, full_name, role, password_hash) VALUES ('admin@competesrl.it', 'Admin', 'admin', '\$2b\$12\$RESTO_DELL_HASH');"
+
+//info of this user !!
 curl -s -X POST http://localhost:8000/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@competesrl.it","password":"CompeteRag2026","tenant_slug":"demo-corp"}' \
   | python3 -m json.tool
 
+//see persons
+docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P "$SQLSERVER_PASSWORD" -C \
+  -Q "USE RAGChat; SELECT email, role, is_active, LEN(password_hash) AS len FROM tenant_demo_corp.users;"
+
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJDMEI3NDMzRS1GMzZCLTE0MTAtQTJFNS0wMDEzNDc3OTI0MUUiLCJlbWFpbCI6ImFkbWluQGNvbXBldGVzcmwuaXQiLCJyb2xlIjoiYWRtaW4iLCJ0ZW5hbnRfaWQiOiIzNjlDNDMzRS1GMzZCLTE0MTAtOENGQi0wMDEzNDc3OTI0MUUiLCJ0ZW5hbnRfc2x1ZyI6ImRlbW8tY29ycCIsImV4cCI6MTc4NDgyMjQ2NywiaWF0IjoxNzg0ODE4ODY3fQ.xQUdDnmUuZMiWlSVxbSl6bYAaCnJVJykq-8tY8TN3pY
 
-//save in var l'access token
+//Fai login(quindi viene generato NEW access token🔥🔥) & save in var l'access token (DURA 1H)(ricorda questa variabile vive solo nella shell corrente)
 TOKEN=$(curl -s -X POST http://localhost:8000/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@competesrl.it","password":"CompeteRag2026","tenant_slug":"demo-corp"}' \
   | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
-echo "$TOKEN" | head -c 40
+
+echo "$TOKEN" | head -c 40    //assicurati che il token ok ci sia visualizzando solo i primi 40chars
+
+set -a; source .env; set +a   //save all vars of my file .env nella shell
 
 //testa endpoint se sono auth🔥🔥se return 200 sei ora auth!!
 curl -i http://localhost:8000/api/v1/auth/me -H "Authorization: Bearer $TOKEN"  
 
+
+//now test the others endpoints
 
 curl -s http://localhost:8000/api/v1/tenants -H "Authorization: Bearer $TOKEN" | python3 -m json.tool
 
