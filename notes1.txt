@@ -1088,14 +1088,14 @@ crei su forgejo repo con readme.md/.gitignore./licenses settate > git clone e sc
 /srv/data/prod/rag-system(e here folders qdrant,redis,sqlserver,upload]
 /srv/data/staging/rag-system(e here folders qdrant,redis,sqlserver,upload]
 
-//nel file .env (🔥🔥QUINDI AVRAI 3 VERSIONI DIFFERENTI DI file .env: 1 in environment dev, 1 in environment staging, 1 in environment production)(il file )
+nel file .env (🔥🔥QUINDI AVRAI 3 VERSIONI DIFFERENTI DI file .env: 1 in environment dev, 1 in environment staging, 1 in environment production)(il file )
 -DOCKER_NETWORK=xxx  #rag-dev-network, rag-staging-network, rag-prod-network
 //e cosi quando avvi il docker-compose docker creera automaticamente la rete indicata
 -DATA_ROOT=xxx   #/srv/data/dev/rag-system, /srv/data/staging/rag-system , /srv/data/prod/rag-system
 -COMPOSE_PROJECT_NAME=xxx   #rag-system-dev, rag-system-staging, rag-system-prod
-//nel file docker-compose
+e nel file docker-compose
 -name: ${COMPOSE_PROJECT_NAME}
--#container_name: fastapi  !non specificare il nome, xk tu hai 1 solo server quindi ci sarebbe conflitto nome container e.g.fastapi di dev env -- fastapi staging env. senza sepcificare docker crea automaticamente e.g. <project_name>-<service_name>-<index> cioe <nome_prj>-fastapi-1
+-#container_name: fastapi   non specificare il nome!, xk tu hai 1 solo server quindi ci sarebbe conflitto nome container e.g.fastapi di dev env -- fastapi staging env. senza sepcificare docker crea automaticamente e.g. <project_name>-<service_name>-<index> cioe <nome_prj>-fastapi-1
 -volumes:- ${DATA_ROOT}/qdrant:/qdrant/storage  //🔥LA PARTE A SX di ':' è path nel filesystem, la parte a dx di ':' è il path dentro il container docker, in questo caso stai speficicando esattamente dove vuoi che vengano salvati i file persistenti  //se avevi qdrant_data:/qdrant/storage e a fondo file volumes: qdrant_data: driver: local allora docker avrebbe salvato il volume in e.g./var/lib/docker/volumes/qdrant_data/_data  (ovviamente persistente quindi fuori dal docker container)
 -sempre nel docker-compose.yml, per ogni container aggiungi  networks: - rag-network  e poi a fondo file
 networks:
@@ -1109,7 +1109,7 @@ networks:
 cd /srv/projects/dev/rag-system
 docker compose up -d    //docker compose up -d --build   x ricostruire anche le images
 //docker leggera dockercompose+dockercomposeoverride+envfile di questo folder
-//oppure fai in maniera separata (xk magari 5 servizi che usano stesso layer python:3.11-slim-bookworm quindi fare tutti è 5 insieme non è top)
+//oppure meglio fai in maniera separata (xk magari 5 servizi che usano stesso layer python:3.11-slim-bookworm quindi fare tutti è 5 insieme non è top)
 docker compose build         # prima builda tutto in sequenza, ricostruisce le imgs, non avvia pero nessun container
 docker compose up -d         # poi avvia
 
@@ -1123,8 +1123,7 @@ cd /srv/projects/prod/rag-system
 docker compose up -d   //or  docker compose up -d --build
 //this env no dockercomposeoverride, docker leggera dockercompose+envfile di questo folder
 
-
-//🔥🔥⚠️BUILDA ALWAYS ONLY 1 COMPONENT ALLA VOLTA, XK THIS PRJ E' ENORME (se spuntano bugs vedi dove sono, e non finisci lo spazio su disk)
+//🔥🔥⚠️BUILDA ALWAYS ONLY 1 COMPONENT ALLA VOLTA, XK THIS PRJ IS VERY VERY BIG! (se spuntano bugs vedi dove sono, e non finisci lo spazio su disk)
 docker compose build fastapi    //questo occupa 25%
 docker compose build celery-worker-high   //questo occupa 20%
 docker compose build celery-worker-default
@@ -1136,32 +1135,46 @@ docker compose up -d   //AVVIA!! cmnq avvia tutti i services del docker-compose,
 df -h /   //vedi ora quanto spazio su disk hai (oppure better check on NetData http://192.168.113.52:19999), primaa di al ero al 22% ora sono al 72%
 
 ###tips
-docker compose down   //abbatte tutto cio che è stato creato (containers/networks, ovviamente no i volumes persistenti) da dockercompose presente in THIS PATH (non cancella e.g container forgejo se non sei here nel suo path)
-docker buildx prune -af   //usa Buildx (usa il moderno BuildKit, oggi si fa cosi),cancella layers creati dal docker build (xk se ne fai tanti puo corrompersi)
-docker compose ls   //vedi tutti i dockercompose sul server
-docker compose up -d --build  //rebuild le imgs then run
-docker compose up -d fastapi   //🔥avvia solo target service + services dipendenze (scritte nel dockercompose)
+🔥docker compose down   //abbatte tutto cio che è stato creato (containers/networks, ovviamente no i volumes persistenti) da dockercompose presente in THIS PATH (non cancella e.g container forgejo se non sei here nel suo path)
+🔥docker buildx prune -af   //usa Buildx (usa il moderno BuildKit, oggi si fa cosi), cancella layers (magari obsoleti) creati dal docker build (xk se ne fai tanti puo corrompersi) build cache, network inutilizzati, imgs inutilizzate,ect
+sudo systemctl restart dockern   //riavvia il Docker daemon
+docker compose ls    //vedi tutti i dockercompose sul server
+docker compose up -d --build   //rebuild le imgs then run
+docker compose up -d fastapi    //🔥avvia solo target service + services dipendenze (scritte nel dockercompose)
 
 //check che spazio su disco non sia vicino al 100%
-df -h /     //🔥🔥CHECK QUANTO SPAZIO SUL DISCO HAI!!
+df -h /     //🔥🔥CHECK QUANTO SPAZIO SUL DISCO HAI!! (cmnq lo puoi vedere anche su Netdata)
 df -h /var/lib/docker
 docker system df   //quanto occupano davvero su disk i services
-free -h   //check free ram
+free -h    //check free ram
 
 docker compose restart sqlserver
-docker logs -f rag-system-dev-sqlserver-1   //see logs of this service
+docker logs -f rag-system-dev-sqlserver-1   //🔥🔥-f segue anche i logs in tempo reale(now) del target container
 docker logs -f rag-system-dev-fastapi-1
+docker logs --tail 50 rag-system-dev-chainlit-1   //see last 50mexs logs di this container
+dicker ps   //tutti i containers devono RUNNARE & HEALTHY(se no edit test target service in dockercompose)
+curl -f http://192.168.113.52:6333/healthz   //check che il container target che sta runnando, sia anche Helthy!!
+docker inspect rag-system-dev-chainlit-1 --format='{{json .State.Health}}' | python3 -m json.tool
+
 docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P "$SQLSERVER_PASSWORD" -C -Q "USE RAGChat; SELECT name FROM sys.schemas WHERE name LIKE 'tenant_%' OR name = 'shared';"
 
-###TO KNOW 
+set -a; source .env; set +a   //carica le tue vars env presenti dentro file .env le rende disponibili su shell di linux (prima erano avaible solo all'interno della rete docker), utile se vuoi lanciare manualmente programmi (e.g.FastAPI)
+grep -n "@router" app/api/routes/auth.py   //è come il search on vscode, return rows finding str '@router'
+
+###TIPS++
+
 -su https://hub.docker.com/r/qdrant/qdrant/tags  vedi le versions (cioe i tags) di images docker di qdrant, da aggiungerla nel tuo docker-compose per creare l'img, SOLITAMENTE NON SCEGLIERE LATEST ma scegli una versione e.g. v1.18.2 (cosi questo prj è riproducibile per sempre perché usa versione fissa no problems di incompatibilita).
 -quando macina ingestion rag, occupa in memoria RAM +-2gb (ancora senza ingestion invece consuma 680mb)(cmnq run 'free -h' e guarda available (attualmente +-5gb ram ok)).
 -ottimo che usi stesso python:3.11-slim-bookworm per piu services (fastapi, e i celeries) cosi riutilizzano stessi packs ect!
 -chainlit_app/requirements.txt (disponibile solo sul server, è di chainlit non c'entra niente con i files creati da te), setta  chainlit==2.11.1  httpx>=0.27.0, poi sempre sul server
-rm -f chainlit_app/.chainlit/config.toml
-chmod -R 777 chainlit_app/.chainlit
-e poi push su forgejo (xk hai rigenerato il file .toml di chainlit)
-
+rm -f chainlit_app/.chainlit/config.toml   //cancella old toml
+chmod -R 777 chainlit_app/.chainlit    //⚠️dai i permessi linux a user usato da chainlit sul server! altrimenti error no permessi!!
+e poi commit&push su forgejo (xk hai rigenerato il file .toml di chainlit)
+-docker compose exec fastapi python -c "from main import create_app; create_app()"   //esegui solo la parte di creazione dell'app e ottieni immediatamente l'exceptions/bugs SENZA DOVER RIAVVIARE DOCKER!!
+-scrivi sempre changelog.md
+-usa sempre per i commits le conventions: feat:xxx, fix:xxx, docs:xxx, refactor:xxx, style:xxx, perf:xxx, test:xxx, ci:xxx, build:xxx, chore:xxx .
+e.g. fix(redis): fix connection leak
+-ricordati di usare standart vMAJOR.MINOR.PATCH (major=breaking change, minor=nuova feat, patch=bug fix) per nomenclature e.g v1.0.0
 
 192.168.113.52
 http://192.168.113.52:8000  //fastapi
@@ -1171,12 +1184,8 @@ http://192.168.113.52:6333  //qdrant (http://192.168.113.52:6333/dashboard)
 http://192.168.113.52:6379  //redis
 http://192.168.113.52:1433  //sqlserver
 
-docker logs -f rag-system-dev-sqlserver-1  
-docker logs -f rag-system-dev-fastapi-1 
-docker logs -f rag-system-dev-chainlit-1  //🔥🔥-f segue anche i logs in tempo reale(now) del target container
-docker logs --tail 50 rag-system-dev-chainlit-1  //see last 50mexs logs
-//e magari gurada anche gli ultimi logs di anche tutti gli altri containers x check all OK!
-
+all ur containers (assicurati sempre che siano tutti HEALTHY(se no edit test of target service in dockercompose))
+docker ps
  ✔ Container rag-system-dev-fastapi-1               Healthy                                                                                             5.1s
  ✔ Container rag-system-dev-celery-worker-high-1    Running                                                                                             0.0s
  ✔ Container rag-system-dev-sqlserver-1             Healthy                                                                                             4.6s
@@ -1187,15 +1196,8 @@ docker logs --tail 50 rag-system-dev-chainlit-1  //see last 50mexs logs
  ✔ Container rag-system-dev-celery-beat-1           Running                                                                                             0.0s
  ✔ Container rag-system-dev-chainlit-1              Started   
 
-docker ps  //tutti i containers devono RUNNARE & HEALTHY(se no edit test of target service in dockercompose)
-curl -f http://localhost:6333/healthz   //IL CONTAINER RUNNA OK, ma assicurati che sia Helthy!!!
-docker inspect rag-system-dev-chainlit-1 --format='{{json .State.Health}}' | python3 -m json.tool
 
-
-set -a; source .env; set +a   //carica le tue vars env presenti dentro file .env le rende disponibili su shell di linux (prima erano avaible solo all'interno della rete docker), utile se vuoi lanciare manualmente programmi (e.g.FastAPI)
-grep -n "@router" app/api/routes/auth.py   //è come il search on vscode, return rows finding str '@router'
-
-//CREATE user x chainlit login
+//👎👎CREATE user x chainlit login (ma error now, better usarlo con tutto creato)
 - docker compose exec fastapi python -c "
 from passlib.context import CryptContext
 print(CryptContext(schemes=['bcrypt']).hash('CompeteRag2026'))"
@@ -1213,51 +1215,29 @@ infine su dashboard chainlit http://192.168.113.52:8080
 username: admin@competesrl.it
 password: CompeteRag2026
 
+###Permessi Linux & Generazione files obbligatori su server
 
+//always to do on the server, sono i permessi della machine (nel mio caso Linux) per poter usare sqlserver, e poi devi caricare i permessi generati su forgejo
+git update-index --chmod=+x docker/sqlserver/entrypoint.sh   //E POI FAI commit&PUSH SU FORGEJO!! con mex "fix entrypoint.sh eseguibile (mode 100755)"
+sed -i 's/\r$//' docker/sqlserver/entrypoint.sh docker/sqlserver/init.sql   //rimuove da entrambi i file i caratteri di fine riga tipici di Windows (\r) convertendoli nel formato Linux (\n) così gli script .sh e i file .sql possono essere eseguiti correttamente in Docker o server Linux
 
-###TO FIX TO DEBUG
-//reset all docker containers/ect all
-sudo systemctl restart dockern   //riavvia il Docker daemon
-docker compose down    //abbatte tutto cio che è stato creato (containers/networks, ovviamente no i volumes persistenti) da dockercompose presente in THIS PATH (non cancella e.g container forgejo se non sei here nel suo path)
-docker system prune -af          #🔥🔥rimuove immagini unused, build cache, network inutilizzati, imgs inutilizzate,ect è il comando clean piu aggressivo
-//docker compose build --no-cache chainlit    //no-cache non riutilizza nulla, ricostruisce tutto!! cmnq ora chainlit è ok
-
-
-chmod -R 777 chainlit_app/.chainlit  //⚠️dai i permessi linux a user usato da chainlit sul server! altrimenti error no permessi!!
-rm chainlit_app/.chainlit/config.toml  //cancella old .toml
-git add, git commit 
-
-//Always to do on the server, x permessi Microsoft di sqlserver (ora che sei su server linux)
-# fix permesso + line endings (li hai editati su Windows)
-git update-index --chmod=+x docker/sqlserver/entrypoint.sh   //E POI FAI PUSH SU FORGEJO!! con mex "fix: entrypoint.sh eseguibile (mode 100755)"
-sed -i 's/\r$//' docker/sqlserver/entrypoint.sh docker/sqlserver/init.sql
-
-git update-index --chmod=+x docker/sqlserver/entrypoint.sh  //e carichi su forgejo
-
-//DAI I PERMESSI A SQLSERVER CONTAINER (E' DA FARE MANUALMENTE IN OGNI NUOVO ambiente e.g. dal cliente) xk sqlserver è l'unico component del mio stack che crea user esterno e devi settare i permessi
+//dai i permessi a sqlserver container (E' DA FARE MANUALMENTE IN OGNI NUOVO ambiente e.g. dal cliente) xk sqlserver è l'unico component del mio stack che crea user esterno e devi settare i permessi
 sudo chown -R 10001:10001 ${DATA_ROOT}/sqlserver  //dai i permessi anche a nuovo utente 10001 linux (quello creato x sqlserver al mount del suo component, che ovviamente deve poter accedere alle directory che gli servono)
 chmod 777 "$DATA_ROOT/sqlserver"   //il 777 dà scrittura all'UID 10001 di SQL Server
 ls -land "$DATA_ROOT/sqlserver"     //log deve mostrare drwxrwxrwx...
 docker logs -f rag-system-dev-sqlserver-1
 
-# carica le variabili del .env nella shell (senza questo, $DATA_ROOT è vuota)
 set -a; source .env; set +a
-# verifica che si espanda davvero — NON deve stampare "/sqlserver" vuoto
-echo "DATA_ROOT=$DATA_ROOT"
-ls -lan "$DATA_ROOT/sqlserver" 2>/dev/null || echo "non esiste"
-
-docker logs -f rag-system-dev-fastapi-1
-
-❗️# dentro il container fastapi, prova a importare l'app e vedi dove si ferma, ti fa vedere il prossimo errore senza dover ribuildare, se è un errore di codice/import puro
-docker compose exec fastapi python -c "from main import create_app; create_app()"
-
-###TO DO AFTER ALL WORKS
--MSSQL_SA_PASSWORD  questo è nuovo SA_PASSWORD sara deprecata a breve(ma attualmente ancora x poco supportata)
-❗️-rifare la generazione di requirements.txt sul server, xk in requirements ho cambiato pydantic>=2.10.3,<3.0.0 -> pydantic[email]>=2.10.3,<3.0.0
-##
+echo "DATA_ROOT=$DATA_ROOT" ls -lan "$DATA_ROOT/sqlserver" 2>/dev/null || echo "non esiste"   //controlla se esiste la cartella /sqlserver al suo interno, se esiste mostra contenuto e permessi
 
 
+###TO DO
+- MSSQL_SA_PASSWORD  questo è nuovo SA_PASSWORD sara deprecata a breve(ma attualmente ancora x poco supportata)
+- do  /srv/backups/ capire i backups come&quando farli
+- forgejo runner x ci/cd automation
 
+
+###
 
 
 //🗄️🗄️🗄️SERVER (DON'T DELETE!!)
@@ -1344,45 +1324,5 @@ brothers of /srv/ is
 
 /opt/     //programs x everyone
 └── miniconda3/                          #python globale (script utility fuori Docker)
-
-
-⚡️FORGEJO LAST THINGS X REAL FINAL ENTERPRISE SETUP
--🔥 UNDERSTAND BETTER /srv/backups/  !!
--forgejo runner x ci/cd automation
--tutte le PR dovreebbero avere lo stesso formato cosi tutte le PR sono uguali, quindi usare un template
-e.g.
-## Description
-Describe the change.
----
-## Related Issue
-Closes #
----
-## Checklist
-- [ ] Tested
-- [ ] Documentation updated
-- [ ] No breaking changes
----
-## Screenshots
-(optional)
--ricordati di usare standart vMAJOR.MINOR.PATCH (major=breaking change, minor=nuova feat, patch=bug fix) per nomenclature e.g v1.0.0
--una Release di solito possiede:  Release v1.2.0, Assets, docker image, changelog, tag
--scrivi sempre changelog.md  e.g.
-# Changelog
-## v1.2.0
-Added
-- OCR pipeline
-- Tenant isolation
-Changed
-- Redis caching
-Fixed
-- SQL timeout
-
-!-usa sempre per i commits le conventions: feat:xxx, fix:xxx, docs:xxx, refactor:xxx, style:xxx, perf:xxx, test:xxx, ci:xxx, build:xxx, chore:xxx .
-e.g. fix(redis): fix connection leak
-
--others are: codeowners avanzato (e.g./frontend/ @frontend-team) 
-
-  
-
 
 
