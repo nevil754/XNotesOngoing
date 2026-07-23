@@ -1,0 +1,44 @@
+Remove-Item -Recurse -Force .git
+
+rm -rf /home/docker/docker
+
+12345678
+
+nelvison.benedetto2@gmail.com
+
+ls -ld mypath  //per vedere permessi
+
+ls -ld 
+
+################################################
+
+pages to open on pc: 
+http://192.168.113.52:3000/    //forgejo git
+http://192.168.113.52:8000/docs#/    //SwaggerUI endpoints (piu veloce di PostMan e conosce gia payloads & schemes) di fastapi
+https://eu.smith.langchain.com/    //langsmith see flow ai
+
+http://192.168.113.52:5555  //flower (admin, beaflwer93!, )
+http://192.168.113.52:8080  //chainlit (admin, admin)
+http://192.168.113.52:6333  //qdrant (http://192.168.113.52:6333/dashboard)
+
+docker logs --tail 50 rag-system-dev-sqlserver-1   //deve dire tutto ok
+docker logs --tail 50 rag-system-dev-fastapi-1   //deve dire tutto ok all connected
+docker logs rag-system-dev-fastapi-1 2>&1 | grep -E "Avvio|connesso|non raggiungibile|Startup"   //x logs di loguru nel container
+
+docker compose logs -f fastapi   //see in realtime logs x fastapi
+docker compose logs -f  //see in realtime  alll logsss
+
+
+
+-x streaming SSE di /api/v1/chat/stream usi swagger+curl
+curl -N -X POST http://localhost:8000/api/v1/chat/stream \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"question":"test","conversation_id":null}'
+
+
+
+
+
+
+
