@@ -936,6 +936,7 @@ git status --short chainlit_app/.chainlit/   //view stato git del target folder,
 	?? file.py	file nuovo non tracciato
 	D file.py	file eliminato nello staging
 	D file.py	file eliminato ma non ancora in staging
+🔥-git log --oneline -5  //see last 5 commits
 
 📃📃📃📃📃---
 
@@ -1058,18 +1059,19 @@ cp .env.example .env   //crea nuovo file called '.env' che è un clone di .env.e
 nano .env   //entra dentro
 
 
-🔥🔥LAST GIT COMMIT STABILE IMG SNAPSHOT (before editing at hand the code x testing all works):  b6812d2058 (23/07/2026)
+🔥🔥🔥SET LAST GIT COMMIT SAFE CHECKPOINT IMG SNAPSHOT (before editing at hand the code x testing all works):  b6812d2058 (23/07/2026)
 //set all x return to safe cade if u break the codebase
 //ALWAYS ON 'develop' branch! and see when something big works, allora PR&merge su branch 'main'
+//in local on the pc
 git checkout develop
-git log --oneline -5
-git tag -a stable-before-refactor b6812d2058 -m "Stable checkpoint before manual refactoring"
+git log --oneline -5  //see last 5 commits
+git tag -a stable-before-myrefactor b6812d2058 -m "STABLE safe checkpoint before manual refactoring on everything block-by-block"
 git tag   //assicurati che sia stato correttamente creato
-git push origin stable-before-refactor
+git push origin stable-before-myrefactor
 //se qualcosa break allora x rollback fai cosi
 git checkout develop
-git revert stable-before-refactor..HEAD   //⭐️ crea nuovi commits che annullano le modifiche errors, riportandoti cosi a safe point WITHOUT re-write the history!!(in enterprise NEVER re-written the history!!) assolutamente da fare se si rompe in main branch (xk per main branch non puoi re-write the history!!)
-git reset --hard stable-before-refactor   //branch locale torna esattamente li al last safe point,  ok farlo se sei solo te e non c'è team e SOLO in development zone 
+git revert stable-before-myrefactor..HEAD   //⭐️ crea nuovi commits che annullano le modifiche errors, riportandoti cosi a safe point WITHOUT re-write the history!!(in enterprise NEVER re-written the history!!) assolutamente da fare se si rompe in main branch (xk per main branch non puoi re-write the history!!)
+git reset --hard stable-before-myrefactor   //branch locale torna esattamente li al last safe point,  ok farlo se sei solo te e non c'è team e SOLO in development zone 
 //git push --force origin main  //⚠️⚠️ --force riscrive la history del branch remoto, IN ENTERPRISE NON SI USA
 
 
