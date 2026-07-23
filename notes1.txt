@@ -1205,6 +1205,10 @@ from passlib.context import CryptContext
 print(CryptContext(schemes=['bcrypt']).hash('CompeteRag2026'))"
 - ora copia l'hash creato ($2b$12$7S2s4uu9zbRohES.z2AF0OYvmJSNSCbnFVWF7oJSWnn1CZU3Et1.O), poi 
 - set -a; source .env; set +a   //copia vars anche nella shell linux corrente, ora nel python puoi fare e.g.  import os; print(os.getenv("DATABASE_URL"))
+-docker compose exec fastapi python -c "
+from passlib.context import CryptContext
+print(CryptContext(schemes=['bcrypt']).hash('CompeteRag2026'))"
+//genera hash code che serve per creare nuovo tenant
 - docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P "$SQLSERVER_PASSWORD" -C \
   -Q "USE RAGChat; INSERT INTO tenant_demo_corp.users (email, full_name, role, password_hash) VALUES ('admin@competesrl.it', 'Admin', 'admin', '\$2b\$12\$7S2s4uu9zbRohES.z2AF0OYvmJSNSCbnFVWF7oJSWnn1CZU3Et1.O');"
 //deve return '1 rows affected'
