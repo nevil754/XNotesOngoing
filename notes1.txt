@@ -1153,6 +1153,7 @@ docker compose up -d   //AVVIA!! cmnq avvia tutti i services del docker-compose,
 df -h /   //vedi ora quanto spazio su disk hai (oppure better check on NetData http://192.168.113.52:19999), primaa di al ero al 22% ora sono al 72%
 
 ###tips
+//le libs presenti in e.g.requirements.txt finiscono nella img al momento della build del dockercompose.
 🔥docker compose down   //abbatte tutto cio che è stato creato (containers/networks, ovviamente no i volumes persistenti) da dockercompose presente in THIS PATH (non cancella e.g container forgejo se non sei here nel suo path)
 🔥docker buildx prune -af   //usa Buildx (usa il moderno BuildKit, oggi si fa cosi), cancella layers (magari obsoleti) creati dal docker build (xk se ne fai tanti puo corrompersi) build cache, network inutilizzati, imgs inutilizzate,ect
 sudo systemctl restart dockern   //riavvia il Docker daemon
