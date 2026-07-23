@@ -28,7 +28,7 @@ docker logs rag-system-dev-fastapi-1 2>&1 | grep -E "Avvio|connesso|non raggiung
 docker compose logs -f fastapi   //see in realtime logs x fastapi
 docker compose logs -f  //see in realtime  alll logsss
 
-
+grep -rn "_async_factory\|_sync_factory" app/ --include="*.py" | grep -v "app/db/sqlserver.py"   //FIND IN ALL CODE WHERE _async_factory or _sync_factory is!!
 
 -x streaming SSE di /api/v1/chat/stream usi swagger+curl
 curl -N -X POST http://localhost:8000/api/v1/chat/stream \
@@ -36,6 +36,38 @@ curl -N -X POST http://localhost:8000/api/v1/chat/stream \
   -H "Content-Type: application/json" \
   -d '{"question":"test","conversation_id":null}'
 
+
+########################################################
+
+//generazione hash code 
+docker compose exec fastapi python -c "
+from passlib.context import CryptContext
+print(CryptContext(schemes=['bcrypt']).hash('CompeteRag2026'))"
+
+//info & take the ACCESS TOKEN of this user!!
+curl -s -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@competesrl.it","password":"CompeteRag2026","tenant_slug":"demo-corp"}' \
+  | python3 -m json.tool
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJDMEI3NDMzRS1GMzZCLTE0MTAtQTJFNS0wMDEzNDc3OTI0MUUiLCJlbWFpbCI6ImFkbWluQGNvbXBldGVzcmwuaXQiLCJyb2xlIjoiYWRtaW4iLCJ0ZW5hbnRfaWQiOiIzNjlDNDMzRS1GMzZCLTE0MTAtOENGQi0wMDEzNDc3OTI0MUUiLCJ0ZW5hbnRfc2x1ZyI6ImRlbW8tY29ycCIsImV4cCI6MTc4NDgyMjQ2NywiaWF0IjoxNzg0ODE4ODY3fQ.xQUdDnmUuZMiWlSVxbSl6bYAaCnJVJykq-8tY8TN3pY
+
+//save in var l'access token
+TOKEN=$(curl -s -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@competesrl.it","password":"CompeteRag2026","tenant_slug":"demo-corp"}' \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+echo "$TOKEN" | head -c 40
+
+//testa endpoint se sono auth🔥🔥se return 200 sei ora auth!!
+curl -i http://localhost:8000/api/v1/auth/me -H "Authorization: Bearer $TOKEN"  
+
+
+curl -s http://localhost:8000/api/v1/tenants -H "Authorization: Bearer $TOKEN" | python3 -m json.tool
+
+
+docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P "$SQLSERVER_PASSWORD" -C \
+  -Q "USE RAGChat; SELECT slug, display_name, [plan], is_active FROM shared.tenants; SELECT name FROM sys.schemas WHERE name LIKE 'tenant_%';"
 
 
 
