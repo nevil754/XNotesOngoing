@@ -1057,6 +1057,22 @@ docker compose up -d
 cp .env.example .env   //crea nuovo file called '.env' che è un clone di .env.example
 nano .env   //entra dentro
 
+
+🔥🔥LAST GIT COMMIT STABILE IMG SNAPSHOT (before editing at hand the code x testing all works):  b6812d2058 (23/07/2026)
+//set all x return to safe cade if u break the codebase
+//ALWAYS ON 'develop' branch! and see when something big works, allora PR&merge su branch 'main'
+git checkout develop
+git log --oneline -5
+git tag -a stable-before-refactor b6812d2058 -m "Stable checkpoint before manual refactoring"
+git tag   //assicurati che sia stato correttamente creato
+git push origin stable-before-refactor
+//se qualcosa break allora x rollback fai cosi
+git checkout develop
+git revert stable-before-refactor..HEAD   //⭐️ crea nuovi commits che annullano le modifiche errors, riportandoti cosi a safe point WITHOUT re-write the history!!(in enterprise NEVER re-written the history!!) assolutamente da fare se si rompe in main branch (xk per main branch non puoi re-write the history!!)
+git reset --hard stable-before-refactor   //branch locale torna esattamente li al last safe point,  ok farlo se sei solo te e non c'è team e SOLO in development zone 
+//git push --force origin main  //⚠️⚠️ --force riscrive la history del branch remoto, IN ENTERPRISE NON SI USA
+
+
 ###
 git checkout -b release/1.0.0 origin/release/1.0.0   //crea branch in locale sul pc linkato a branch remoto origin/release/1.0.0
 //merge main->develop
