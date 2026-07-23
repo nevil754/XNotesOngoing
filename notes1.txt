@@ -1152,6 +1152,12 @@ docker compose pull qdrant redis flower sqlserver  //scarica imgs docker da onli
 docker compose up -d   //AVVIA!! cmnq avvia tutti i services del docker-compose, rispettando l'ordine
 df -h /   //vedi ora quanto spazio su disk hai (oppure better check on NetData http://192.168.113.52:19999), primaa di al ero al 22% ora sono al 72%
 
+E FA UNA BUILD DI UN SERVICE E L'ALTRA CONSIGLIATO FARE SEMPRE
+docker builder prune -af   //delete GBs of layers inutilized
+docker image prune -af   //delete imgs inutilized
+df -h /     //see space
+
+
 ###tips
 //le libs presenti in e.g.requirements.txt finiscono nella img al momento della build del dockercompose.
 🔥docker compose down   //abbatte tutto cio che è stato creato (containers/networks, ovviamente no i volumes persistenti) da dockercompose presente in THIS PATH (non cancella e.g container forgejo se non sei here nel suo path)
