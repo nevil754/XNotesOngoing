@@ -90,6 +90,14 @@ docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -
   -Q "USE RAGChat; SELECT slug, display_name, [plan], is_active FROM shared.tenants; SELECT name FROM sys.schemas WHERE name LIKE 'tenant_%';"
 
 
+#################################
+
+▶️▶️ WHERE I AM WHERE TO START TODAY ▶️▶️ : collection.py create_collection() -> aensure_collection() -> ensure_collection() (pipeline annidata di dove sono ora, continue finendo tutti gli endpoints)
+
+
+
+
+
 
 
 
