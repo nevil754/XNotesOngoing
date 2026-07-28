@@ -79,6 +79,8 @@ ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untent
 the psw '12345678' x users valterm, deploy, runner; psw 'Suit-Force-Card' x root,docker(non lo utilizzo).
 //ricorda che e.g.se sei deploy e vuoi diventare root, devi prima passare da valterm (admin fisico umano)
 
+🔥🔥⚡️vscode: dx>Go To Definition (vai in deep),  dx>Find All References (TROVA ALL DOCS CHE USANO THIS TARGET str !!)
+
 
 tree /srv/      //vedi graph struttura a cartelle
 tree -a /srv/   //per vedere anche i nomi files

@@ -94,8 +94,9 @@ docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -
 
 ▶️▶️ WHERE I AM WHERE TO START TODAY ▶️▶️ : collection.py create_collection() -> aensure_collection() -> ensure_collection() (pipeline annidata di dove sono ora, continue finendo tutti gli endpoints)
 
-
-
+TODO /FIX : 
+🐞-in spaces.py  _get_owned_space() e list_spaces() filtro per campo owner_user_id della tab shared.tenants, ma in init.sql in quella tab non ho quel campo!!
+⚠️-tenant_service.py tenant_db.provision_tenant  deep check è corretto che richiama se stesso vero? 
 
 
 
