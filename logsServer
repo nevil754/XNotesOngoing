@@ -1,0 +1,241 @@
+testati endpoints
+
+###################### ENDPOINTS
+
+
+---GET /api/v1/spaces  //WORKS!!
+
+OLD
+curl -i http://192.168.113.52:8000/api/v1/spaces \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4"
+
+
+curl -i http://192.168.113.52:8000/api/v1/spaces \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+
+
+
+---GET /api/v1/auth/me
+curl -i http://192.168.113.52:8000/api/v1/auth/me \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+
+---GET /api/v1/tenants
+curl -i http://192.168.113.52:8000/api/v1/tenants \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+
+---GET /api/v1/users
+curl -i http://192.168.113.52:8000/api/v1/users \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+
+---GET /api/v1/spaces
+curl -i http://192.168.113.52:8000/api/v1/spaces \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+
+---GET /api/v1/jobs
+curl -i http://192.168.113.52:8000/api/v1/jobs \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+
+---GET /api/v1/collections
+curl -i http://192.168.113.52:8000/api/v1/collections \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+
+
+######################
+
+
+deploy@srvdocker01:/srv/environments/dev/rag-system$ curl -i http://192.168.113.52:8000/api/v1/spaces \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4"
+HTTP/1.1 200 OK
+date: Wed, 29 Jul 2026 14:37:13 GMT
+server: uvicorn
+content-length: 2
+content-type: application/json
+x-request-id: ef9df080
+
+deploy@srvdocker01:/srv/environments/dev/rag-system$ grep -rn "authorization\|Header\|HTTPBearer\|Security\|Depends" app/api/routes/spaces.py app/api/deps.pypy
+app/api/deps.py:3:from fastapi import Depends, Header, HTTPException, Request, status
+app/api/deps.py:37:    authorization: Annotated[str | None, Header()] = None,
+app/api/deps.py:38:    x_api_key: Annotated[str | None, Header(alias="X-API-Key")] = None,
+app/api/deps.py:52:    if authorization:
+app/api/deps.py:53:        token = extract_bearer_token(authorization)
+app/api/deps.py:116:    tenant: Annotated[TenantContext, Depends(get_current_tenant)],
+app/api/deps.py:122:    tenant: Annotated[TenantContext, Depends(get_current_tenant)],
+app/api/deps.py:127:    tenant: Annotated[TenantContext, Depends(get_current_tenant)],
+app/api/deps.py:143:    authorization: Annotated[str | None, Header()] = None,
+app/api/deps.py:145:    token = extract_bearer_token(authorization)
+app/api/deps.py:161:#     tenant: Annotated[TenantContext, Depends(get_current_tenant)],
+app/api/deps.py:172:    platform_user: Annotated[PlatformContext, Depends(get_current_platform_user)],
+app/api/deps.py:192:CurrentTenant = Annotated[TenantContext, Depends(get_current_tenant)]
+app/api/deps.py:194:CurrentDB = Annotated[AsyncSession, Depends(get_db)]
+app/api/deps.py:196:CurrentRedis = Annotated[TenantRedis, Depends(get_tenant_redis)]
+app/api/deps.py:198:AdminOnly = Annotated[TenantContext, Depends(require_admin)]
+app/api/deps.py:200:SuperAdminOnly = Annotated[TenantContext, Depends(require_superadmin)]
+app/api/deps.py:202:CurrentPlatformUser = Annotated[PlatformContext, Depends(get_current_platform_user)]
+deploy@srvdocker01:/srv/environments/dev/rag-system$ curl -i http://192.168.113.52:8000/api/v1/spaces \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4"
+HTTP/1.1 200 OK
+date: Wed, 29 Jul 2026 14:58:42 GMT
+server: uvicorn
+content-length: 2
+content-type: application/json
+x-request-id: dee93905
+
+[]deploy@srvdocker01:/srv/environments/dev/rag-system---GET /api/v1/auth/meme
+curl -i http://192.168.113.52:8000/api/v1/auth/me \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4"
+---GET: command not found
+HTTP/1.1 401 Unauthorized
+date: Wed, 29 Jul 2026 15:01:46 GMT
+server: uvicorn
+www-authenticate: Bearer
+content-length: 39
+content-type: application/json
+x-request-id: b39f2052
+
+{"detail":"Token non valido o scaduto"}deploy@srvdockcurl -i http://192.168.113.52:8000/api/v1/auth/me \://192.168.113.52:8000/api/v1/auth/me \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4"
+HTTP/1.1 401 Unauthorized
+date: Wed, 29 Jul 2026 15:01:52 GMT
+server: uvicorn
+www-authenticate: Bearer
+content-length: 39
+content-type: application/json
+x-request-id: f18f24ec
+
+{"detail":"Token non valido o scaduto"}deploy@srvdockcurl -i http://192.168.113.52:8000/api/v1/auth/me \://192.168.113.52:8000/api/v1/auth/me \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4"
+HTTP/1.1 401 Unauthorized
+date: Wed, 29 Jul 2026 15:02:57 GMT
+server: uvicorn
+www-authenticate: Bearer
+content-length: 39
+content-type: application/json
+x-request-id: ce42b571
+
+{"detail":"Token non valido o scaduto"}deploy@srvdockcurl -i http://192.168.113.52:8000/api/v1/spaces \p://192.168.113.52:8000/api/v1/spaces \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4"
+HTTP/1.1 200 OK
+date: Wed, 29 Jul 2026 15:06:57 GMT
+server: uvicorn
+content-length: 2
+content-type: application/json
+x-request-id: 276ed97c
+
+[]deploy@srvdocker01:/srv/environments/dev/rag-systemcurl -i http://192.168.113.52:8000/api/v1/spaces \ \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4"
+HTTP/1.1 200 OK
+date: Wed, 29 Jul 2026 15:07:36 GMT
+server: uvicorn
+content-length: 2
+content-type: application/json
+x-request-id: 2db40dc5
+
+[]deploy@srvdocker01:/srv/environments/dev/rag-systemcurl -i http://192.168.113.52:8000/api/v1/spaces \ \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4"
+HTTP/1.1 200 OK
+date: Wed, 29 Jul 2026 15:08:58 GMT
+server: uvicorn
+content-length: 2
+content-type: application/json
+x-request-id: 3995bcb0
+
+[]deploy@srvdocker01:/srv/environments/dev/rag-systemcurl -i http://192.168.113.52:8000/api/v1/spaces \ \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+HTTP/1.1 200 OK
+date: Wed, 29 Jul 2026 15:09:26 GMT
+server: uvicorn
+content-length: 2
+content-type: application/json
+x-request-id: 2485bc6b
+
+[]deploy@srvdocker01:/srv/environments/dev/rag-systemcurl -i http://192.168.113.52:8000/api/v1/spaces \ \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAxxxx"
+HTTP/1.1 401 Unauthorized
+date: Wed, 29 Jul 2026 15:17:14 GMT
+server: uvicorn
+www-authenticate: Bearer
+content-length: 48
+content-type: application/json
+x-request-id: 566a3de8
+
+{"detail":"Token platform non valido o scaduto"}deplocurl -i http://192.168.113.52:8000/api/v1/spaces \rl -i http://192.168.113.52:8000/api/v1/spaces \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+HTTP/1.1 200 OK
+date: Wed, 29 Jul 2026 15:17:31 GMT
+server: uvicorn
+content-length: 2
+content-type: application/json
+x-request-id: e87de9b0
+
+[]deploy@srvdocker01:/srv/environments/dev/rag-systemcurl -i http://192.168.113.52:8000/api/v1/spaces \ \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4"
+HTTP/1.1 401 Unauthorized
+date: Wed, 29 Jul 2026 15:17:37 GMT
+server: uvicorn
+www-authenticate: Bearer
+content-length: 48
+content-type: application/json
+x-request-id: e1f3db51
+
+{"detail":"Token platform non valido o scaduto"}deplocurl -i http://192.168.113.52:8000/api/v1/spaces \rl -i http://192.168.113.52:8000/api/v1/spaces \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4"
+HTTP/1.1 401 Unauthorized
+date: Wed, 29 Jul 2026 15:17:58 GMT
+server: uvicorn
+www-authenticate: Bearer
+content-length: 48
+content-type: application/json
+x-request-id: cd8d1e4d
+
+{"detail":"Token platform non valido o scaduto"}deplocurl -i http://192.168.113.52:8000/api/v1/auth/me \l -i http://192.168.113.52:8000/api/v1/auth/me \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+HTTP/1.1 401 Unauthorized
+date: Wed, 29 Jul 2026 15:20:10 GMT
+server: uvicorn
+www-authenticate: Bearer
+content-length: 39
+content-type: application/json
+x-request-id: a8ec600a
+
+{"detail":"Token non valido o scaduto"}deploy@srvdockcurl -i http://192.168.113.52:8000/api/v1/tenants \://192.168.113.52:8000/api/v1/tenants \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+HTTP/1.1 500 Internal Server Error
+date: Wed, 29 Jul 2026 15:23:13 GMT
+server: uvicorn
+content-length: 21
+content-type: text/plain; charset=utf-8
+
+Internal Server Errordeploy@srvdocker01:/srv/environmcurl -i http://192.168.113.52:8000/api/v1/users \2:8000/api/v1/users \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+HTTP/1.1 401 Unauthorized
+date: Wed, 29 Jul 2026 15:24:13 GMT
+server: uvicorn
+www-authenticate: Bearer
+content-length: 39
+content-type: application/json
+x-request-id: 30e0db90
+
+{"detail":"Token non valido o scaduto"}deploy@srvdockcurl -i http://192.168.113.52:8000/api/v1/spaces \p://192.168.113.52:8000/api/v1/spaces \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+HTTP/1.1 200 OK
+date: Wed, 29 Jul 2026 15:25:00 GMT
+server: uvicorn
+content-length: 2
+content-type: application/json
+x-request-id: 41a204d5
+
+[]deploy@srvdocker01:/srv/environments/dev/rag-systemcurl -i http://192.168.113.52:8000/api/v1/collections \ \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+HTTP/1.1 401 Unauthorized
+date: Wed, 29 Jul 2026 15:27:32 GMT
+server: uvicorn
+www-authenticate: Bearer
+content-length: 39
+content-type: application/json
+x-request-id: a20ed056
+
+{"detail":"Token non valido o scaduto"}deploy@srvdocker01:/srv/environments/dev/rag-system$
+
+
+
+
