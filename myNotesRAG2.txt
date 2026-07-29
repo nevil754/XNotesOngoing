@@ -93,9 +93,99 @@ docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -
 
 ▶️▶️ WHERE I AM WHERE TO START TODAY ▶️▶️ : collection.py create_collection() -> aensure_collection() -> ensure_collection() (pipeline annidata di dove sono ora, continue finendo tutti gli endpoints)
 
-TODO /FIX check: 
+🐞🐞🐞TODO /FIX check: 
 OK falso allarme- in spaces.py  _get_owned_space() e list_spaces() filtro per campo owner_user_id della tab shared.tenants, ma in init.sql in quella tab non ho quel campo!!
 OK falso allarme- tenant_service.py tenant_db.provision_tenant  deep check è corretto che richiama se stesso vero? 
+- sistemare swagger l'authorization xk non mi compare il btn, il problema è extract_bearer_token cmnq vedi last mexs Claude Mexs
+- cosa è esattamente X-API-Key? xk in certe endpoints mi chiede entrambi?
+- 
+
+
+
+
+admin@platform.competesrl.it
+Admin123456!
+demo-corp
+$2b$12$SBT65yjDI0Z4fniKLfaYKe/W3I.dU1UiELRk01anItj6s9hxlWlBe    //psw_hash
+
+
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "platform_user_id": "3D07433E-F36B-1410-8C29-003AE1B2471C",
+  "email": "admin@platform.competesrl.it"
+}
+
+Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4
+
+Bearer 3D07433E-F36B-1410-8C29-003AE1B2471C
+
+per GET /api/v1/spaces mi chiede come param, l'authorization, cosa è esattamente cosa devo passargli esattamente ? una str che inizia con Bearer o no? io quando faccio platform-login ricevo {
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "platform_user_id": "3D07433E-F36B-1410-8C29-003AE1B2471C",
+  "email": "admin@platform.competesrl.it"
+} 
+
+
+docker compose up -d sqlserver
+docker logs -f rag-system-dev-sqlserver-1
+
+
+docker run --rm -v "$DATA_ROOT/sqlserver:/data" busybox sh -c "rm -rf /data/* /data/.[!.]*"   //cancella tutti i datas salvati x sqlserver, vengono ricreati quando fai ripartire il coantiner
+ls -lan "$DATA_ROOT/sqlserver"
+docker compose up -d sqlserver
+docker logs -f rag-system-dev-sqlserver-1
+docker compose up -d
+
+docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P "$SQLSERVER_PASSWORD" -C \
+  -Q "USE RAGChat; SELECT email, role, is_active, LEN(password_hash) AS len FROM tenant_demo_corp.users;"
+
+
+###################### ENDPOINTS
+
+
+---GET /api/v1/spaces  //WORKS!!
+
+OLD
+curl -i http://192.168.113.52:8000/api/v1/spaces \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4"
+
+
+curl -i http://192.168.113.52:8000/api/v1/spaces \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+
+
+
+---GET /api/v1/auth/me
+curl -i http://192.168.113.52:8000/api/v1/auth/me \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+
+---GET /api/v1/tenants
+curl -i http://192.168.113.52:8000/api/v1/tenants \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+
+---GET /api/v1/users
+curl -i http://192.168.113.52:8000/api/v1/users \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+
+---GET /api/v1/spaces
+curl -i http://192.168.113.52:8000/api/v1/spaces \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+
+---GET /api/v1/jobs
+curl -i http://192.168.113.52:8000/api/v1/jobs \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+
+---GET /api/v1/collections
+curl -i http://192.168.113.52:8000/api/v1/collections \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+
+
+######################
+
 
 
 
