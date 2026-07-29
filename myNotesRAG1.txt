@@ -1208,10 +1208,12 @@ e.g. fix(redis): fix connection leak
 192.168.113.52
 http://192.168.113.52:8000  //fastapi
 http://192.168.113.52:5555  //flower (admin, beaflwer93!, )
-http://192.168.113.52:8080  //chainlit (admin, admin)
+http://192.168.113.52:8080  //chainlit (admin, admin) ma intanto non lo uso piu
 http://192.168.113.52:6333  //qdrant (http://192.168.113.52:6333/dashboard)
 http://192.168.113.52:6379  //redis
 http://192.168.113.52:1433  //sqlserver
+http://192.168.113.52:8000/docs   //🔥Swagger UI endpoints
+
 
 all ur containers (assicurati sempre che siano tutti HEALTHY(se no edit test of target service in dockercompose))
 docker ps
@@ -1226,7 +1228,8 @@ docker ps
  ✔ Container rag-system-dev-chainlit-1              Started   
 
 
-//👎👎CREATE user x chainlit login (ma error now, better usarlo con tutto creato)
+
+//👎👎CREATE user x chainlit login (ma error now, better usarlo con tutto creato) NON LO USO PIU CHAINLIT!!
 - docker compose exec fastapi python -c "
 from passlib.context import CryptContext
 print(CryptContext(schemes=['bcrypt']).hash('CompeteRag2026'))"
@@ -1360,5 +1363,19 @@ brothers of /srv/ is
 
 /opt/     //programs x everyone
 └── miniconda3/                          #python globale (script utility fuori Docker)
+
+
+################################# ❇️❇️❇️ ALL SETUP FROM 0 ON SERVER LINUX X RUN APP ❇️❇️❇️
+
+
+
+
+
+
+
+
+
+
+
 
 

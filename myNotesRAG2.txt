@@ -40,7 +40,6 @@ curl -N -X POST http://localhost:8000/api/v1/chat/stream \
 ########################################################
 
 
-
 //generazione hash code 
 docker compose exec fastapi python -c "
 from passlib.context import CryptContext
@@ -75,7 +74,7 @@ TOKEN=$(curl -s -X POST http://localhost:8000/api/v1/auth/login \
 
 echo "$TOKEN" | head -c 40    //assicurati che il token ok ci sia visualizzando solo i primi 40chars
 
-set -a; source .env; set +a   //save all vars of my file .env nella shell
+set -a; source .env; set +a   //🔥🔥🔥save all vars of my file .env nella shell
 
 //testa endpoint se sono auth🔥🔥se return 200 sei ora auth!!
 curl -i http://localhost:8000/api/v1/auth/me -H "Authorization: Bearer $TOKEN"  
@@ -94,9 +93,9 @@ docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -
 
 ▶️▶️ WHERE I AM WHERE TO START TODAY ▶️▶️ : collection.py create_collection() -> aensure_collection() -> ensure_collection() (pipeline annidata di dove sono ora, continue finendo tutti gli endpoints)
 
-TODO /FIX : 
-🐞-in spaces.py  _get_owned_space() e list_spaces() filtro per campo owner_user_id della tab shared.tenants, ma in init.sql in quella tab non ho quel campo!!
-⚠️-tenant_service.py tenant_db.provision_tenant  deep check è corretto che richiama se stesso vero? 
+TODO /FIX check: 
+OK falso allarme- in spaces.py  _get_owned_space() e list_spaces() filtro per campo owner_user_id della tab shared.tenants, ma in init.sql in quella tab non ho quel campo!!
+OK falso allarme- tenant_service.py tenant_db.provision_tenant  deep check è corretto che richiama se stesso vero? 
 
 
 
