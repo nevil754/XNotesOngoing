@@ -134,6 +134,7 @@ ls /opt
 ls /usr/local/bin
 
 //##INFO ABOUT MACHINE
+lsb_release -a   //vedi versione e.g.Ubuntu 24.04
 systemd-detect-virt   //se return None allora server fisico, se return kvm,xen,openvz,vmware → VPS
   fwupdmgr get-updates   //solo x server fisici, update firware hardware
   fwupdmgr update   //solo x server fisici, update firware hardware
@@ -380,7 +381,16 @@ chown -R deploy:deploy /home/deploy/.ssh
 touch /home/deploy/.ssh/config
 chmod 600 /home/deploy/.ssh/config
 
-######INSTALL Forgejo (x normale add/commit/push ect) & Forgejo Runner (per poter eseguire anche pipeline ci/cd)
+//setta le dirs x ospitare i models scaricati (ne utilizzi 3, vedi celery.Dockerfile)
+cd /srv/environments/dev/rag-system
+set -a; source .env; set +a    //cosi carchi le env vars del file .env anche nella shell linux,
+mkdir -p "$DATA_ROOT/huggigface-cache"   //se sei in dev, $DATA_ROOT = cd /srv/environments/dev/rag-system, se sei in production è cd /srv/environments/prod/rag-system
+chmod 777 "$DATA_ROOT/huggigface-cache"  //x permessi
+ls -land "$DATA_ROOT/huggigface-cache"    //deve mostrare drwxrwxrwx
+//è x models scaricati da huggingface.co
+
+
+######⭐️⭐️⭐️ INSTALL Forgejo (x normale add/commit/push ect) & Forgejo Runner (per poter eseguire anche pipeline ci/cd)
 //forgejo usa un git system embedded proprio, non quello installato su machine linux
 //nome admin=forgejo-admin ,psw=Suap45skh!, email=nelvison.benedetto2@gmail.com
 Suap45skh!
@@ -1143,11 +1153,20 @@ cd /srv/projects/prod/rag-system
 docker compose up -d   //or  docker compose up -d --build
 //this env no dockercomposeoverride, docker leggera dockercompose+envfile di questo folder
 
-//🔥🔥⚠️BUILDA ALWAYS ONLY 1 COMPONENT ALLA VOLTA, XK THIS PRJ IS VERY VERY BIG! (se spuntano bugs vedi dove sono, e non finisci lo spazio su disk)
+//🧱🔥🔥⚠️BUILDA ALWAYS ONLY 1 COMPONENT ALLA VOLTA, XK THIS PRJ IS VERY VERY BIG! (se spuntano bugs vedi dove sono, e non finisci lo spazio su disk)
 docker compose build fastapi    //questo occupa 25%
 docker compose build celery-worker-high   //questo occupa 20%
 docker compose build celery-worker-default
 docker compose build celery-beat
+//carica i 3 modelli (vedi celery.Dockerfile) nel volume huggingface-cache, senza dover aspettare di fare la 1request
+docker compose exec fastapi python -c "
+from fastembed import TextEmbedding, SparseTextEmbedding
+TextEmbedding('intfloat/multilingual-e5-large')
+SparseTextEmbedding('prithivida/Splade_PP_en_v1')
+print('modelli in cache')
+"
+ls -la "$DATA_ROOT/huggingface-cache"
+du -sh "$DATA_ROOT/huggingface-cache"    # ~2-3 GB una volta scaricati
 docker compose build --no-cache chainlit   //bypassa la cache avvelenata TODO IST TRICKY WORKS NOW BUT FIX ASAP
 //qdrant/qdrant:v1.18.2, redis:7.0-alpine, mher/flower:2.0 nel dockercompose non hanno una sezione build, quindi al massimo in anticipo puoi solo scaricare le imgs 
 docker compose pull qdrant redis flower sqlserver  //scarica imgs docker da online (x questi services non devo buildare nulla in anticipo xk non hanno nulla da buildare), non crea nessun container ne avvia nulla. cmnq anche se non lo fai manualmente succede cmnq quando fai dockercomposeup 
@@ -1157,7 +1176,7 @@ df -h /   //vedi ora quanto spazio su disk hai (oppure better check on NetData h
 E FA UNA BUILD DI UN SERVICE E L'ALTRA CONSIGLIATO FARE SEMPRE
 docker builder prune -af   //delete GBs of layers inutilized
 docker image prune -af   //delete imgs inutilized
-df -h /     //see space
+df -h /     //see free space
 
 
 ###tips

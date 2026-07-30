@@ -21,6 +21,8 @@ http://192.168.113.52:5555  //flower (admin, beaflwer93!, )
 http://192.168.113.52:8080  //chainlit (admin, admin)
 http://192.168.113.52:6333  //qdrant (http://192.168.113.52:6333/dashboard)
 
+docker logs --tail 500 rag-system-dev-sqlserver-1 
+docker logs --tail 500 rag-system-dev-fastapi-1
 docker logs --tail 50 rag-system-dev-fastapi-1   //deve dire tutto ok all connected
 docker logs --tail 50 rag-system-dev-sqlserver-1   //deve dire tutto ok
 docker logs rag-system-dev-fastapi-1 2>&1 | grep -E "Avvio|connesso|non raggiungibile|Startup"   //x logs di loguru nel container
@@ -96,10 +98,8 @@ docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -
 🐞🐞🐞TODO /FIX check: 
 OK falso allarme- in spaces.py  _get_owned_space() e list_spaces() filtro per campo owner_user_id della tab shared.tenants, ma in init.sql in quella tab non ho quel campo!!
 OK falso allarme- tenant_service.py tenant_db.provision_tenant  deep check è corretto che richiama se stesso vero? 
-- sistemare swagger l'authorization xk non mi compare il btn, il problema è extract_bearer_token cmnq vedi last mexs Claude Mexs
-- cosa è esattamente X-API-Key? xk in certe endpoints mi chiede entrambi?
-- 
-
+- attualmente uso una versione di fastembed che NON supporta 'BAAI/bge-m3', attualmente ne sto usando un altro solo xk devo fare piu test e DEVO DOWNLOAD correctly all 3 models in cache (during celery.Dockerfile  build!!). per fastembed utilizzo TextEmbedding() SparseTextEmbedding() TextCrossEncoder() ciascuno per scaricare i 3 models.
+- magari ho il bycript creato arriva anche al frontend forse non è molto sicuro?
 
 
 
@@ -109,36 +109,24 @@ demo-corp
 $2b$12$SBT65yjDI0Z4fniKLfaYKe/W3I.dU1UiELRk01anItj6s9hxlWlBe    //psw_hash
 
 
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4",
-  "token_type": "bearer",
-  "expires_in": 3600,
-  "platform_user_id": "3D07433E-F36B-1410-8C29-003AE1B2471C",
-  "email": "admin@platform.competesrl.it"
-}
-
-Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4
-
-Bearer 3D07433E-F36B-1410-8C29-003AE1B2471C
-
-per GET /api/v1/spaces mi chiede come param, l'authorization, cosa è esattamente cosa devo passargli esattamente ? una str che inizia con Bearer o no? io quando faccio platform-login ricevo {
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4",
-  "token_type": "bearer",
-  "expires_in": 3600,
-  "platform_user_id": "3D07433E-F36B-1410-8C29-003AE1B2471C",
-  "email": "admin@platform.competesrl.it"
-} 
-
-
 docker compose up -d sqlserver
 docker logs -f rag-system-dev-sqlserver-1
 
-
+docker compose down
+set -a; source .env; set +a
 docker run --rm -v "$DATA_ROOT/sqlserver:/data" busybox sh -c "rm -rf /data/* /data/.[!.]*"   //cancella tutti i datas salvati x sqlserver, vengono ricreati quando fai ripartire il coantiner
-ls -lan "$DATA_ROOT/sqlserver"
-docker compose up -d sqlserver
-docker logs -f rag-system-dev-sqlserver-1
+ls -lan "$DATA_ROOT/sqlserver"   //deve restituire solo 8
+docker compose up -d sqlserver 
+docker logs --tail 500 rag-system-dev-fastapi-1
 docker compose up -d
+
+sed -n '180,285p' docker/sqlserver/init.sql
+grep -n "sp_executesql\|EXEC(\|EXEC (\|EXEC @\|EXEC(@" docker/sqlserver/init.sql
+grep -n "EXEC\|sp_executesql" docker/sqlserver/init.sql
+sed -n '226,237p' docker/sqlserver/init.sql | cat -A
+
+sed -n '180,285p' docker/sqlserver/init.sql
+grep -n "sp_executesql\|EXEC(\|EXEC (\|EXEC @\|EXEC(@" docker/sqlserver/init.sql
 
 docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P "$SQLSERVER_PASSWORD" -C \
   -Q "USE RAGChat; SELECT email, role, is_active, LEN(password_hash) AS len FROM tenant_demo_corp.users;"
@@ -146,45 +134,71 @@ docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -
 
 ###################### ENDPOINTS
 
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5RDc4NDMzRS1GMzZCLTE0MTAtODJCRi0wMDcwQzRBNzZCOTkiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1NDE3MjA5LCJpYXQiOjE3ODU0MTM2MDl9.pfgbElnQq88ozdCM0PdjTJAq__PxrkxABpnxkTi2Y44",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "platform_user_id": "9D78433E-F36B-1410-82BF-0070C4A76B99",
+  "email": "admin@platform.competesrl.it"
+}
 
----GET /api/v1/spaces  //WORKS!!
-
-OLD
-curl -i http://192.168.113.52:8000/api/v1/spaces \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzM3NzQyLCJpYXQiOjE3ODUzMzQxNDJ9.kcQLf8dgo9QRMQ4cXXS0aUHS3zjRVF1C4jkV7qwmOi4"
-
-
-curl -i http://192.168.113.52:8000/api/v1/spaces \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+WHICH WORKS:
+GET /health
+GET /ready
+POST /api/v1/auth/platform-login   //ottengo bearer token, ok solo x edits spaces e/o tenants 
+GET /api/v1/tenants
+GET /api/v1/spaces
 
 
 
----GET /api/v1/auth/me
-curl -i http://192.168.113.52:8000/api/v1/auth/me \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+docker logs --tail 1000 rag-system-dev-fastapi-1
 
----GET /api/v1/tenants
-curl -i http://192.168.113.52:8000/api/v1/tenants \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+fix: version fastemebd 0.4.1 -> 0.8.0, added HF_HOME: "/cache/huggingface" e - ${DATA_ROOT}/huggingface-cache:/cache/huggingface per fastpai celeryworker celerydefault e celerydockerfile tolto il copy per la cache
 
----GET /api/v1/users
-curl -i http://192.168.113.52:8000/api/v1/users \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
+celery.Dockerfile tolto || ECHO cosi fallisce la build se non riesce correttamente a scaricare i 3 models e metterli in sp
 
----GET /api/v1/spaces
-curl -i http://192.168.113.52:8000/api/v1/spaces \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
 
----GET /api/v1/jobs
-curl -i http://192.168.113.52:8000/api/v1/jobs \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
-
----GET /api/v1/collections
-curl -i http://192.168.113.52:8000/api/v1/collections \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzRDA3NDMzRS1GMzZCLTE0MTAtOEMyOS0wMDNBRTFCMjQ3MUMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1MzQxMjQ0LCJpYXQiOjE3ODUzMzc2NDR9.kFngcZleKaj2psenkRi7MSLgb5wdCy55ce9-ZlAFa4g"
 
 
 ######################
+BAAI/bge-m3  //non supportato da mio fastembed attuale
+intfloat/multilingual-e5-large   //ok questo viene supportato dal mio attuale
+
+
+MODELLI CHE UTILIZZO 
+TextEmbedding("intfloat/multilingual-e5-large")   #xk la mia version actual of 'fastembed' doesn't support the BAAI/bge-m3
+SparseTextEmbedding("prithivida/Splade_PP_en_v1")
+TextCrossEncoder("BAAI/bge-reranker-base")
+
+🔥🔥🔥!-ti dice quali modelli supporta attualmente il tuo 'fastembed' x TextEmbedding()! NON HAI DISPONIBILE BAAI/bge-m3 (allora uso intfloat/multilingual-e5-large)!!
+//x TextEmbedding()
+docker compose exec fastapi python -c "
+from fastembed import TextEmbedding
+for m in TextEmbedding.list_supported_models():
+    print(m['model'], '| dim:', m.get('dim'))
+"
+//x SparseTextEmbedding()
+docker compose exec fastapi python -c "
+from fastembed import SparseTextEmbedding
+for m in SparseTextEmbedding.list_supported_models():
+    print(m['model'])
+"
+//x TextCrossEncoder()
+docker compose exec fastapi python -c "
+from fastembed.rerank.cross_encoder import TextCrossEncoder
+for m in TextCrossEncoder.list_supported_models():
+    print(m['model'])
+"
+
+
+🔥-pre-carica model intfloat/multilingual-e5-large altrimenti lo farebbe quando crei un nuovo space, prima creazione sarà lenta e potrebbe andare in timeout HTTP. le query da cercare vanno prefissate con query: , i documenti da indicizzare con passage: . Se non li metti, il retrieval funziona ma con qualità degradata.
+docker compose exec fastapi python -c "
+from fastembed import TextEmbedding
+m = TextEmbedding('intfloat/multilingual-e5-large')
+print('ok, dim:', len(list(m.embed(['test']))[0]))
+"
+
+
 
 
 
