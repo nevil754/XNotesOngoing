@@ -1159,6 +1159,11 @@ docker compose build fastapi    //questo occupa 25%
 docker compose build celery-worker-high   //questo occupa 20%
 docker compose build celery-worker-default
 docker compose build celery-beat
+docker compose build --no-cache chainlit   //bypassa la cache avvelenata TODO IST TRICKY WORKS NOW BUT FIX ASAP
+//qdrant/qdrant:v1.18.2, redis:7.0-alpine, mher/flower:2.0 nel dockercompose non hanno una sezione build, quindi al massimo in anticipo puoi solo scaricare le imgs 
+docker compose pull qdrant redis flower sqlserver  //scarica imgs docker da online (x questi services non devo buildare nulla in anticipo xk non hanno nulla da buildare), non crea nessun container ne avvia nulla. cmnq anche se non lo fai manualmente succede cmnq quando fai dockercomposeup 
+🔥docker compose up -d   //AVVIA!! cmnq avvia tutti i services del docker-compose, rispettando l'ordine
+df -h /   //vedi ora quanto spazio su disk hai (oppure better check on NetData http://192.168.113.52:19999), primaa di al ero al 22% ora sono al 72%
 
 //now CARICA I 3 small MODELLI LLM (vedi celery.Dockerfile) nel volume fastembed-cache, senza dover aspettare di fare la 1request
 docker compose exec fastapi python -c "
@@ -1171,15 +1176,9 @@ print('ok')
 "
 set -a; source .env; set +a
 ls -la "$DATA_ROOT/fastembed-cache"
-du -sh "$DATA_ROOT/fastembed-cache"    //deve mostrare ~2-3 GB una volta scaricati
+du -sh "$DATA_ROOT/fastembed-cache"    //deve mostrare ~2-3 GB!!
 ls "$DATA_ROOT/fastembed-cache"   # vedi le cartelle models--...
 rm -rf "$DATA_ROOT/fastembed-cache/models--qdrant--<vecchio-modello>"  //cancelli un model target vecchio che non utilizzi piu
-
-docker compose build --no-cache chainlit   //bypassa la cache avvelenata TODO IST TRICKY WORKS NOW BUT FIX ASAP
-//qdrant/qdrant:v1.18.2, redis:7.0-alpine, mher/flower:2.0 nel dockercompose non hanno una sezione build, quindi al massimo in anticipo puoi solo scaricare le imgs 
-docker compose pull qdrant redis flower sqlserver  //scarica imgs docker da online (x questi services non devo buildare nulla in anticipo xk non hanno nulla da buildare), non crea nessun container ne avvia nulla. cmnq anche se non lo fai manualmente succede cmnq quando fai dockercomposeup 
-docker compose up -d   //AVVIA!! cmnq avvia tutti i services del docker-compose, rispettando l'ordine
-df -h /   //vedi ora quanto spazio su disk hai (oppure better check on NetData http://192.168.113.52:19999), primaa di al ero al 22% ora sono al 72%
 
 E A FINE ALL BUILDS (non tra una piccola builds e l'altra altrimenti cancelli anche datas condivisi) X CLEAN ALL INUTILIZED:
 docker builder prune -af   //delete GBs of layers inutilized
