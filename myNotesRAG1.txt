@@ -382,12 +382,13 @@ touch /home/deploy/.ssh/config
 chmod 600 /home/deploy/.ssh/config
 
 //setta le dirs x ospitare i models scaricati (ne utilizzi 3, vedi celery.Dockerfile)
+//serve x models scaricati da huggingface.co per i volumes
 cd /srv/environments/dev/rag-system
 set -a; source .env; set +a    //cosi carchi le env vars del file .env anche nella shell linux,
-mkdir -p "$DATA_ROOT/huggigface-cache"   //se sei in dev, $DATA_ROOT = cd /srv/environments/dev/rag-system, se sei in production è cd /srv/environments/prod/rag-system
-chmod 777 "$DATA_ROOT/huggigface-cache"  //x permessi
-ls -land "$DATA_ROOT/huggigface-cache"    //deve mostrare drwxrwxrwx
-//è x models scaricati da huggingface.co
+//questo server xk plugin fastembed per la cache usa un suo space di default /tmp/fastembed_cache, quindi devi reindirizzare manualmente nel dockercompose
+mkdir -p "$DATA_ROOT/fastembed-cache"    //se sei in dev, $DATA_ROOT = cd /srv/environments/dev/rag-system, se sei in production è cd /srv/environments/prod/rag-system
+chmod 777 "$DATA_ROOT/fastembed-cache"   //x permessi
+ls -land "$DATA_ROOT/fastembed-cache"    //deve mostrare drwxrwxrwx
 
 
 ######⭐️⭐️⭐️ INSTALL Forgejo (x normale add/commit/push ect) & Forgejo Runner (per poter eseguire anche pipeline ci/cd)
@@ -1126,7 +1127,7 @@ nel file .env (🔥🔥QUINDI AVRAI 3 VERSIONI DIFFERENTI DI file .env: 1 in env
 e nel file docker-compose
 -name: ${COMPOSE_PROJECT_NAME}
 -#container_name: fastapi   non specificare il nome!, xk tu hai 1 solo server quindi ci sarebbe conflitto nome container e.g.fastapi di dev env -- fastapi staging env. senza sepcificare docker crea automaticamente e.g. <project_name>-<service_name>-<index> cioe <nome_prj>-fastapi-1
--volumes:- ${DATA_ROOT}/qdrant:/qdrant/storage  //🔥LA PARTE A SX di ':' è path nel filesystem, la parte a dx di ':' è il path dentro il container docker, in questo caso stai speficicando esattamente dove vuoi che vengano salvati i file persistenti  //se avevi qdrant_data:/qdrant/storage e a fondo file volumes: qdrant_data: driver: local allora docker avrebbe salvato il volume in e.g./var/lib/docker/volumes/qdrant_data/_data  (ovviamente persistente quindi fuori dal docker container)
+-volumes:- ${DATA_ROOT}/qdrant:/qdrant/storage  //🔥🔥🔥LA PARTE A SX di ':' è path nel filesystem, la parte a dx di ':' è il path dentro il container docker, in questo caso stai speficicando esattamente dove vuoi che vengano salvati i file persistenti  //se avevi qdrant_data:/qdrant/storage e a fondo file volumes: qdrant_data: driver: local allora docker avrebbe salvato il volume in e.g./var/lib/docker/volumes/qdrant_data/_data  (ovviamente persistente quindi fuori dal docker container)
 -sempre nel docker-compose.yml, per ogni container aggiungi  networks: - rag-network  e poi a fondo file
 networks:
   rag-network:
@@ -1158,22 +1159,29 @@ docker compose build fastapi    //questo occupa 25%
 docker compose build celery-worker-high   //questo occupa 20%
 docker compose build celery-worker-default
 docker compose build celery-beat
-//carica i 3 modelli (vedi celery.Dockerfile) nel volume huggingface-cache, senza dover aspettare di fare la 1request
+
+//now CARICA I 3 small MODELLI LLM (vedi celery.Dockerfile) nel volume fastembed-cache, senza dover aspettare di fare la 1request
 docker compose exec fastapi python -c "
 from fastembed import TextEmbedding, SparseTextEmbedding
+from fastembed.rerank.cross_encoder import TextCrossEncoder
 TextEmbedding('intfloat/multilingual-e5-large')
 SparseTextEmbedding('prithivida/Splade_PP_en_v1')
-print('modelli in cache')
+TextCrossEncoder('BAAI/bge-reranker-base')
+print('ok')
 "
-ls -la "$DATA_ROOT/huggingface-cache"
-du -sh "$DATA_ROOT/huggingface-cache"    # ~2-3 GB una volta scaricati
+set -a; source .env; set +a
+ls -la "$DATA_ROOT/fastembed-cache"
+du -sh "$DATA_ROOT/fastembed-cache"    //deve mostrare ~2-3 GB una volta scaricati
+ls "$DATA_ROOT/fastembed-cache"   # vedi le cartelle models--...
+rm -rf "$DATA_ROOT/fastembed-cache/models--qdrant--<vecchio-modello>"  //cancelli un model target vecchio che non utilizzi piu
+
 docker compose build --no-cache chainlit   //bypassa la cache avvelenata TODO IST TRICKY WORKS NOW BUT FIX ASAP
 //qdrant/qdrant:v1.18.2, redis:7.0-alpine, mher/flower:2.0 nel dockercompose non hanno una sezione build, quindi al massimo in anticipo puoi solo scaricare le imgs 
 docker compose pull qdrant redis flower sqlserver  //scarica imgs docker da online (x questi services non devo buildare nulla in anticipo xk non hanno nulla da buildare), non crea nessun container ne avvia nulla. cmnq anche se non lo fai manualmente succede cmnq quando fai dockercomposeup 
 docker compose up -d   //AVVIA!! cmnq avvia tutti i services del docker-compose, rispettando l'ordine
 df -h /   //vedi ora quanto spazio su disk hai (oppure better check on NetData http://192.168.113.52:19999), primaa di al ero al 22% ora sono al 72%
 
-E FA UNA BUILD DI UN SERVICE E L'ALTRA CONSIGLIATO FARE SEMPRE
+E A FINE ALL BUILDS (non tra una piccola builds e l'altra altrimenti cancelli anche datas condivisi) X CLEAN ALL INUTILIZED:
 docker builder prune -af   //delete GBs of layers inutilized
 docker image prune -af   //delete imgs inutilized
 df -h /     //see free space

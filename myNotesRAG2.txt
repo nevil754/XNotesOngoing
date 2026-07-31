@@ -100,7 +100,7 @@ OK falso allarme- in spaces.py  _get_owned_space() e list_spaces() filtro per ca
 OK falso allarme- tenant_service.py tenant_db.provision_tenant  deep check è corretto che richiama se stesso vero? 
 - attualmente uso una versione di fastembed che NON supporta 'BAAI/bge-m3', attualmente ne sto usando un altro solo xk devo fare piu test e DEVO DOWNLOAD correctly all 3 models in cache (during celery.Dockerfile  build!!). per fastembed utilizzo TextEmbedding() SparseTextEmbedding() TextCrossEncoder() ciascuno per scaricare i 3 models.
 - magari ho il bycript creato arriva anche al frontend forse non è molto sicuro?
-
+- <string>:4: UserWarning: The model intfloat/multilingual-e5-large now uses mean pooling instead of CLS embedding. In order to preserve the previous behaviour, consider either pinning fastembed version to 0.5.1 or using `add_custom_model` functionality.
 
 
 admin@platform.competesrl.it
