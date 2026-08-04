@@ -14,15 +14,17 @@ ls -ld
 
 pages to open on pc: 
 http://192.168.113.52:3000/    //forgejo git
-http://192.168.113.52:8000/docs#/    //SwaggerUI endpoints (piu veloce di PostMan e conosce gia payloads & schemes) di fastapi
+http://192.168.113.52:8000/docs#/    //🔥SwaggerUI endpoints (piu veloce di PostMan e conosce gia payloads & schemes) di fastapi
 https://eu.smith.langchain.com/    //langsmith see flow ai
 
 http://192.168.113.52:5555  //flower (admin, beaflwer93!, )
 http://192.168.113.52:8080  //chainlit (admin, admin)
 http://192.168.113.52:6333  //qdrant (http://192.168.113.52:6333/dashboard)
 
-docker logs --tail 500 rag-system-dev-sqlserver-1 
+docker logs --tail 300 rag-system-dev-sqlserver-1 
 docker logs --tail 300 rag-system-dev-fastapi-1
+docker logs --tail 300 rag-system-dev-redis-1
+docker logs --tail 300 rag-system-dev-qdrant-1
 docker logs --tail 50 rag-system-dev-fastapi-1   //deve dire tutto ok all connected
 docker logs --tail 50 rag-system-dev-sqlserver-1   //deve dire tutto ok
 docker logs rag-system-dev-fastapi-1 2>&1 | grep -E "Avvio|connesso|non raggiungibile|Startup"   //x logs di loguru nel container
@@ -101,14 +103,15 @@ OK falso allarme- tenant_service.py tenant_db.provision_tenant  deep check è co
 - attualmente uso una versione di fastembed che NON supporta 'BAAI/bge-m3', attualmente ne sto usando un altro solo xk devo fare piu test e DEVO DOWNLOAD correctly all 3 models in cache (during celery.Dockerfile  build!!). per fastembed utilizzo TextEmbedding() SparseTextEmbedding() TextCrossEncoder() ciascuno per scaricare i 3 models.
 - magari ho il bycript creato arriva anche al frontend forse non è molto sicuro?
 - <string>:4: UserWarning: The model intfloat/multilingual-e5-large now uses mean pooling instead of CLS embedding. In order to preserve the previous behaviour, consider either pinning fastembed version to 0.5.1 or using `add_custom_model` functionality.
+-dockercompose / *.override redis, Poi il punto critico: ricrea Redis e cancella l'AOF vecchio. C'è un rischio aggiuntivo — Redis ha --appendonly yes con persistenza su ${DATA_ROOT}/redis. Se è partito una volta senza password e ha scritto dati, il riavvio potrebbe caricare uno stato che non ti aspetti.
+- quando avevo donwload i 3 modelli llm mi aveva dato un warning di usare metodi appositi (per 1 dei 3, non mi ricordo quale forse l'prisha) (quelli di default funzionano cmnq ma con prestazioni degradate).
+
 
 TO DO AFTER:
 - PATCH /api/v1/spaces/{space_id} okey aggiorna il display_name ma non lo slug (attualmente rimane quello di prima)
 
 
 TO KNOW:
-- 2 level login: 
-- che differenza c'è tra CREATE space e invece il CREATE tenant?
 - la differenza tra endpoints CREATE space e invece il CREATE tenant, e che CREATE space crea space + crea tenant (prende info dal singolo slug che gli passi + info dai dati dell'admin), mentre invece CREATE tenant server se vuoi creare un 2ndo tenant (all'interno dello space).
 🔥🔥- JWT è un HEADER.PAYLOAD.SIGNATURE: header dice come è firmato il token (e.g.{"alg": "HS256","typ": "JWT"}), payload contiene le informazioni sull'utente (e.g.{"sub": "user123","tenant": "acme","role": "admin"} (questi vengono comunemente chiamati 🔥CLAIMS))) e la signature è la firma crittografica (serve a garantire che nessuno abbia modificato il token).
 quindi solitamente il frontend -> backend il 'Bearer eyJhbGc...' e il backend estrae solo il token puro (usando lib security) e fa
@@ -117,12 +120,26 @@ payload = jwt.decode(
     settings.jwt_secret_key,
     algorithms=[settings.jwt_algorithm],
 )
+- xk ho endpoint POST /api/v1/collections che è tenant-scoped(è davvero tenant-scoped!)? cioe mica l'utente deve creare una nuova collection qdrant quando è gia dentro un tenant...viene creata sempre di default un qdrantcollection quando viene creato lo space.
+e poi facendolo crea solo sul db la nuova row, mica crea una nuova collection su qdrant, quindi non capisco a cosa serve all'utente poter creare le collections (cmnq appena creato lo space, se login nel tenant-scope vedo che non ho nessuna row collection nel [tenant_ufficioxxxx].[collections]). forse serve nel [tenant-scoped] GET /api/v1/documents che mi chiede la collection_id
+-FARE SEMPRE : 
 
 
+
+
+
+//default user created by init.sql
 admin@platform.competesrl.it
 Admin123456!
 demo-corp
 $2b$12$SBT65yjDI0Z4fniKLfaYKe/W3I.dU1UiELRk01anItj6s9hxlWlBe    //psw_hash
+
+//created by me
+user22@gmail.com
+user2 newton
+psw829!psw829!
+user
+e gli ho creato una nuova collection, collection_id 1E27F3A0-BD9E-4E31-BF34-EB2E7290CD27
 
 
 docker compose up -d sqlserver
@@ -152,7 +169,7 @@ docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -
 
 //X ADMIN
 {
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5RDc4NDMzRS1GMzZCLTE0MTAtODJCRi0wMDcwQzRBNzZCOTkiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1NTEyODg5LCJpYXQiOjE3ODU1MDkyODl9.iK-tkl-9d6CUXZqIsBifkMmuKEc6qV44nQBdxezo8YI",
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5RDc4NDMzRS1GMzZCLTE0MTAtODJCRi0wMDcwQzRBNzZCOTkiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1ODU3MzY3LCJpYXQiOjE3ODU4NTM3Njd9.t-LkEkoMkEE2CSIk7t0D0mQ5WenvCYyWS92k25i15_0",
   "token_type": "bearer",
   "expires_in": 3600,
   "platform_user_id": "9D78433E-F36B-1410-82BF-0070C4A76B99",
@@ -160,22 +177,21 @@ docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -
 }
 //X MOVE WITHIN TENANT-SCOPE
 {
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5RDc4NDMzRS1GMzZCLTE0MTAtODJCRi0wMDcwQzRBNzZCOTkiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJyb2xlIjoiYWRtaW4iLCJ0ZW5hbnRfaWQiOiI0MjA2NDMzRS1GMzZCLTE0MTAtODJDMy0wMDcwQzRBNzZCOTkiLCJ0ZW5hbnRfc2x1ZyI6Im9mZmljZWdiMiIsImV4cCI6MTc4NTUxMjk4NCwiaWF0IjoxNzg1NTA5Mzg0fQ.-ZlNk-Js5hDf-ylIpIFzdQM_gVYSgtSkaIjMLWIl7vA",
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzMzk2MUUwMS1BMzRBLTRGOUEtQUQ2Ri1CQTA3RjE4REEwNjQiLCJlbWFpbCI6InVzZXIyMkBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsInRlbmFudF9pZCI6IjgyRUM0MjNFLUYzNkItMTQxMC04MkNDLTAwNzBDNEE3NkI5OSIsInRlbmFudF9zbHVnIjoidWZmaWNpb3h4eHgiLCJleHAiOjE3ODU4NjE0MzksImlhdCI6MTc4NTg1NzgzOX0.JyWoMHjizaiQa1-MkMOej13l-d8xfRfYM1T2z5sBflc",
   "token_type": "bearer",
   "expires_in": 3600,
-  "user_id": "9D78433E-F36B-1410-82BF-0070C4A76B99",
-  "user_role": "admin",
-  "tenant_slug": "officegb2"
+  "user_id": "33961E01-A34A-4F9A-AD6F-BA07F18DA064",
+  "user_role": "user",
+  "tenant_slug": "ufficioxxxx"
 }
 
-// api/v1/auth/login
+//creato nuovo user nello space target ,ora testo api/v1/auth/login
 {
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJDRkRENDFFNi1EQTFBLTRDOEYtOEU5MC1EMEQxNkQwMTE0OTEiLCJlbWFpbCI6ImRkZGRkZGRAZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwidGVuYW50X2lkIjoiNDQwNjQzM0UtRjM2Qi0xNDEwLTgyQzMtMDA3MEM0QTc2Qjk5IiwidGVuYW50X3NsdWciOiJvZmZpY2UwMCIsImV4cCI6MTc4NTUxMzEwOCwiaWF0IjoxNzg1NTA5NTA4fQ.baX2q4k8h8oO_jtQiDNvT3DyfkPdW634xhr13d27lwM",
-  "token_type": "bearer",
-  "expires_in": 3600,
-  "user_id": "CFDD41E6-DA1A-4C8F-8E90-D0D16D011491",
-  "user_role": "admin",
-  "tenant_slug": "office00"
+  "id": "33961E01-A34A-4F9A-AD6F-BA07F18DA064",
+  "email": "user22@gmail.com",
+  "full_name": "user2 newton",
+  "role": "user",
+  "is_active": true
 }
 
 
