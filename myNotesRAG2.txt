@@ -122,11 +122,12 @@ payload = jwt.decode(
 )
 - xk ho endpoint POST /api/v1/collections che è tenant-scoped(è davvero tenant-scoped!)? cioe mica l'utente deve creare una nuova collection qdrant quando è gia dentro un tenant...viene creata sempre di default un qdrantcollection quando viene creato lo space.
 e poi facendolo crea solo sul db la nuova row, mica crea una nuova collection su qdrant, quindi non capisco a cosa serve all'utente poter creare le collections (cmnq appena creato lo space, se login nel tenant-scope vedo che non ho nessuna row collection nel [tenant_ufficioxxxx].[collections]). forse serve nel [tenant-scoped] GET /api/v1/documents che mi chiede la collection_id
--FARE SEMPRE : 
+- guardare dove salva i files fisici, soprattuto come dove il folder parent viene creato
 
 
 
 
+-
 
 //default user created by init.sql
 admin@platform.competesrl.it
