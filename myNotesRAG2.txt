@@ -25,6 +25,11 @@ docker logs --tail 300 rag-system-dev-sqlserver-1
 docker logs --tail 300 rag-system-dev-fastapi-1
 docker logs --tail 300 rag-system-dev-redis-1
 docker logs --tail 300 rag-system-dev-qdrant-1
+
+docker logs --tail 300 rag-system-dev-celery-worker-default-1  //ok, è quella normale utilizzata
+docker logs --tail 300 rag-system-dev-celery-worker-high-1
+docker logs --tail 300 rag-system-dev-celery-beat-1
+
 docker logs --tail 50 rag-system-dev-fastapi-1   //deve dire tutto ok all connected
 docker logs --tail 50 rag-system-dev-sqlserver-1   //deve dire tutto ok
 docker logs rag-system-dev-fastapi-1 2>&1 | grep -E "Avvio|connesso|non raggiungibile|Startup"   //x logs di loguru nel container
@@ -105,6 +110,27 @@ OK falso allarme- tenant_service.py tenant_db.provision_tenant  deep check è co
 - <string>:4: UserWarning: The model intfloat/multilingual-e5-large now uses mean pooling instead of CLS embedding. In order to preserve the previous behaviour, consider either pinning fastembed version to 0.5.1 or using `add_custom_model` functionality.
 -dockercompose / *.override redis, Poi il punto critico: ricrea Redis e cancella l'AOF vecchio. C'è un rischio aggiuntivo — Redis ha --appendonly yes con persistenza su ${DATA_ROOT}/redis. Se è partito una volta senza password e ha scritto dati, il riavvio potrebbe caricare uno stato che non ti aspetti.
 - quando avevo donwload i 3 modelli llm mi aveva dato un warning di usare metodi appositi (per 1 dei 3, non mi ricordo quale forse l'prisha) (quelli di default funzionano cmnq ma con prestazioni degradate).
+!!ASAP- , la causa più probabile è una libreria nativa (PyTorch o ONNX Runtime usata da FastEmbed) compilata con istruzioni AVX2/FMA che la CPU virtuale del server non espone. Il warning su NNPACK è solo un indizio che conferma che l'ambiente CPU è limitato, ma non è lui il responsabile del crash.
+attualmente mio modello cpu è QEMU Virtual CPU version 2.5+, Se fosse una VM KVM configurata per esporre la CPU reale, vedresti qualcosa tipo: AMD..., quindi errore SIGILL significa il processore ha ricevuto un'istruzione che non esiste, fastembed esegue comando AVX2 instruction ma la cpu conosce solo SSE4.2! 
+esegui questi comandi:   lscpu     grep flags /proc/cpuinfo
+cat /proc/cpuinfo | grep "model name"   //vedi il modello virtuale della tua cpu (io ho 'QEMU Virtual CPU version 2.5+' )
+vedi che tu attualmente hai flags:
+sse
+sse2
+ssse3
+sse4_1
+sse4_2
+aes
+...
+ma mancano di (quelli che vengono usati da fastembed(PyTorch))!! : 
+avx
+avx2
+fma
+
+Ciao mauro, 
+la mia attuale cpu (QEMU Virtual CPU version 2.5+) non regge dei comandi di delle librerie (AI) che sto utilizzando.
+puoi abilitare il passthrough della CPU / il modello di CPU dell'host per il mio VPS KVM. 
+Ho bisogno che i flag AVX e AVX2 della CPU siano disponibili all'interno della VM.
 
 
 TO DO AFTER:
@@ -120,14 +146,13 @@ payload = jwt.decode(
     settings.jwt_secret_key,
     algorithms=[settings.jwt_algorithm],
 )
+- vs code, VEDI TUTTI I PROBLEMI(sia rossi che verdi) che ti segnala il compilatore: view > problems.
 - xk ho endpoint POST /api/v1/collections che è tenant-scoped(è davvero tenant-scoped!)? cioe mica l'utente deve creare una nuova collection qdrant quando è gia dentro un tenant...viene creata sempre di default un qdrantcollection quando viene creato lo space.
 e poi facendolo crea solo sul db la nuova row, mica crea una nuova collection su qdrant, quindi non capisco a cosa serve all'utente poter creare le collections (cmnq appena creato lo space, se login nel tenant-scope vedo che non ho nessuna row collection nel [tenant_ufficioxxxx].[collections]). forse serve nel [tenant-scoped] GET /api/v1/documents che mi chiede la collection_id
 - guardare dove salva i files fisici, soprattuto come dove il folder parent viene creato
 
 
 
-
--
 
 //default user created by init.sql
 admin@platform.competesrl.it
@@ -139,8 +164,15 @@ $2b$12$SBT65yjDI0Z4fniKLfaYKe/W3I.dU1UiELRk01anItj6s9hxlWlBe    //psw_hash
 user22@gmail.com
 user2 newton
 psw829!psw829!
-user
-e gli ho creato una nuova collection, collection_id 1E27F3A0-BD9E-4E31-BF34-EB2E7290CD27
+role: user
+tenant-slug: ufficioxxxx
+e gli ho creato una nuova collection, collection_id   1E27F3A0-BD9E-4E31-BF34-EB2E7290CD27
+
+//non ancora creato
+user33@gmail.com
+user3 einstain
+psw811!psw811!
+role: admin //vedere che cosa fa da admin
 
 
 docker compose up -d sqlserver
@@ -170,7 +202,7 @@ docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -
 
 //X ADMIN
 {
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5RDc4NDMzRS1GMzZCLTE0MTAtODJCRi0wMDcwQzRBNzZCOTkiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1ODU3MzY3LCJpYXQiOjE3ODU4NTM3Njd9.t-LkEkoMkEE2CSIk7t0D0mQ5WenvCYyWS92k25i15_0",
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5RDc4NDMzRS1GMzZCLTE0MTAtODJCRi0wMDcwQzRBNzZCOTkiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1OTMwNjQxLCJpYXQiOjE3ODU5MjcwNDF9.RHGoPXMb4xQ8A4OVDFo1Dr1cZSnM8hX8yHftwppcaRY",
   "token_type": "bearer",
   "expires_in": 3600,
   "platform_user_id": "9D78433E-F36B-1410-82BF-0070C4A76B99",
@@ -178,7 +210,7 @@ docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -
 }
 //X MOVE WITHIN TENANT-SCOPE
 {
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzMzk2MUUwMS1BMzRBLTRGOUEtQUQ2Ri1CQTA3RjE4REEwNjQiLCJlbWFpbCI6InVzZXIyMkBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsInRlbmFudF9pZCI6IjgyRUM0MjNFLUYzNkItMTQxMC04MkNDLTAwNzBDNEE3NkI5OSIsInRlbmFudF9zbHVnIjoidWZmaWNpb3h4eHgiLCJleHAiOjE3ODU4NjE0MzksImlhdCI6MTc4NTg1NzgzOX0.JyWoMHjizaiQa1-MkMOej13l-d8xfRfYM1T2z5sBflc",
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzMzk2MUUwMS1BMzRBLTRGOUEtQUQ2Ri1CQTA3RjE4REEwNjQiLCJlbWFpbCI6InVzZXIyMkBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsInRlbmFudF9pZCI6IjgyRUM0MjNFLUYzNkItMTQxMC04MkNDLTAwNzBDNEE3NkI5OSIsInRlbmFudF9zbHVnIjoidWZmaWNpb3h4eHgiLCJleHAiOjE3ODU5Mzg2ODQsImlhdCI6MTc4NTkzNTA4NH0.Pyz6k7MhQjZs8vyh4rHBRfi8TBI4K00XlUM4UOSp2v0",
   "token_type": "bearer",
   "expires_in": 3600,
   "user_id": "33961E01-A34A-4F9A-AD6F-BA07F18DA064",

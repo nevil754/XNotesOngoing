@@ -99,6 +99,7 @@ cd /root   //NEGATA X PERMESSI UTENTE
 cd ..    //father
 mkdir myfolder
 ps aux   //processi in esecuzione
+lscpu   //vedi cpu, ect
 htop     //🔥🔥x cpu & ram realtime
 df -h    //disk & spazio
 uname -a   //hardware & system
@@ -389,6 +390,7 @@ set -a; source .env; set +a    //cosi carchi le env vars del file .env anche nel
 mkdir -p "$DATA_ROOT/fastembed-cache"    //se sei in dev, $DATA_ROOT = cd /srv/environments/dev/rag-system, se sei in production è cd /srv/environments/prod/rag-system
 chmod 777 "$DATA_ROOT/fastembed-cache"   //x permessi
 ls -land "$DATA_ROOT/fastembed-cache"    //deve mostrare drwxrwxrwx
+
 
 //abilita la creazione di nuovi folders fisici (e.g.viene creato folder 'ufficioXXX' che contiene i docs di quell'ufficio)
 set -a; source .env; set +a
@@ -1169,7 +1171,7 @@ docker compose pull qdrant redis flower sqlserver  //scarica imgs docker da onli
 🔥docker compose up -d   //AVVIA!! cmnq avvia tutti i services del docker-compose, rispettando l'ordine
 df -h /   //vedi ora quanto spazio su disk hai (oppure better check on NetData http://192.168.113.52:19999), primaa di al ero al 22% ora sono al 72%
 
-//now CARICA I 3 small MODELLI LLM (vedi celery.Dockerfile) nel volume fastembed-cache, senza dover aspettare di fare la 1request
+//🤖🤖🤖now CARICA I 3 small MODELLI LLM (vedi celery.Dockerfile) nel volume fastembed-cache, senza dover aspettare di fare la 1request
 docker compose exec fastapi python -c "
 from fastembed import TextEmbedding, SparseTextEmbedding
 from fastembed.rerank.cross_encoder import TextCrossEncoder
@@ -1183,17 +1185,56 @@ ls -la "$DATA_ROOT/fastembed-cache"
 du -sh "$DATA_ROOT/fastembed-cache"    //deve mostrare ~2-3 GB!!
 ls "$DATA_ROOT/fastembed-cache"   # vedi le cartelle models--...
 rm -rf "$DATA_ROOT/fastembed-cache/models--qdrant--<vecchio-modello>"  //cancelli un model target vecchio che non utilizzi piu
-
 E A FINE ALL BUILDS (non tra una piccola builds e l'altra altrimenti cancelli anche datas condivisi) X CLEAN ALL INUTILIZED:
-docker builder prune -af   //delete GBs of layers inutilized
-docker image prune -af   //delete imgs inutilized
+docker builder prune -af   //🔥 FREE SPACE delete GBs of layers inutilized
+docker image prune -af   //🔥 FREE SPACE delete imgs inutilized
 df -h /     //see free space
+
+
+##### se vuoi i 3 models AI su server estrno strong, COME STORAGE (e gireranno cmnq su server weak!!)
+
+//sul server strong
+sudo apt install python3.11 python3.11-venv python3-pip    //stessa versione che utilizzo anche io, cosi stesso python tra le 2 machines 
+cd XXXX
+mkdir -p fastembed-cache
+chmod 777 fastembed-cache  //x permessi
+ls -land fastembed-cache   //deve mostrare drwxrwxrwx
+
+python3.11 -m venv fastembed-env   //crea ambiente python temp, intanto here su server strong è solo storage (non calcolerà mai niente) 
+source fastembed-env/bin/activate   //attiva ambiente
+pip install fastembed==0.8.0
+
+export HF_HOME=$PWD/fastembed-cache/.cache/huggingface    //non è qualcosa di linux, è env var di huggingface, vive solo in questo terminal corrente
+echo $HF_HOME   //deve mostrare XXXX/fastembed-cache/.cache/huggingface
+
+python3.11 -c "
+from fastembed import TextEmbedding, SparseTextEmbedding
+from fastembed.rerank.cross_encoder import TextCrossEncoder
+TextEmbedding('intfloat/multilingual-e5-large')
+SparseTextEmbedding('prithivida/Splade_PP_en_v1')
+TextCrossEncoder('BAAI/bge-reranker-base')
+print('MODELS DOWNLOADED')
+"
+du -sh fastembed-cache  //dovresti vedere +-4GB
+
+//ora i modelli sono sul server potente, quindi da questo server weak se li voglio utilizzare
+sudo apt install sshfs    //x link filesystem tra 2 machines
+sudo mkdir -p /mnt/fastembed-cache   //lo fai sul server weak, questo è solo una 'porta'
+sshfs user@MACCHINA_POTENTE:/XXXX/fastembed-cache /mnt/fastembed-cache  //🔥crea link filesystem remoto via SSH
+//ora da questo server weak
+ls /mnt/fastembed-cache  //dovrei vedere i models sul server potente
+e nel docker-compose
+volumes:
+  - /mnt/fastembed-cache:/cache/fastembed
+
+#####
+
 
 
 ###tips
 //le libs presenti in e.g.requirements.txt finiscono nella img al momento della build del dockercompose.
-🔥docker compose down   //abbatte tutto cio che è stato creato (containers/networks, ovviamente no i volumes persistenti) da dockercompose presente in THIS PATH (non cancella e.g container forgejo se non sei here nel suo path)
-🔥docker buildx prune -af   //usa Buildx (usa il moderno BuildKit, oggi si fa cosi), cancella layers (magari obsoleti) creati dal docker build (xk se ne fai tanti puo corrompersi) build cache, network inutilizzati, imgs inutilizzate,ect
+docker compose down   //🔥 abbatte tutto cio che è stato creato (containers/networks, ovviamente no i volumes persistenti) da dockercompose presente in THIS PATH (non cancella e.g container forgejo se non sei here nel suo path)
+docker buildx prune -af   //🔥FREE SPACE usa Buildx (usa il moderno BuildKit, oggi si fa cosi), cancella layers (magari obsoleti) creati dal docker build (xk se ne fai tanti puo corrompersi) build cache, network inutilizzati, imgs inutilizzate,ect
 sudo systemctl restart dockern   //riavvia il Docker daemon
 docker compose ls    //vedi tutti i dockercompose sul server
 docker compose up -d --build   //rebuild le imgs then run
@@ -1258,7 +1299,7 @@ docker ps
  ✔ Container rag-system-dev-chainlit-1              Started   
 
 now open Microsoft SQL Server Manager:
-open new cmd (anche se ne haigia aperti!) e fare ssh -L 14330:127.0.0.1:1433 deploy@192.168.113.52
+open new cmd (anche se ne haigia aperti!) e fare ssh -L 14330:127.0.0.1:1433 deploy@192.168.113.52  (psw 12345678)
 127.0.0.1,14330 
 Authenticazione di SQL Server
 SA
