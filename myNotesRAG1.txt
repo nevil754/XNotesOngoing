@@ -686,6 +686,7 @@ a questa poi aggiungerai la ssh key: nelvisonb-dev-laptop30
 --explore>organizations>competesrl>teams:owners>add team member> search and find target accout to add (nelvison.benedetto)
 --organization>repositories>🔥new repository: 
 name: rag-system (CONSIGLIATO NOMENCLATURA SEMPRE in minuscolo e con - per gli spazi), make repository private: check, default branch: main, initialize repo: gitignore python, license:.., advanced options labels: advanced(Kind/Bug,Kind/Feature,...), NON spuntare 'make this repo a template' xk attualemente il tuo rag system non è ancora ultimato final finito ma ancora in fase di evoluzione.
+SE HAI PERO UN PRJ IN LOCALE CODE creato, allora...
 
 🔥-set branch protection rules
 target repo>settings>branches>branch protection rules: 
@@ -1239,7 +1240,7 @@ docker compose exec redis redis-cli -a "$REDIS_PASSWORD" --no-auth-warning DBSIZ
 
 
 🗄🗄🗄 connect sqlserver to Microsoft SQL Server Manager:
-open new cmd (anche se ne haigia aperti!) e fare ssh -L 14330:127.0.0.1:1433 deploy@192.168.113.52  (psw 12345678)
+open new cmd (anche se ne haigia aperti!) e fare  ssh -L 14330:127.0.0.1:1433 deploy@192.168.113.52  (psw 12345678)
 127.0.0.1,14330 
 Authenticazione di SQL Server
 SA

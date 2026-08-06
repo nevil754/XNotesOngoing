@@ -262,6 +262,11 @@ fix: version fastemebd 0.4.1 -> 0.8.0, added HF_HOME: "/cache/huggingface" e - $
 
 celery.Dockerfile tolto || ECHO cosi fallisce la build se non riesce correttamente a scaricare i 3 models e metterli in sp
 
+docker compose logs redis     
+docker compose logs --tail 300 redis   
+
+docker compose exec redis redis-cli -a "$REDIS_PASSWORD" --no-auth-warning DBSIZE     //
+docker compose exec redis redis-cli -a "$REDIS_PASSWORD" --no-auth-warning KEYS '*'   //elenca tutte le keys
 
 ######################
 
