@@ -391,11 +391,12 @@ mkdir -p "$DATA_ROOT/fastembed-cache"    //se sei in dev, $DATA_ROOT = cd /srv/e
 chmod 777 "$DATA_ROOT/fastembed-cache"   //x permessi
 ls -land "$DATA_ROOT/fastembed-cache"    //deve mostrare drwxrwxrwx
 
-
 //abilita la creazione di nuovi folders fisici (e.g.viene creato folder 'ufficioXXX' che contiene i docs di quell'ufficio)
 set -a; source .env; set +a
 chmod -R 777 "$DATA_ROOT/uploads"
 ls -land "$DATA_ROOT/uploads"    #deve return drwxrwxrwx
+
+//!!ricorda che il codice è in /srv/environments/dev/rag-system (dove fai cd e lanci i comandi), invece $DATA_ROOT è /srv/data/dev/rag-system (i dati persistiti, i bind mount) SONO 2 PATHS diversi!
 
 ######⭐️⭐️⭐️ INSTALL Forgejo (x normale add/commit/push ect) & Forgejo Runner (per poter eseguire anche pipeline ci/cd)
 //forgejo usa un git system embedded proprio, non quello installato su machine linux
@@ -1160,7 +1161,8 @@ cd /srv/projects/prod/rag-system
 docker compose up -d   //or  docker compose up -d --build
 //this env no dockercomposeoverride, docker leggera dockercompose+envfile di questo folder
 
-//🧱🔥🔥⚠️BUILDA ALWAYS ONLY 1 COMPONENT ALLA VOLTA, XK THIS PRJ IS VERY VERY BIG! (se spuntano bugs vedi dove sono, e non finisci lo spazio su disk)
+//🧱🧱🧱🔥🔥⚠️BUILDA ALWAYS ONLY 1 COMPONENT ALLA VOLTA, XK THIS PRJ IS VERY VERY BIG! (se spuntano bugs vedi dove sono, e non finisci lo spazio su disk)
+//utilizza ...build --no-cache  x ignorare possibile cache rimanente, e ricostruisce davvero da 0
 docker compose build fastapi    //questo occupa 25%
 docker compose build celery-worker-high   //questo occupa 20%
 docker compose build celery-worker-default
@@ -1170,6 +1172,8 @@ docker compose build --no-cache chainlit   //bypassa la cache avvelenata TODO IS
 docker compose pull qdrant redis flower sqlserver  //scarica imgs docker da online (x questi services non devo buildare nulla in anticipo xk non hanno nulla da buildare), non crea nessun container ne avvia nulla. cmnq anche se non lo fai manualmente succede cmnq quando fai dockercomposeup 
 🔥docker compose up -d   //AVVIA!! cmnq avvia tutti i services del docker-compose, rispettando l'ordine
 df -h /   //vedi ora quanto spazio su disk hai (oppure better check on NetData http://192.168.113.52:19999), primaa di al ero al 22% ora sono al 72%
+
+//❗️❗️ docker build celery-worker-high celery-worker-default celery-beat    claude mi ha detto di rifarlo fare anche quando non ho modificato proprio nel docker compose ma qualcosa nel code..
 
 //🤖🤖🤖now CARICA I 3 small MODELLI LLM (vedi celery.Dockerfile) nel volume fastembed-cache, senza dover aspettare di fare la 1request
 docker compose exec fastapi python -c "
@@ -1191,7 +1195,60 @@ docker image prune -af   //🔥 FREE SPACE delete imgs inutilized
 df -h /     //see free space
 
 
-##### se vuoi i 3 models AI su server estrno strong, COME STORAGE (e gireranno cmnq su server weak!!)
+//🦊🦊su Redis container l'AOF (Append Only File, funzionalita redis x rendere PERSISTENTI i dati su disco) in Production, la prima volta che avvii l'app deve essere vuoto!
+//in Production with '--appendonly:"yes"' e ovviamente non deve essere sovrascritto da un possibile docker-compose.override.yml con "no".
+docker compose up -d --force-recreate redis
+docker logs --tail 300 rag-system-dev-redis-1
+set -a; source .env; set +a   //carica le env nel file .env nella shell terminal corrente
+docker compose exec redis redis-cli ping  //deve return noauth xk non hai passato la pswredis
+docker compose exec redis redis-cli -a "$REDIS_PASSWORD" ping  //dovrebbe dare ok PONG
+docker compose exec redis redis-cli -a "$REDIS_PASSWORD" DBSIZE   //dovrebbe return 0 (cioe le keys redis salvate)  / solo le chiavi scritte dopo il riavvio 
+docker compose exec redis redis-cli -a "$REDIS_PASSWORD" CONFIG GET appendonly   //dovrebbe return appendonly -> yes
+//se vuoi svuotare ram x il tuo redis (attention, perdi le keys redis create durante l'utilizzo della tua app!!)
+docker compose exec redis redis-cli -a "$REDIS_PASSWORD" --no-auth-warning FLUSHALL
+docker compose exec redis redis-cli -a "$REDIS_PASSWORD" --no-auth-warning DBSIZE
+
+
+//♻️♻️♻️ per start AGAIN FROM GROUND cancel ALL datas re-building everything from 00
+docker buildx prune -af 
+docker image prune -af 
+set -a; source .env; set +a
+echo "DATA_ROOT=$DATA_ROOT"    //deve return  /srv/data/dev/rag-system
+//svuota i dati applicativi (non elimina i 3 LLM models che hai gia scaricato), se vuoi fare anche quelli aggiungi 'fastembed-cache'
+for d in sqlserver qdrant redis uploads; do
+  docker run --rm -v "$DATA_ROOT/$d:/data" busybox sh -c "rm -rf /data/* /data/.[!.]*"
+  chmod 777 "$DATA_ROOT/$d"
+done
+//verifica che siano vuote
+for d in sqlserver qdrant redis uploads; do
+  echo "=== $d ==="; ls -la "$DATA_ROOT/$d"
+done
+
+//!!ricorda che il codice è in /srv/environments/dev/rag-system (dove fai cd e lanci i comandi), invece $DATA_ROOT è /srv/data/dev/rag-system (i dati persistiti, i bind mount) SONO 2 PATHS diversi!
+ora fai tutti i 'docker build ...' (fallo 1 alla volta!!)
+
+//check che non hai nessun dato vecchio
+//SQL: solo demo-corp, nessun tenant di test
+set -a; source .env; set +a
+docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P "$SQLSERVER_PASSWORD" -C \
+  -Q "USE RAGChat; SELECT slug FROM shared.tenants; SELECT name FROM sys.schemas WHERE name LIKE 'tenant_%';"
+//Qdrant: nessuna collection
+curl -s http://localhost:6333/collections | python3 -m json.tool
+//Redis: vuoto
+docker compose exec redis redis-cli -a "$REDIS_PASSWORD" --no-auth-warning DBSIZE
+
+
+🗄🗄🗄 connect sqlserver to Microsoft SQL Server Manager:
+open new cmd (anche se ne haigia aperti!) e fare ssh -L 14330:127.0.0.1:1433 deploy@192.168.113.52  (psw 12345678)
+127.0.0.1,14330 
+Authenticazione di SQL Server
+SA
+serv95psw!
+check Trust Server Certificate
+//fai un po di tentativi x connetterti
+
+
+##### se vuoi i 3 models AI su server esterno strong, COME STORAGE (e gireranno cmnq su server weak!!)
 
 //sul server strong
 sudo apt install python3.11 python3.11-venv python3-pip    //stessa versione che utilizzo anche io, cosi stesso python tra le 2 machines 
@@ -1227,14 +1284,17 @@ e nel docker-compose
 volumes:
   - /mnt/fastembed-cache:/cache/fastembed
 
-#####
-
-
 
 ###tips
+
 //le libs presenti in e.g.requirements.txt finiscono nella img al momento della build del dockercompose.
 docker compose down   //🔥 abbatte tutto cio che è stato creato (containers/networks, ovviamente no i volumes persistenti) da dockercompose presente in THIS PATH (non cancella e.g container forgejo se non sei here nel suo path)
-docker buildx prune -af   //🔥FREE SPACE usa Buildx (usa il moderno BuildKit, oggi si fa cosi), cancella layers (magari obsoleti) creati dal docker build (xk se ne fai tanti puo corrompersi) build cache, network inutilizzati, imgs inutilizzate,ect
+docker buildx prune -af   //🗑FREE SPACE delete build cache usando Buildx (moderno)
+docker image prune -af    //🗑FREE SPACE delete imgs inutilizzate
+docker system prune -af   //🗑🗑 fa tutto, opzionale ai 2 🗑 qua sopra
+docker system df   //check space free now
+df -h /
+docker compose build --no-cache   //🔥🔥🔥--no-cache ignora possibili rimanenze di cache, quindi riparte ricostrundo DAVVERO tutto
 sudo systemctl restart dockern   //riavvia il Docker daemon
 docker compose ls    //vedi tutti i dockercompose sul server
 docker compose up -d --build   //rebuild le imgs then run
@@ -1277,13 +1337,13 @@ e.g. fix(redis): fix connection leak
 -nella Realase e.g.v1.0.0 (proprio come fanno in enterprise) avere  Tag Git (v1.0.0), Release Notes(elenca novità, bug fix e breaking changes), Docker Image(artefatto da distribuire in produzione), Binary/Executable(per app desktop, CLI o mobile), Changelog(storico delle modifiche), Migration SQL(aggiornamento dello schema), File di configurazione(.env.example, valori richiesti), Test report(dimostra che la release è stata verificata), SBOM / Security scan (inventario dipendenze e sicurezza).
 
 192.168.113.52
+http://192.168.113.52:8000/docs   //🔥Swagger UI endpoints
 http://192.168.113.52:8000  //fastapi
 http://192.168.113.52:5555  //flower (admin, beaflwer93!, )
 http://192.168.113.52:8080  //chainlit (admin, admin) ma intanto non lo uso piu
 http://192.168.113.52:6333  //qdrant (http://192.168.113.52:6333/dashboard)
 http://192.168.113.52:6379  //redis
 http://192.168.113.52:1433  //sqlserver
-http://192.168.113.52:8000/docs   //🔥Swagger UI endpoints
 
 
 all ur containers (assicurati sempre che siano tutti HEALTHY(se no edit test of target service in dockercompose))
@@ -1298,14 +1358,9 @@ docker ps
  ✔ Container rag-system-dev-celery-beat-1           Running                                                                                             0.0s
  ✔ Container rag-system-dev-chainlit-1              Started   
 
-now open Microsoft SQL Server Manager:
-open new cmd (anche se ne haigia aperti!) e fare ssh -L 14330:127.0.0.1:1433 deploy@192.168.113.52  (psw 12345678)
-127.0.0.1,14330 
-Authenticazione di SQL Server
-SA
-serv95psw!
-check Trust Server Certificate
-//fai un po di tentativi x connetterti
+
+
+
 
 //👎👎CREATE user x chainlit login (ma error now, better usarlo con tutto creato) NON LO USO PIU CHAINLIT!!
 - docker compose exec fastapi python -c "

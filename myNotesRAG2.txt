@@ -25,10 +25,12 @@ docker logs --tail 300 rag-system-dev-sqlserver-1
 docker logs --tail 300 rag-system-dev-fastapi-1
 docker logs --tail 300 rag-system-dev-redis-1
 docker logs --tail 300 rag-system-dev-qdrant-1
+docker logs --tail 300 redis   
 
 docker logs --tail 300 rag-system-dev-celery-worker-default-1  //ok, è quella normale utilizzata
 docker logs --tail 300 rag-system-dev-celery-worker-high-1
 docker logs --tail 300 rag-system-dev-celery-beat-1
+docker logs --tail 300 rag-system-dev-redis-beat-1
 
 docker logs --tail 50 rag-system-dev-fastapi-1   //deve dire tutto ok all connected
 docker logs --tail 50 rag-system-dev-sqlserver-1   //deve dire tutto ok
@@ -127,7 +129,7 @@ avx
 avx2
 fma
 
-Ciao mauro, 
+mauro, 
 la mia attuale cpu (QEMU Virtual CPU version 2.5+) non regge dei comandi di delle librerie (AI) che sto utilizzando.
 puoi abilitare il passthrough della CPU / il modello di CPU dell'host per il mio VPS KVM. 
 Ho bisogno che i flag AVX e AVX2 della CPU siano disponibili all'interno della VM.
@@ -161,18 +163,19 @@ demo-corp
 $2b$12$SBT65yjDI0Z4fniKLfaYKe/W3I.dU1UiELRk01anItj6s9hxlWlBe    //psw_hash
 
 //created by me
-user22@gmail.com
-user2 newton
+user22adm@gmail.com
+user2adm newton
 psw829!psw829!
-role: user
-tenant-slug: ufficioxxxx
-e gli ho creato una nuova collection, collection_id   1E27F3A0-BD9E-4E31-BF34-EB2E7290CD27
+role: admin
+tenant-slug: spacebb
+e gli ho creato una nuova collection, collection_id   
+
 
 //non ancora creato
-user33@gmail.com
-user3 einstain
-psw811!psw811!
-role: admin //vedere che cosa fa da admin
+  "email": "user33user@gmail.com",
+  "full_name": "user33user newton",
+  "password": "psw829!psw800!",
+  "role": "user"
 
 
 docker compose up -d sqlserver
@@ -202,20 +205,30 @@ docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -
 
 //X ADMIN
 {
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5RDc4NDMzRS1GMzZCLTE0MTAtODJCRi0wMDcwQzRBNzZCOTkiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg1OTMwNjQxLCJpYXQiOjE3ODU5MjcwNDF9.RHGoPXMb4xQ8A4OVDFo1Dr1cZSnM8hX8yHftwppcaRY",
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJCQTIzNDMzRS1GMzZCLTE0MTAtODA5Ny0wMDAzNjhBQjA3RkMiLCJlbWFpbCI6ImFkbWluQHBsYXRmb3JtLmNvbXBldGVzcmwuaXQiLCJpc19wbGF0Zm9ybSI6dHJ1ZSwiZXhwIjoxNzg2MDIzOTI2LCJpYXQiOjE3ODYwMjAzMjZ9.ZqOtOQALz4d8uDkotvgsLoovQAkmFmnYus2fvtXwVGA",
   "token_type": "bearer",
   "expires_in": 3600,
-  "platform_user_id": "9D78433E-F36B-1410-82BF-0070C4A76B99",
+  "platform_user_id": "BA23433E-F36B-1410-8097-000368AB07FC",
   "email": "admin@platform.competesrl.it"
 }
 //X MOVE WITHIN TENANT-SCOPE
 {
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzMzk2MUUwMS1BMzRBLTRGOUEtQUQ2Ri1CQTA3RjE4REEwNjQiLCJlbWFpbCI6InVzZXIyMkBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsInRlbmFudF9pZCI6IjgyRUM0MjNFLUYzNkItMTQxMC04MkNDLTAwNzBDNEE3NkI5OSIsInRlbmFudF9zbHVnIjoidWZmaWNpb3h4eHgiLCJleHAiOjE3ODU5Mzg2ODQsImlhdCI6MTc4NTkzNTA4NH0.Pyz6k7MhQjZs8vyh4rHBRfi8TBI4K00XlUM4UOSp2v0",
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJFOTgwNzExRS00N0I0LTRFNjUtOUNCMS0wMjM0MjdFMzZDM0MiLCJlbWFpbCI6InVzZXIyMmFkbUBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJ0ZW5hbnRfaWQiOiJDNTIzNDMzRS1GMzZCLTE0MTAtODA5Ny0wMDAzNjhBQjA3RkMiLCJ0ZW5hbnRfc2x1ZyI6InNwYWNlYmIiLCJleHAiOjE3ODYwMzA2NjcsImlhdCI6MTc4NjAyNzA2N30.t1AjmWNZD0lxDxfu7w9ZnJh9RZBEF_7Nh1ANOWx2Sek",
   "token_type": "bearer",
   "expires_in": 3600,
-  "user_id": "33961E01-A34A-4F9A-AD6F-BA07F18DA064",
-  "user_role": "user",
-  "tenant_slug": "ufficioxxxx"
+  "user_id": "E980711E-47B4-4E65-9CB1-023427E36C3C",
+  "user_role": "admin",
+  "tenant_slug": "spacebb"
+}
+
+//creazione new space
+{
+  "id": "C523433E-F36B-1410-8097-000368AB07FC",
+  "slug": "spacebb",
+  "display_name": "spaceBB",
+  "plan": "starter",
+  "is_active": true,
+  "created_at": "2026-08-06T13:07:50.293000"
 }
 
 //creato nuovo user nello space target ,ora testo api/v1/auth/login
