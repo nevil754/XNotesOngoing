@@ -68,8 +68,8 @@ sudo -i  //diventa utente root (se chiede psw la psw è la stessa cioe Suit-Forc
 su - deploy  //☄️diventi utente 'deploy'(password 12345678)(xk per usare Forgejo puoi solo come utente 'deploy'!!)
 cd /srv/environments/dev/rag-system
 http://192.168.113.52:3000   //open Forgejo(è come GitLab cioe self-hosted ma moolto piu leggero)
-nelvison.benedetto, Utod83win!!
-forgejo-admin, Suap45skh!, nelvison.benedetto2@gmail.com
+nelvison.benedetto, Utod83win!!    //questo va utilizzato giornalmente
+forgejo-admin, Suap45skh!, nelvison.benedetto2@gmail.com   //questo va utilizzato solo x creare le repos ect lavoro da admin
 http://192.168.113.52:19999   //Netdata x vedere ram & disk in tempo reale anche x i containers
 
 ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untente docker in /home/docker
@@ -575,7 +575,8 @@ accounts .git (di forgejo) legati ad ogni environment (puoi anche NON farlo subi
 
 i 3 ambienti (develop,testing,production) sono asettici l'uno dall'altro a livello di filesystem (se non possono essere in db separati, allora configura che siano in folders con permessi ect che siano al massimo isolati), di rete docker (network isolati), e db/volumi separati ovviamente.
 
-//forgejo-admin: da usare solo x amministrare forgejo (creare repos, creare organizations, gestire runne, gestire users, config forgejo), non per lavorare giornalmente!
+
+//🔥forgejo-admin: da usare solo x amministrare forgejo (creare repos, creare organizations, gestire runne, gestire users, config forgejo), non per lavorare giornalmente!
 //per un team enorme usano GitFlow
 -crea organization: here in questa organization (e.g."RAGsystem") conterra tutti i prjs, gestione utenti e permessi condivisa (solitamente un'organization è per azienda).
 -creati un account git personale: questo è quello tuo con cui farai i commit push ect. x convenzione nome.cognome .
@@ -628,6 +629,7 @@ Release v1.2.0
   `develop` → deploy in /srv/environments/dev
   `staging` → deploy in /srv/environments/staging
   `main`    → deploy in /srv/environments/prod
+//🔥🔥all'inzio quando hai caricato tutto il code su forgejo, poi vai sul server in questi 3 folders e incolli tutto il code, e poi semplicemente in /dev utilizzi solo il branch 'developer', in /prod utilizzi solo il branch main, ect.
 
 -naming dei branches
 feature/rag-hybrid-search       # nuova funzionalità
@@ -683,10 +685,16 @@ psw: Utod83win!!
 //questo è l'account che userai quotidianamente
 a questa poi aggiungerai la ssh key: nelvisonb-dev-laptop30
 
+
 --explore>organizations>competesrl>teams:owners>add team member> search and find target accout to add (nelvison.benedetto)
---organization>repositories>🔥new repository: 
-name: rag-system (CONSIGLIATO NOMENCLATURA SEMPRE in minuscolo e con - per gli spazi), make repository private: check, default branch: main, initialize repo: gitignore python, license:.., advanced options labels: advanced(Kind/Bug,Kind/Feature,...), NON spuntare 'make this repo a template' xk attualemente il tuo rag system non è ancora ultimato final finito ma ancora in fase di evoluzione.
-SE HAI PERO UN PRJ IN LOCALE CODE creato, allora...
+--organization>repositories>🔥🔥NEW REPOSITORY🔥🔥: 
+name: rag-system (CONSIGLIATO NOMENCLATURA SEMPRE in minuscolo e con - per gli spazi), make repository private: check, default branch: main, ❌initialize repo: gitignore python, license:.., advanced options labels: advanced(Kind/Bug,Kind/Feature,...), NON spuntare 'make this repo a template' xk attualmente il tuo rag system non è ancora ultimato final finito ma ancora in fase di evoluzione.
+SE HAI PERO UN PRJ IN LOCALE CODE (w no git) gia creato, allora non inizializzare gia la repo su forgejo con files .gitignore/license/ect (li aggiungi a mano gia nel code, intanto esistono gia i templates online), E POI COLLEGA tramite ssh (git remote add origin ssh://...).
+poi git add ., git commit -m"first commit", git push -u origin main (COSI X I SUCCESSIVI push fai solo 'git push', -u setta l'upstream quindi crei puntatore e git si ricorda a quale branch remoto pushare).
+poi  git checkout -b develop  (-b crei new branch in locale) , poi  git push -u origin develop  (colleghi con upstream, e verra creato cosi il branch su forgejo)
+poi git checkout -b release/1.0.0  , poi  git push -u origin release/1.0.0  //questa è una ReleaseTemp(la prima che fai), cioe viene eliminata (non la prima che fai) poi quando hai finito i tests (cmnq questa poi verra caricata sul server in  /srv/environments/staging/rag-system)
+//ora hai i 3 branch in locale linkati ai 3 in remoto, ora devi solo upload il code sul server nei 3 folders /srv/environments/dev/rag-system, /srv/environments/prod/rag-system,  /srv/environments/staging/rag-system. 
+
 
 🔥-set branch protection rules
 target repo>settings>branches>branch protection rules: 
@@ -695,7 +703,7 @@ target repo>settings>branches>branch protection rules:
 --unprotected file patterns separated using semicolon ; : lascia blank
 --push: disable push (cosi nessuno puo pushare su direttamente su main, nemmeno te)
 --require signed commits: lascia blank
---required approvals: 1 (almeno 1 review obbligatoria prima del merge)
+--required approvals: 1 (almeno 1 review obbligatoria prima del merge) //PERO SE SEI SOLO TU CHE USI LA REPO, PUOI SETTARE A 0 cosi velocizzi il process
 --restrict approvals to whitelisted users or teams: uncheck (per ora ok, poi in enterprise puoi restrict solo a certi teams)
 
 --dismiss stale approvals: check (se qualcuno approva una PR e poi cambi codice, l'approvazione vecchia viene annullata, cio evita ok vecchi su codice nuovo)
@@ -998,7 +1006,7 @@ Hide automatically generated Archives: uncheck (forgejo crea automaticamente Sou
 //⚠️errori sempre da evitare: NON creare tag da branch 'develop', NON fare release da feature/xxx branch, NON modificare codice dopo tag (🔥MAI!)
 
 
-⭐️⭐️⭐️SET THE FIRST TIME THE CODE IN THE ENVS ON THE SERVER
+⭐️⭐️⭐️⭐️⭐️SET THE FIRST TIME THE CODE IN THE ENVS ON THE SERVER
 cd /srv/environments/dev    //sul server
 mkdir testtt-repooo   //🔥🔥CREA FOLDER X IL TUO PRJ!!
 cd testtt-repooo
