@@ -694,6 +694,8 @@ poi git add ., git commit -m"first commit", git push -u origin main (COSI X I SU
 poi  git checkout -b develop  (-b crei new branch in locale) , poi  git push -u origin develop  (colleghi con upstream, e verra creato cosi il branch su forgejo)
 poi git checkout -b release/1.0.0  , poi  git push -u origin release/1.0.0  //questa è una ReleaseTemp(la prima che fai), cioe viene eliminata (non la prima che fai) poi quando hai finito i tests (cmnq questa poi verra caricata sul server in  /srv/environments/staging/rag-system)
 //ora hai i 3 branch in locale linkati ai 3 in remoto, ora devi solo upload il code sul server nei 3 folders /srv/environments/dev/rag-system, /srv/environments/prod/rag-system,  /srv/environments/staging/rag-system. 
+poi   cp .env.example .env   //crea nuovo file called '.env' che è un clone di .env.example
+nano .env   //entra dentro
 
 
 🔥-set branch protection rules
@@ -1083,7 +1085,7 @@ git status   //check che sia tutto ok allineato
 docker compose up -d
 //quindi ora hai main--tag v2.0.0 -- dockercompose running
 
-!Ora nel code nei 3 envs avrai file .env.example (serve solo x layout no values veri), 🔥ora DEVI ENTRARE IN CIASCUN ENVIRONMENT SUL SERVER ed aggiungi .env file (PER CISCUN ENVIRONMENT)
+🔥🔥!Ora nel code nei 3 envs avrai file .env.example (serve solo x layout no values veri), 🔥ora DEVI ENTRARE IN CIASCUN ENVIRONMENT SUL SERVER ed aggiungi .env file (PER CISCUN ENVIRONMENT)
 cp .env.example .env   //crea nuovo file called '.env' che è un clone di .env.example
 nano .env   //entra dentro
 
@@ -1345,6 +1347,7 @@ e.g. fix(redis): fix connection leak
 -Merge vs Rebase quando usarli: duranto lo sviluppo della feature usa 'rebase'(cosi non crei commit inutili di merge), quando integri una feature allora usa 'merge commit'(perché questo MANTIENE LA HISTORY!! anche fra anni)(non usare 'squash' xk perdi la history).  
 -nella Realase e.g.v1.0.0 (proprio come fanno in enterprise) avere  Tag Git (v1.0.0), Release Notes(elenca novità, bug fix e breaking changes), Docker Image(artefatto da distribuire in produzione), Binary/Executable(per app desktop, CLI o mobile), Changelog(storico delle modifiche), Migration SQL(aggiornamento dello schema), File di configurazione(.env.example, valori richiesti), Test report(dimostra che la release è stata verificata), SBOM / Security scan (inventario dipendenze e sicurezza).
 
+http://192.168.113.52:8090   //frontend
 192.168.113.52
 http://192.168.113.52:8000/docs   //🔥Swagger UI endpoints
 http://192.168.113.52:8000  //fastapi

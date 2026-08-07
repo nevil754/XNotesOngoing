@@ -22,13 +22,13 @@ http://192.168.113.52:8080  //chainlit (admin, admin)
 http://192.168.113.52:6333  //qdrant (http://192.168.113.52:6333/dashboard)
 
 docker logs --tail 300 rag-system-dev-sqlserver-1 
-docker logs --tail 300 rag-system-dev-fastapi-1
+docker logs --tail 200 rag-system-dev-fastapi-1
 docker logs --tail 300 rag-system-dev-redis-1
 docker logs --tail 300 rag-system-dev-qdrant-1
 docker logs --tail 300 redis   
 
-docker logs --tail 300 rag-system-dev-celery-worker-default-1  //ok, è quella normale utilizzata
-docker logs --tail 300 rag-system-dev-celery-worker-high-1
+docker logs --tail 200 rag-system-dev-celery-worker-default-1  //ok, è quella normale utilizzata
+docker logs --tail 200 rag-system-dev-celery-worker-high-1
 docker logs --tail 300 rag-system-dev-celery-beat-1
 docker logs --tail 300 rag-system-dev-redis-beat-1
 
@@ -169,6 +169,10 @@ psw829!psw829!
 role: admin
 tenant-slug: spacebb
 e gli ho creato una nuova collection, collection_id   
+
+user4@gmail.com
+user4
+psw844!psw844!
 
 
 //non ancora creato
