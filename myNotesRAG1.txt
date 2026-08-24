@@ -1049,7 +1049,7 @@ docker compose up -d
 
 //🐞🐞 hotfix/xxx   ← fix urgenti, partono da main. pero dopo che poi l'hai mergiato al main (e cosi ora production non ha errori) allora applica il fix anche a env stagine e developing (altrimenti perderesti il fix alla prossima relase in v2.0.0)
 
-☀️☀️ COME SI USA GIORNALMENTE X GLI ENVS SUL SERVER
+☀️☀️☀️ COME SI USA GIORNALMENTE X GLI ENVS SUL SERVER
 //fase di sviluppo
 cd /srv/environments/dev/testtt-repooo
 git fetch origin   //scarica gli aggiornamenti sul locale, ma non modifica il code locale coma fa invece 'git pull'
@@ -1178,13 +1178,13 @@ docker compose build fastapi    //questo occupa 25%
 docker compose build celery-worker-high   //questo occupa 20%
 docker compose build celery-worker-default
 docker compose build celery-beat
-docker compose build --no-cache chainlit   //bypassa la cache avvelenata TODO IST TRICKY WORKS NOW BUT FIX ASAP
+//docker compose build --no-cache chainlit   //bypassa la cache avvelenata, cmnq non lo utilizzo piu Chainlit!
 //qdrant/qdrant:v1.18.2, redis:7.0-alpine, mher/flower:2.0 nel dockercompose non hanno una sezione build, quindi al massimo in anticipo puoi solo scaricare le imgs 
-docker compose pull qdrant redis flower sqlserver  //scarica imgs docker da online (x questi services non devo buildare nulla in anticipo xk non hanno nulla da buildare), non crea nessun container ne avvia nulla. cmnq anche se non lo fai manualmente succede cmnq quando fai dockercomposeup 
+docker compose pull qdrant redis flower sqlserver   //scarica imgs docker da online (x questi services non devo buildare nulla in anticipo xk non hanno nulla da buildare), non crea nessun container ne avvia nulla. cmnq anche se non lo fai manualmente succede cmnq quando fai dockercomposeup 
 🔥docker compose up -d   //AVVIA!! cmnq avvia tutti i services del docker-compose, rispettando l'ordine
 df -h /   //vedi ora quanto spazio su disk hai (oppure better check on NetData http://192.168.113.52:19999), primaa di al ero al 22% ora sono al 72%
 
-//❗️❗️ docker build celery-worker-high celery-worker-default celery-beat    claude mi ha detto di rifarlo fare anche quando non ho modificato proprio nel docker compose ma qualcosa nel code..
+//❗️❗️docker build celery-worker-high celery-worker-default celery-beat    //ricaricali  anche quando non ho modificato proprio il docker compose ma qualcosa nel code (suggerito da claude, ogni tanto devi proprio rifarli se stai editando il code).
 
 //🤖🤖🤖now CARICA I 3 small MODELLI LLM (vedi celery.Dockerfile) nel volume fastembed-cache, senza dover aspettare di fare la 1request
 docker compose exec fastapi python -c "
@@ -1213,30 +1213,31 @@ docker logs --tail 300 rag-system-dev-redis-1
 set -a; source .env; set +a   //carica le env nel file .env nella shell terminal corrente
 docker compose exec redis redis-cli ping  //deve return noauth xk non hai passato la pswredis
 docker compose exec redis redis-cli -a "$REDIS_PASSWORD" ping  //dovrebbe dare ok PONG
-docker compose exec redis redis-cli -a "$REDIS_PASSWORD" DBSIZE   //dovrebbe return 0 (cioe le keys redis salvate)  / solo le chiavi scritte dopo il riavvio 
-docker compose exec redis redis-cli -a "$REDIS_PASSWORD" CONFIG GET appendonly   //dovrebbe return appendonly -> yes
+docker compose exec redis redis-cli -a "$REDIS_PASSWORD" DBSIZE   //dovrebbe return 0 (cioe il num di keys redis salvate, oppure 8 xk sono le keys create e.g.da Celery)  / solo le chiavi scritte dopo il riavvio 
+docker compose exec redis redis-cli -a "$REDIS_PASSWORD" --scan   //vedi cosa sono quelle keys(se il comando prima non ti ha return 0)
+docker compose exec redis redis-cli -a "$REDIS_PASSWORD" CONFIG GET appendonly   //dovrebbe return appendonly -> yes, QUINDI AOF attivo! cmnq ora io l'ho disabilitato nel docker.compose.override.yaml
 //se vuoi svuotare ram x il tuo redis (attention, perdi le keys redis create durante l'utilizzo della tua app!!)
 docker compose exec redis redis-cli -a "$REDIS_PASSWORD" --no-auth-warning FLUSHALL
 docker compose exec redis redis-cli -a "$REDIS_PASSWORD" --no-auth-warning DBSIZE
 
 
-//♻️♻️♻️ per start AGAIN FROM GROUND cancel ALL datas re-building everything from 00
+//!!♻️♻️♻️ per start AGAIN FROM GROUND cancel ALL datas re-building everything from 00
 docker buildx prune -af 
 docker image prune -af 
 set -a; source .env; set +a
 echo "DATA_ROOT=$DATA_ROOT"    //deve return  /srv/data/dev/rag-system
 //svuota i dati applicativi (non elimina i 3 LLM models che hai gia scaricato), se vuoi fare anche quelli aggiungi 'fastembed-cache'
-for d in sqlserver qdrant redis uploads; do
+for d in sqlserver qdrant redis uploads chainlit; do
   docker run --rm -v "$DATA_ROOT/$d:/data" busybox sh -c "rm -rf /data/* /data/.[!.]*"
   chmod 777 "$DATA_ROOT/$d"
 done
 //verifica che siano vuote
-for d in sqlserver qdrant redis uploads; do
+for d in sqlserver qdrant redis uploads chainlit; do
   echo "=== $d ==="; ls -la "$DATA_ROOT/$d"
 done
 
 //!!ricorda che il codice è in /srv/environments/dev/rag-system (dove fai cd e lanci i comandi), invece $DATA_ROOT è /srv/data/dev/rag-system (i dati persistiti, i bind mount) SONO 2 PATHS diversi!
-ora fai tutti i 'docker build ...' (fallo 1 alla volta!!)
+ora fai tutti i 'docker build ...' (fallo 1 ALLA VOLTA parti con fastapi..!!)
 
 //check che non hai nessun dato vecchio
 //SQL: solo demo-corp, nessun tenant di test
@@ -1347,7 +1348,7 @@ e.g. fix(redis): fix connection leak
 -Merge vs Rebase quando usarli: duranto lo sviluppo della feature usa 'rebase'(cosi non crei commit inutili di merge), quando integri una feature allora usa 'merge commit'(perché questo MANTIENE LA HISTORY!! anche fra anni)(non usare 'squash' xk perdi la history).  
 -nella Realase e.g.v1.0.0 (proprio come fanno in enterprise) avere  Tag Git (v1.0.0), Release Notes(elenca novità, bug fix e breaking changes), Docker Image(artefatto da distribuire in produzione), Binary/Executable(per app desktop, CLI o mobile), Changelog(storico delle modifiche), Migration SQL(aggiornamento dello schema), File di configurazione(.env.example, valori richiesti), Test report(dimostra che la release è stata verificata), SBOM / Security scan (inventario dipendenze e sicurezza).
 
-http://192.168.113.52:8090   //frontend
+http://192.168.113.52:8090   //my frontend
 192.168.113.52
 http://192.168.113.52:8000/docs   //🔥Swagger UI endpoints
 http://192.168.113.52:8000  //fastapi
