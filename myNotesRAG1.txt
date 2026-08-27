@@ -937,6 +937,7 @@ git push   //prende tutti i commit locali su 'develop' e li manda al remoto orig
 🔥 target repo>settings>branches>default branch: 'develop'>update  perché d'ora in poi le features/xxx devono generarsi a partire da branch 'develop'!!(branch 'main' rimane x la production)
 ADD NEW FEATURE feature/xxx AL CODE
 
+
 📃📃📃📃📃---x infos
 QUANDO FAI 'git push' SE IL BRANCH è STATO CREATO with '-u ..' ALLORA TOPTOP XK COSI è GIA LEGATO e git push pusha 100% in destinatione corretta!!
 git log -1   //🔥VEDI LAST COMMIT(snapshot img of the code)(e anche sua date) IN LOCALE
@@ -1185,6 +1186,9 @@ docker compose pull qdrant redis flower sqlserver   //scarica imgs docker da onl
 df -h /   //vedi ora quanto spazio su disk hai (oppure better check on NetData http://192.168.113.52:19999), primaa di al ero al 22% ora sono al 72%
 
 //❗️❗️docker build celery-worker-high celery-worker-default celery-beat    //ricaricali  anche quando non ho modificato proprio il docker compose ma qualcosa nel code (suggerito da claude, ogni tanto devi proprio rifarli se stai editando il code).
+//!le view Razor (.cshtml) vengono create nell'assembly durante la build, quindi per aggiornarle devi ricreare il container.
+
+docker inspect rag-system-dev-ragsystem-frontend-1 --format '{{ index .Config.Labels "com.docker.compose.project.working_dir" }}'  //scopri il path filesystem del dockercompose che runna il container 'rag-system-frontend'
 
 //🤖🤖🤖now CARICA I 3 small MODELLI LLM (vedi celery.Dockerfile) nel volume fastembed-cache, senza dover aspettare di fare la 1request
 docker compose exec fastapi python -c "
@@ -1227,17 +1231,17 @@ docker image prune -af
 set -a; source .env; set +a
 echo "DATA_ROOT=$DATA_ROOT"    //deve return  /srv/data/dev/rag-system
 //svuota i dati applicativi (non elimina i 3 LLM models che hai gia scaricato), se vuoi fare anche quelli aggiungi 'fastembed-cache'
-for d in sqlserver qdrant redis uploads chainlit; do
+for d in sqlserver qdrant redis uploads; do
   docker run --rm -v "$DATA_ROOT/$d:/data" busybox sh -c "rm -rf /data/* /data/.[!.]*"
   chmod 777 "$DATA_ROOT/$d"
 done
 //verifica che siano vuote
-for d in sqlserver qdrant redis uploads chainlit; do
+for d in sqlserver qdrant redis uploads ; do
   echo "=== $d ==="; ls -la "$DATA_ROOT/$d"
 done
 
 //!!ricorda che il codice è in /srv/environments/dev/rag-system (dove fai cd e lanci i comandi), invece $DATA_ROOT è /srv/data/dev/rag-system (i dati persistiti, i bind mount) SONO 2 PATHS diversi!
-ora fai tutti i 'docker build ...' (fallo 1 ALLA VOLTA parti con fastapi..!!)
+ora fai TUTTI i 'docker build ...' (fallo 1 ALLA VOLTA parti con fastapi..!!)
 
 //check che non hai nessun dato vecchio
 //SQL: solo demo-corp, nessun tenant di test
@@ -1250,7 +1254,7 @@ curl -s http://localhost:6333/collections | python3 -m json.tool
 docker compose exec redis redis-cli -a "$REDIS_PASSWORD" --no-auth-warning DBSIZE
 
 
-🗄🗄🗄 connect sqlserver to Microsoft SQL Server Manager:
+🗄🗄🗄 you connect container sqlserver to Microsoft SQL Server Manager (so you can write the queries):
 open new cmd (anche se ne haigia aperti!) e fare  ssh -L 14330:127.0.0.1:1433 deploy@192.168.113.52  (psw 12345678)
 127.0.0.1,14330 
 Authenticazione di SQL Server

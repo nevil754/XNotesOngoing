@@ -154,7 +154,8 @@ e poi facendolo crea solo sul db la nuova row, mica crea una nuova collection su
 - guardare dove salva i files fisici, soprattuto come dove il folder parent viene creato
 
 
-
+docker compose build ragsystem-frontend
+docker compose up -d
 
 //default user created by init.sql
 admin@platform.competesrl.it
