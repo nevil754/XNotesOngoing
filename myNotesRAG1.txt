@@ -1193,21 +1193,27 @@ docker inspect rag-system-dev-ragsystem-frontend-1 --format '{{ index .Config.La
 //🤖🤖🤖now CARICA I 3 small MODELLI LLM (vedi celery.Dockerfile) nel volume fastembed-cache, senza dover aspettare di fare la 1request
 docker compose exec fastapi python -c "
 from fastembed import TextEmbedding, SparseTextEmbedding
-from fastembed.rerank.cross_encoder import TextCrossEncoder
+from sentence_transformers import CrossEncoder  #!better than from fastembed.rerank.cross_encoder import CrossEncoder  che utilizza invece fastembed
 TextEmbedding('intfloat/multilingual-e5-large')
 SparseTextEmbedding('prithivida/Splade_PP_en_v1')
-TextCrossEncoder('BAAI/bge-reranker-base')
+CrossEncoder('BAAI/bge-reranker-base')
 print('ok')
 "
 set -a; source .env; set +a
 ls -la "$DATA_ROOT/fastembed-cache"
 du -sh "$DATA_ROOT/fastembed-cache"    //deve mostrare ~2-3 GB!!
-ls "$DATA_ROOT/fastembed-cache"   # vedi le cartelle models--...
+ls "$DATA_ROOT/fastembed-cache"   # vedi le cartelle models--…
+docker compose exec -u root fastapi chown -R 100:101 /cache/fastembed   //!dai i permessi crud x utente container fastapi
+docker compose exec fastapi ls -ld /cache/fastembed/.cache/huggingface/hub   //!dai i permessi crud x utente container fastapi
+//RICORDA CHE nel dockercompos grazie a FASTEMBED_CACHE_PATH:"/cache/fastembed" allora here quando runni TextEmbedding(...)→FastEmbed SparseTextEmbedding(...)→FastEmbed entrambe le libs utilizzano FastEmbed, quindi grazie a FASTEMBED_CACHE_PATH setti esattamente dove verranno scaricate!  INVECE IL 3rzo model from sentence_transformers import CrossEncoder  CrossEncoder(...)→Sentence Transformers/Transformers quindi non passa da fastembed ma utiizza transformers/huggingface_hub, quindi consigliato add env HF_HOME:"/cache/fastembed/.cache/huggingface" COSI HAI ANCHE LA SEZIONE dedicata x queste libs che non utilizzano fastembed e che vogliono(o creano se non c'è) proprio nomenclatura '.cache/huggingface/...', tutto ok dentro ${DATA_ROOT}/fastembed-cache:/cache/fastembed !
+
 rm -rf "$DATA_ROOT/fastembed-cache/models--qdrant--<vecchio-modello>"  //cancelli un model target vecchio che non utilizzi piu
 E A FINE ALL BUILDS (non tra una piccola builds e l'altra altrimenti cancelli anche datas condivisi) X CLEAN ALL INUTILIZED:
 docker builder prune -af   //🔥 FREE SPACE delete GBs of layers inutilized
 docker image prune -af   //🔥 FREE SPACE delete imgs inutilized
 df -h /     //see free space
+//docker compose exec fastapi ls -la /cache/fastembed/.cache/huggingface/hub/models--BAAI--bge-reranker-base  //check se il container ha i permessi x utilizzare quel model
+//echo "DATA_ROOT=$DATA_ROOT"  //check dove è il data_root
 
 
 //🦊🦊su Redis container l'AOF (Append Only File, funzionalita redis x rendere PERSISTENTI i dati su disco) in Production, la prima volta che avvii l'app deve essere vuoto!
