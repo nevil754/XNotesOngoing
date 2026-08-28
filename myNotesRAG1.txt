@@ -1194,11 +1194,12 @@ docker inspect rag-system-dev-ragsystem-frontend-1 --format '{{ index .Config.La
 docker compose exec fastapi python -c "
 from fastembed import TextEmbedding, SparseTextEmbedding
 from sentence_transformers import CrossEncoder  #!better than from fastembed.rerank.cross_encoder import CrossEncoder  che utilizza invece fastembed
-TextEmbedding('intfloat/multilingual-e5-large')
-SparseTextEmbedding('prithivida/Splade_PP_en_v1')
-CrossEncoder('BAAI/bge-reranker-base')
+TextEmbedding('intfloat/multilingual-e5-large')  #ottimo x documenti/query in piu lingue (compreso l'italiano)
+SparseTextEmbedding('prithivida/Splade_PP_en_v1')   #ottimo x inglese xk ha '_en_', menu quindi su altre lingue
+CrossEncoder('BAAI/bge-reranker-base')   #nì, attualmente è un po vecchio. 
 print('ok')
 "
+//cmnq oggi meglio  SparseTextEmbedding('Qdrant/bm25') al posto di prithivida/Splade_PP_en_v1 e CrossEncoder('BAAI/bge-reranker-v2-m3') al posto di BAAI/bge-reranker-base.
 set -a; source .env; set +a
 ls -la "$DATA_ROOT/fastembed-cache"
 du -sh "$DATA_ROOT/fastembed-cache"    //deve mostrare ~2-3 GB!!
@@ -1270,7 +1271,7 @@ check Trust Server Certificate
 //fai un po di tentativi x connetterti
 
 
-##### se vuoi i 3 models AI su server esterno strong, COME STORAGE (e gireranno cmnq su server weak!!)
+##### se vuoi i 3 models AI su server esterno strong, COME STORAGE (e gireranno cmnq su server weak in ram!!)
 
 //sul server strong
 sudo apt install python3.11 python3.11-venv python3-pip    //stessa versione che utilizzo anche io, cosi stesso python tra le 2 machines 

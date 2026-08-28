@@ -163,6 +163,12 @@ Admin123456!
 demo-corp
 $2b$12$SBT65yjDI0Z4fniKLfaYKe/W3I.dU1UiELRk01anItj6s9hxlWlBe    //psw_hash
 
+space1
+filiale-8upp
+123456789111@gmail.com
+123456789111
+
+
 //created by me
 user22adm@gmail.com
 user2adm newton
