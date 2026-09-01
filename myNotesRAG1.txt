@@ -20,6 +20,7 @@ task: CF_2026_0259 - PROGETTO CON SFEL Sviluppo
 text: Inizio test caricamento e settaggio Server per ospitare & runnare il RAG system.
 
 CODE VERRA CARICATO REALMENTE SU 'Azure DevOps Services | Sign In'(see link in mexs w mauro)(here magari dovra essere replicata infrastruttura a environments come ho gia fatto in /srv/)
+https://dev.azure.com/compet-e/_git/RAG-System    //repo(backend) su azure devops
 
 #######################################
 
@@ -1006,7 +1007,7 @@ Mark as pre-release: se questa relase x testing (quindi e.g. si chiama 'v1.0.0-b
 Hide automatically generated Archives: uncheck (forgejo crea automaticamente Source code (zip) e Source code (tar.gz) x chi vuole scaricare il codice della release)
 > create release.  //ricardati usa sempre standart nomenclatura vMAJOR.MINOR.PATCH
 //ora grazie alla Release puoi scaricarla tramite .zip e contiene tutto il code
-//⚠️errori sempre da evitare: NON creare tag da branch 'develop', NON fare release da feature/xxx branch, NON modificare codice dopo tag (🔥MAI!)
+//⚠️errori sempre da evitare: NON creare tag da branch 'develop'⚠️, NON fare release da feature/xxx branch, NON modificare codice dopo tag (🔥MAI!)
 
 
 ⭐️⭐️⭐️⭐️⭐️SET THE FIRST TIME THE CODE IN THE ENVS ON THE SERVER
@@ -1173,8 +1174,21 @@ cd /srv/projects/prod/rag-system
 docker compose up -d   //or  docker compose up -d --build
 //this env no dockercomposeoverride, docker leggera dockercompose+envfile di questo folder
 
+🐳🖥🖥 HOW RUN ONLY CONTAINERS AI ON SERVER GPU
+
+
+
+
+
 //🧱🧱🧱🔥🔥⚠️BUILDA ALWAYS ONLY 1 COMPONENT ALLA VOLTA, XK THIS PRJ IS VERY VERY BIG! (se spuntano bugs vedi dove sono, e non finisci lo spazio su disk)
 //utilizza ...build --no-cache  x ignorare possibile cache rimanente, e ricostruisce davvero da 0
+abilita i permessi di scrittura x service container sqlserver:
+entra come utente linux ùche puo creare nuovi folders (e.g. user 'docker')
+docker compose run --rm -u root --entrypoint "id mssql" sqlserver  //verifica l'UID:GID reale usato dall'utente mssql dentro l'immagine (solitamente è 10001:0) 
+sudo chown -R 10001:10001 /srv/data/staging/rag-system/sqlserver  //10001:10001 sostituiscilo con il vero uid:gid ottenuto prima
+sudo mkdir -p /srv/data/staging/rag-system/sqlserver   //cre folder
+sudo chown -R 10001:10001 /srv/data/staging/rag-system/sqlserver   //apply permessi
+
 docker compose build fastapi    //questo occupa 25%
 docker compose build celery-worker-high   //questo occupa 20%
 docker compose build celery-worker-default
@@ -1184,6 +1198,8 @@ docker compose build celery-beat
 docker compose pull qdrant redis flower sqlserver   //scarica imgs docker da online (x questi services non devo buildare nulla in anticipo xk non hanno nulla da buildare), non crea nessun container ne avvia nulla. cmnq anche se non lo fai manualmente succede cmnq quando fai dockercomposeup 
 🔥docker compose up -d   //AVVIA!! cmnq avvia tutti i services del docker-compose, rispettando l'ordine
 df -h /   //vedi ora quanto spazio su disk hai (oppure better check on NetData http://192.168.113.52:19999), primaa di al ero al 22% ora sono al 72%
+docker image ls  //vedi le img che hai buildato, anche quelle che magari non stanno runnando!
+//ricorda che il docker-compose.override.yml lo cancelli in ambiente di produzione, xk serve solo x settare easy certe cose x te developer.
 
 //❗️❗️docker build celery-worker-high celery-worker-default celery-beat    //ricaricali  anche quando non ho modificato proprio il docker compose ma qualcosa nel code (suggerito da claude, ogni tanto devi proprio rifarli se stai editando il code).
 //!le view Razor (.cshtml) vengono create nell'assembly durante la build, quindi per aggiornarle devi ricreare il container.
@@ -1194,9 +1210,9 @@ docker inspect rag-system-dev-ragsystem-frontend-1 --format '{{ index .Config.La
 docker compose exec fastapi python -c "
 from fastembed import TextEmbedding, SparseTextEmbedding
 from sentence_transformers import CrossEncoder  #!better than from fastembed.rerank.cross_encoder import CrossEncoder  che utilizza invece fastembed
-TextEmbedding('intfloat/multilingual-e5-large')  #ottimo x documenti/query in piu lingue (compreso l'italiano)
-SparseTextEmbedding('prithivida/Splade_PP_en_v1')   #ottimo x inglese xk ha '_en_', menu quindi su altre lingue
-CrossEncoder('BAAI/bge-reranker-base')   #nì, attualmente è un po vecchio. 
+TextEmbedding('intfloat/multilingual-e5-large')  #ottimo x documenti/query in piu lingue (compreso l'italiano), vecchio was BAAI/bge-m3
+SparseTextEmbedding('Qdrant/bm25')   #ottimo x inglese xk ha '_en_', menu quindi su altre lingue, old was prithivida/Splade_PP_en_v1  
+CrossEncoder('BAAI/bge-reranker-v2-m3')   #BAAI/bge-reranker-base attualmente è un po vecchio.   
 print('ok')
 "
 //cmnq oggi meglio  SparseTextEmbedding('Qdrant/bm25') al posto di prithivida/Splade_PP_en_v1 e CrossEncoder('BAAI/bge-reranker-v2-m3') al posto di BAAI/bge-reranker-base.
@@ -1204,8 +1220,9 @@ set -a; source .env; set +a
 ls -la "$DATA_ROOT/fastembed-cache"
 du -sh "$DATA_ROOT/fastembed-cache"    //deve mostrare ~2-3 GB!!
 ls "$DATA_ROOT/fastembed-cache"   # vedi le cartelle models--…
-docker compose exec -u root fastapi chown -R 100:101 /cache/fastembed   //!dai i permessi crud x utente container fastapi
-docker compose exec fastapi ls -ld /cache/fastembed/.cache/huggingface/hub   //!dai i permessi crud x utente container fastapi
+
+docker compose exec -u root fastapi chown -R 100:101 /cache/fastembed   //🔥🔥!dai i permessi crud x utente container fastapi
+docker compose exec fastapi ls -ld /cache/fastembed/.cache/huggingface/hub   //🔥🔥!dai i permessi crud x utente container fastapi
 //RICORDA CHE nel dockercompos grazie a FASTEMBED_CACHE_PATH:"/cache/fastembed" allora here quando runni TextEmbedding(...)→FastEmbed SparseTextEmbedding(...)→FastEmbed entrambe le libs utilizzano FastEmbed, quindi grazie a FASTEMBED_CACHE_PATH setti esattamente dove verranno scaricate!  INVECE IL 3rzo model from sentence_transformers import CrossEncoder  CrossEncoder(...)→Sentence Transformers/Transformers quindi non passa da fastembed ma utiizza transformers/huggingface_hub, quindi consigliato add env HF_HOME:"/cache/fastembed/.cache/huggingface" COSI HAI ANCHE LA SEZIONE dedicata x queste libs che non utilizzano fastembed e che vogliono(o creano se non c'è) proprio nomenclatura '.cache/huggingface/...', tutto ok dentro ${DATA_ROOT}/fastembed-cache:/cache/fastembed !
 
 rm -rf "$DATA_ROOT/fastembed-cache/models--qdrant--<vecchio-modello>"  //cancelli un model target vecchio che non utilizzi piu
@@ -1234,7 +1251,7 @@ docker compose exec redis redis-cli -a "$REDIS_PASSWORD" --no-auth-warning DBSIZ
 
 //!!♻️♻️♻️ per start AGAIN FROM GROUND cancel ALL datas re-building everything from 00
 docker buildx prune -af 
-docker image prune -af 
+docker image prune -af   //ok runnalo pure, non elimina le build che hai costruito ma che magari non stanno runnando
 set -a; source .env; set +a
 echo "DATA_ROOT=$DATA_ROOT"    //deve return  /srv/data/dev/rag-system
 //svuota i dati applicativi (non elimina i 3 LLM models che hai gia scaricato), se vuoi fare anche quelli aggiungi 'fastembed-cache'
@@ -1368,7 +1385,7 @@ http://192.168.113.52:8080  //chainlit (admin, admin) ma intanto non lo uso piu
 http://192.168.113.52:6333  //qdrant (http://192.168.113.52:6333/dashboard)
 http://192.168.113.52:6379  //redis
 http://192.168.113.52:1433  //sqlserver
-
+opena also LangSmith x tracing query LLM.
 
 all ur containers (assicurati sempre che siano tutti HEALTHY(se no edit test of target service in dockercompose))
 docker ps
