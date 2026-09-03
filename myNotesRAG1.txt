@@ -76,9 +76,15 @@ http://192.168.113.52:19999   //Netdata x vedere ram & disk in tempo reale anche
 ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untente docker in /home/docker
 //quando fai comando 'sudo ...' allora dici al system di login come admin 'root' SOLO x questo comando, se fai invece 'sudo -i' diventi proprio admin root finche non logout.
 
+-Server GPU WSL Linux sudo:
+user: administrator
+pwd: Administrat0r*
+Administrat0r*
+e lavoro principalmente su administrator@SRVAI2k22:/mnt/c/Windows/system32$
+
 🔥🔥⚡️👥👥⚡️ QUINDI I TUOI USERS SONO 'root'(x installazione os, recovery, emergenze), 'valterm'(è admin umano, x set server, ect), 'deploy'(robot operativo del system, usato da forgejo all'interno del suo system, questo utente linux esegue i containers fa ci/cd runner eseguire script), 'runner'(x pipeline ci/cd di forgejo runner). 
 the psw '12345678' x users valterm, deploy, runner; psw 'Suit-Force-Card' x root,docker(non lo utilizzo).
-//ricorda che e.g.se sei deploy e vuoi diventare root, devi prima passare da valterm (admin fisico umano)
+//ricorda che e.g. se sei deploy e vuoi diventare root, devi prima passare da valterm (admin fisico umano)
 
 🔥🔥⚡️vscode: dx>Go To Definition (vai in deep),  dx>Find All References (TROVA ALL DOCS CHE USANO THIS TARGET str !!)
 
@@ -143,7 +149,7 @@ systemd-detect-virt   //se return None allora server fisico, se return kvm,xen,o
 lscpu   //x cpu
 free -h  //x ram, SUL SERVER HO 8GB di RAM!! ricorda che gli LLM girano su [srvdocker01]!!
 lsblk    //disks
-nvidia-smi  //se hai gpu nvidia
+nvidia-smi  //🔥🔥se hai gpu nvidia, e vedi anche versione cuda!!
 sudo lshw   //tutto l'hardware
 lspci    //x pci
 lsusb    //x usb
@@ -251,13 +257,64 @@ docker run --rm \
 //wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh   //con wget è piu easy installation rispetto a curl x installation
 
 
-🔥🔥🔥############SERVER SETUP X PRJ RAG SYSTEM from bottom:
+🔥🔥🔥🗄🗄🗄############SERVER SETUP X PRJ RAG SYSTEM from bottom:
+
+### se vuoi versione easy, hai solo user 'root' e 'admin'(umano)
+entra come root user
+sudo usermod -aG docker administrator   //ora i commands docker funzionano anche x user 'administrator'
+
+//entra come utente admin
+sudo mkdir /srv   //sudo xk ovviamente '/' appartiene a root
+sudo chown administrator:administrator /srv
+ls -ld /srv    //dovresti vedere e.g.drwxr-xr-x administrator administrator /srv
+or crea i folders/foles .sh
+
+chmod +x /srv/scripts/*.sh
+chmod +x /srv/backups/scripts/*.sh
+sudo chown -R administrator:administrator /srv
+tree -pug /srv
+sudo chmod 755 /srv
+
+chmod 755 \
+/srv/environments \
+/srv/infrastructure \
+/srv/data \
+/srv/backups \
+/srv/logs \
+/srv/scripts
+
+chmod -R u+rwX,go+rX /srv
+
+e poi scrichi il git dentro ubuntu, e  ssh -T -p 222 git@192.168.113.52 (se sei connesso ok te lo dice),
+altrimenti crea key ssh con ssh-keygen -t ed25519 -C "administrator-SRVAI2k22"   e ottieni
+"Your public key has been saved in /home/administrator/.ssh/id_ed25519.pub
+The key fingerprint is:
+SHA256:s9w85euvPO8jIQtC252S+Zpvo1J8YT0idcTV6Qce6Bw administrator-SRVAI2k22
+The key's randomart image is:
++--[ED25519 256]--+
+|           o.o...|
+|          . E o..|
+|         . = o.o |
+|      . . + = ...|
+|     . +S* +..  .|
+|      o.O==o.    |
+|       oo=+o..   |
+|      .  .=oo..  |
+|       .+=.o=B+. |
++----[SHA256]-----+
+poi fai cat ~/.ssh/id_ed25519.pub  e ottieni
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAO26I0VHsWOIMNz2WertJAid1014M6Q5wJ8dwToxQTQ administrator-SRVAI2k22
+e copi tutto e incolli su forgejo>nelvison.benedetto>settings>ssh key> add (come sempre come nome consigliato e.g.administrator-SRVAI2k22-Server2GPUwslUbuntu). 
+
+###
+
 //gia esistenti 'valterm'(admin principale creato durante installazione ubuntu)
 //'tree mypath' per vedere subito la struttura ad albero!!
 
 sudo -i
 whoami
 tree /home/docker   //questo utente e questo folder in realta anche non serve conteneva i volumes di qdrant ma io intanto uso mia struttura 
+awk -F: '$3 >= 1000 {print $1}' /etc/passwd   //vedi tutti utenti normali (esclusi quelli di sistema di linux)
 
 //🔥crea gli utenti (dovresti gia aver 'valterm' creato durante installazione linux ubuntu, e 'docker' che non utilizzo ma che era creato & settato x usare docker engine (quindi user linux da NON cancellare)
 adduser deploy   //crea user deploy (psw 12345678)
@@ -266,12 +323,12 @@ adduser --disabled-password --gecos "" runner   //crea user runner (psw disabili
   passwd -l runner   //disabilitat psw se utente era gia stato creato w psw
   sudo grep runner /etc/Shadow   //se return 'runner:!$6$...' allora ok psw disabilitata
 
-🔥🔥⚡️👥👥⚡️ QUINDI I TUOI USERS SONO 'root'(x installazione os, recovery, emergenze), 'valterm'(è admin umano, x set server, ect), 'deploy'(robot operativo del system, usato da forgejo all'interno del suo system (cmqn tu fai push utilizzando user 'valterm')), 'runner'(x pipeline ci/cd di forgejo runner). psw '12345678' x valterm, deploy, runner; psw 'Suit-Force-Card' x root,docker(non lo utilizzo).
+🔥👥 QUINDI I TUOI USERS SONO 'root'(x installazione os, recovery, emergenze), 'valterm'(è admin umano, x set server, ect), 'deploy'(robot operativo del system, usato da forgejo all'interno del suo system (cmqn tu fai push utilizzando user 'valterm')), 'runner'(x pipeline ci/cd di forgejo runner). psw '12345678' x valterm, deploy, runner; psw 'Suit-Force-Card' x root,docker(non lo utilizzo).
 
 //ora crea i groups
 getent group  //vedi tutti i grups
 getent group X   //vedi chi c'è dentro X group
-getent group docker   //🔥DONT DELETE è stato creato da DockerEngine e SOLO tutti gli users all'interno possono usare DockerEngine (quindi commands 'docker...')!
+getent group docker   //⚠️🔥DONT DELETE è stato creato da DockerEngine e SOLO tutti gli users all'interno possono usare DockerEngine (quindi commands 'docker...')!
 groupadd srv-deploy
 groupadd srv-read
 
@@ -1174,20 +1231,37 @@ cd /srv/projects/prod/rag-system
 docker compose up -d   //or  docker compose up -d --build
 //this env no dockercomposeoverride, docker leggera dockercompose+envfile di questo folder
 
+
 🐳🖥🖥 HOW RUN ONLY CONTAINERS AI ON SERVER GPU
-
-
+1- sul server che ha la gpu runna 'nvidia-smi' e vedi CUDA Version: XX.Y cioè la versione massima supportata dal driver nvidia installata. quando lo sai puoi scegliere versione corretta cu121/cu124/cu126 ect.
+2- crea file requirements-gpu.in che è un clone di file requirements.in ma in piu/differente ha:
+--extra-index-url https://download.pytorch.org/whl/cu128     # invece di /cpu — cuXXX deciso al punto 2
+torch==2.13.0+cu128                                            # invece di +cpu
+torchvision==0.28.0+cu128                                      # invece di +cpu
+fastembed-gpu==0.8.0     # invece di fastembed==0.8.0 (verificare versione disponibile su PyPI, §1.1) 
+//ovviamente ora che hai 2 requirements.in 1 x cpu e 1 x gpu, se devi aggiornare una lib devi poi aggiornare entrambe le versioni.
+3- su server gpu che pero ha microsoft, entra dentro wls per accedere a Ubuntu linux.
+exit  //🔥esci da wsl (Ubuntu linux) e torni su powershell/cmd originale.
+wsl --shutdown  //da fuori wsl, chiude wsl, consigliato poi rientrare x vedere edits linux applicate.
+wsl  //entra dentro ubuntu linux 
+4- ora che hai il requirements-gpu.in, crea il file requirements-gpu.txt (GENERALO DA WITHIN SERVER2(quello con la gpu)!)
+docker run --rm -v "$(pwd):/w" -w /w python:3.11-slim-bookworm bash -c "
+  pip install pip-tools &&
+  pip-compile requirements-gpu.in --output-file requirements-gpu.txt --resolver=backtracking --no-header --annotate
+"
+5- ora lavora sui dockerfile. 
 
 
 
 //🧱🧱🧱🔥🔥⚠️BUILDA ALWAYS ONLY 1 COMPONENT ALLA VOLTA, XK THIS PRJ IS VERY VERY BIG! (se spuntano bugs vedi dove sono, e non finisci lo spazio su disk)
 //utilizza ...build --no-cache  x ignorare possibile cache rimanente, e ricostruisce davvero da 0
 abilita i permessi di scrittura x service container sqlserver:
-entra come utente linux ùche puo creare nuovi folders (e.g. user 'docker')
+entra come utente linux che puo creare nuovi folders (e.g. user 'docker')
 docker compose run --rm -u root --entrypoint "id mssql" sqlserver  //verifica l'UID:GID reale usato dall'utente mssql dentro l'immagine (solitamente è 10001:0) 
 sudo chown -R 10001:10001 /srv/data/staging/rag-system/sqlserver  //10001:10001 sostituiscilo con il vero uid:gid ottenuto prima
 sudo mkdir -p /srv/data/staging/rag-system/sqlserver   //cre folder
 sudo chown -R 10001:10001 /srv/data/staging/rag-system/sqlserver   //apply permessi
+//🔥ricorda differenza 'docker run...' vs 'docker exec...' è che il run crea un container TEMPORANEO, mentre exec esegue comando dentro il container target.
 
 docker compose build fastapi    //questo occupa 25%
 docker compose build celery-worker-high   //questo occupa 20%
@@ -1376,7 +1450,7 @@ e.g. fix(redis): fix connection leak
 -Merge vs Rebase quando usarli: duranto lo sviluppo della feature usa 'rebase'(cosi non crei commit inutili di merge), quando integri una feature allora usa 'merge commit'(perché questo MANTIENE LA HISTORY!! anche fra anni)(non usare 'squash' xk perdi la history).  
 -nella Realase e.g.v1.0.0 (proprio come fanno in enterprise) avere  Tag Git (v1.0.0), Release Notes(elenca novità, bug fix e breaking changes), Docker Image(artefatto da distribuire in produzione), Binary/Executable(per app desktop, CLI o mobile), Changelog(storico delle modifiche), Migration SQL(aggiornamento dello schema), File di configurazione(.env.example, valori richiesti), Test report(dimostra che la release è stata verificata), SBOM / Security scan (inventario dipendenze e sicurezza).
 
-http://192.168.113.52:8090   //my frontend
+http://192.168.113.52:8090   //my frontend dev, http://192.168.113.52:8091/ x staging, http://192.168.113.52:8092/  x production
 192.168.113.52
 http://192.168.113.52:8000/docs   //🔥Swagger UI endpoints
 http://192.168.113.52:8000  //fastapi
