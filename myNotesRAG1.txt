@@ -1249,8 +1249,18 @@ docker run --rm -v "$(pwd):/w" -w /w python:3.11-slim-bookworm bash -c "
   pip install pip-tools &&
   pip-compile requirements-gpu.in --output-file requirements-gpu.txt --resolver=backtracking --no-header --annotate
 "
-5- ora lavora sui dockerfile. 
-
+5- ora crea i files nuovi fastapi-gpu.Dockerfile e celery-gpu.Dockerfile pensati apposta per ubuntu linux con gpu.
+6- controlla ancora in server2 ubuntu linux, comandi 'nvidia-smi', 'nvidia-ctk' e ' docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi' (dovrebbe mostrare la gpu) dovrebbero esserci entrambi. 
+7- runna su entrambi i servers :  
+🔥docker compose --profile infra up -d --build   //sul server1
+🔥docker compose --profile gpu up -d --build    //sul server2
+8- runna prj su server2, lei logs assicurati che fastembed/torch carichino sul device `cuda` e non su `cpu`.
+9- ultimi checks, 
+docker compose --profile gpu exec fastapi python3.11 -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"  //deve stampare True + il nome della tua GPU.
+docker compose --profile gpu exec fastapi python3.11 -c "import onnxruntime; print(onnxruntime.get_available_providers())"  //deve comparire CUDAExecutionProvider oltre che CPUExecutionProvider
+nvidia-smi  //mentre sta eseguendo una query, devi vedere il processor gpu che usando
+9.2- assicurati davvero che ci sia connessione server1<-->server2 no firewall ect,  curl -v http://172.23.52.150:8001/health
+10- il frontend usa  http://${IP_SERVER2}:8081  //usa ip server2
 
 
 //🧱🧱🧱🔥🔥⚠️BUILDA ALWAYS ONLY 1 COMPONENT ALLA VOLTA, XK THIS PRJ IS VERY VERY BIG! (se spuntano bugs vedi dove sono, e non finisci lo spazio su disk)
