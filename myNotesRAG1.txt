@@ -76,11 +76,13 @@ http://192.168.113.52:19999   //Netdata x vedere ram & disk in tempo reale anche
 ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untente docker in /home/docker
 //quando fai comando 'sudo ...' allora dici al system di login come admin 'root' SOLO x questo comando, se fai invece 'sudo -i' diventi proprio admin root finche non logout.
 
--Server GPU WSL Linux sudo:
+🗄🗄-Server GPU WSL Linux sudo:
+su server2 windows> open powershell tasto dx open as administrator (inserisci credenziali che SOLO mauro conosce)> wsl > e dentro wsl ubuntu linux diventi questo user
 user: administrator
 pwd: Administrat0r*
 Administrat0r*
-e lavoro principalmente su administrator@SRVAI2k22:/mnt/c/Windows/system32$
+e lavoro principalmente su administrator@SRVAI2k22:/mnt/c/Windows/system32$   //che ha wsl Ubuntu installato
+
 
 🔥🔥⚡️👥👥⚡️ QUINDI I TUOI USERS SONO 'root'(x installazione os, recovery, emergenze), 'valterm'(è admin umano, x set server, ect), 'deploy'(robot operativo del system, usato da forgejo all'interno del suo system, questo utente linux esegue i containers fa ci/cd runner eseguire script), 'runner'(x pipeline ci/cd di forgejo runner). 
 the psw '12345678' x users valterm, deploy, runner; psw 'Suit-Force-Card' x root,docker(non lo utilizzo).
@@ -1261,6 +1263,18 @@ docker compose --profile gpu exec fastapi python3.11 -c "import onnxruntime; pri
 nvidia-smi  //mentre sta eseguendo una query, devi vedere il processor gpu che usando
 9.2- assicurati davvero che ci sia connessione server1<-->server2 no firewall ect,  curl -v http://172.23.52.150:8001/health
 10- il frontend usa  http://${IP_SERVER2}:8081  //usa ip server2
+
+netsh interface portproxy add v4tov4 listenport=8001 listenaddress=0.0.0.0 connectport=8001 connectaddress=172.22.120.157  //🔥🔥su windows powershell, x my container fastapi, mappa porta linux ubuntu -> porta windows
+//fai la stessa cosa per gli altri my containers (ovviamente solo quelli che girano su gpu)
+
+curl -v http://192.168.113.40:8001/health
+ping 192.168.113.52  //linux, vedi se risci a raggiungere machine target
+hostname -I   //linux, vedi ip di this machine
+ipconfig  //windows powershell, vedi in Ipv4 Address l'ip di this machine
+http://192.168.113.40:8001/health   //è il curl -v http://192.168.113.40:8001/health   //prova ad agganciarti al container target
+
+IP_SERVER1 = 192.168.113.52
+IP_SERVER2 = 172.22.120.157
 
 
 //🧱🧱🧱🔥🔥⚠️BUILDA ALWAYS ONLY 1 COMPONENT ALLA VOLTA, XK THIS PRJ IS VERY VERY BIG! (se spuntano bugs vedi dove sono, e non finisci lo spazio su disk)
