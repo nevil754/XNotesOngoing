@@ -871,7 +871,7 @@ Home
 una release è una descrizione scritta a mano di un tag.
 e.g.
 Tag v1.0.0
-Release Version 1.0.0 con description e.g.'First production-ready release. Features ...'  Always follow standart vMAJOR.MINOR.PATCH 
+Release Version 1.0.0 con description e.g.'First production-ready release. Features ...'  Always follow standart 🔥vMAJOR.MINOR.PATCH🔥 
 MAJOR → cambiamenti incompatibili (breaking changes)
 MINOR → nuove funzionalità compatibili
 PATCH → bug fix
@@ -1049,14 +1049,14 @@ git branch -a   //vedi pero che hai ancora in cache la reference a il branch rem
 git fetch --prune   //🔥 x eliminare referenza vecchia al remote feature/xxx
 ora il branch develop è aggiornato con il lavoro fatto nel branch feature/xxx, quindi poi quando sarai soddifatto del branch develop e vuoi caricare sul main, fai una Realease with Tag e.g.v1.0.0
 
-🛫ORA FAI UNA RELEASE+TAG (per vedere come si fa, solitamente pero lo faresti solo quando sei soddisfatto con il develop e vuoi portare fuori il prodotto (che passera in staging e poi production))
+🛫🛫ORA FAI UNA RELEASE+TAG (per vedere come si fa, solitamente pero lo faresti solo quando sei soddisfatto con il develop e vuoi portare fuori il prodotto (che passera in staging e poi production))
 ora fai un merge commit (tramite PR) develop->main su forgejo, e poi
 git checkout main  //SEMPRE CREARE I TAGS X LA RELASE DA MAIN branch!!
 git pull origin main   //aggiorna locale main, cosi allineato locale--remoto
 git tag -a v1.0.0 -m "First production release"   //tag crea reference v1.0.0-->commit a81f92d.. -a contiene metadata author/date/mexs 
 git tag   //vedi che c'è v1.0.0
 git push origin v1.0.0   //push del tag creato al remoto forgejo
-forgejo>target repository > releases > new release> 
+forgejo>target repository > releases (su github lo trovi in column dx in piccolo)> new release> 
 tag: v1.0.0 (quello appena pushato), 
 target branch: main, 
 title: "RAGsystem v1.0.0 Initial Production Release", 
