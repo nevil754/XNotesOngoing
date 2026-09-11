@@ -77,7 +77,7 @@ ssh docker@192.168.113.52  //quando entri sul TUO server atterri dentro l'untent
 //quando fai comando 'sudo ...' allora dici al system di login come admin 'root' SOLO x questo comando, se fai invece 'sudo -i' diventi proprio admin root finche non logout.
 
 🗄🗄-Server GPU WSL Linux sudo:
-su server2 windows> open powershell tasto dx open as administrator (inserisci credenziali che SOLO mauro conosce)> wsl > e dentro wsl ubuntu linux diventi questo user
+su server2 windows> open powershell tasto dx open as administrator (inserisci credenziali che SOLO mauro conosce)> wsl --list --verbose (quelle gia installate) > e dentro wsl ubuntu linux diventi questo user
 user: administrator
 pwd: Administrat0r*
 Administrat0r*
