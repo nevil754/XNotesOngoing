@@ -22,7 +22,10 @@ text: Inizio test caricamento e settaggio Server per ospitare & runnare il RAG s
 CODE VERRA CARICATO REALMENTE SU 'Azure DevOps Services | Sign In'(see link in mexs w mauro)(here magari dovra essere replicata infrastruttura a environments come ho gia fatto in /srv/)
 https://dev.azure.com/compet-e/_git/RAG-System    //repo(backend) su azure devops
 
-####################################### #
+frontend nice clonato  
+RSA key fingerprint is: SHA256:ohD8VZEXGWo6Ez8GSEJQ9WpafgLFsOfLOtGGQCQo6Og
+
+#######################################
 
 prjRAG1_env
 conda create -n prjRAG1_env python=3.11 -c conda-forge
@@ -67,7 +70,7 @@ ssh docker@192.168.113.52  //da cmd, ACCEDI AL TUO SERVER🔥🔥
 Suit-Force-Card   //psw
 sudo -i  //diventa utente root (se chiede psw la psw è la stessa cioe Suit-Force-Card)
 su - deploy  //☄️diventi utente 'deploy'(password 12345678)(xk per usare Forgejo puoi solo come utente 'deploy'!!)
-cd /srv/environments/dev/rag-system
+cd /srv/environments/staging/rag-system
 http://192.168.113.52:3000   //open Forgejo(è come GitLab cioe self-hosted ma moolto piu leggero)
 nelvison.benedetto, Utod83win!!    //questo va utilizzato giornalmente
 forgejo-admin, Suap45skh!, nelvison.benedetto2@gmail.com   //questo va utilizzato solo x creare le repos ect lavoro da admin
@@ -1174,6 +1177,17 @@ git checkout develop
 git pull origin develop   //🔥🔥significa  origin → il repository remoto (Forgejo nel tuo caso), develop → il branch remoto dove vuoi caricare
 git merge main    //sei in branch X, allora merge main->X
 git push origin develop
+
+
+git log --oneline -5   //vedi gli ultimi 5 commit locali
+git log --oneline origin/main..main  //vedi quali commit hai in locale, ma non in remoto
+git show --stat 740791f  //vedi in target commit cosa è stato aggiunto/tolto (+/-)
+git show fb5cc3b -- myNotesRAG1.txt  //vedi dentro il commit target dentro il file target cosa è stato +/-
+git show 740791f   //vedi dentro il target commit
+git reset --hard 740791f  //⚠️ riporta il branch esattamente uguale a commit target (proveniente dal passato)
+
+
+
 ###
 
 
@@ -1280,7 +1294,11 @@ IP_SERVER2=192.168.113.40  //mentre ip della macchina wsl linux è 172.22.120.15
 ping 172.22.120.157
 http://172.22.120.157:8001
 
-192.168.113.40
+http://192.168.113.40:8001  //questo è il Backend_Url che usa il frontend
+
+ http://192.168.113.40:8001
+ http://192.168.113.40:8081
+
 
 //🧱🧱🧱🔥🔥⚠️BUILDA ALWAYS ONLY 1 COMPONENT ALLA VOLTA, XK THIS PRJ IS VERY VERY BIG! (se spuntano bugs vedi dove sono, e non finisci lo spazio su disk)
 //utilizza ...build --no-cache  x ignorare possibile cache rimanente, e ricostruisce davvero da 0
@@ -1481,13 +1499,13 @@ e.g. fix(redis): fix connection leak
 -Merge vs Rebase quando usarli: duranto lo sviluppo della feature usa 'rebase'(cosi non crei commit inutili di merge), quando integri una feature allora usa 'merge commit'(perché questo MANTIENE LA HISTORY!! anche fra anni)(non usare 'squash' xk perdi la history).  
 -nella Realase e.g.v1.0.0 (proprio come fanno in enterprise) avere  Tag Git (v1.0.0), Release Notes(elenca novità, bug fix e breaking changes), Docker Image(artefatto da distribuire in produzione), Binary/Executable(per app desktop, CLI o mobile), Changelog(storico delle modifiche), Migration SQL(aggiornamento dello schema), File di configurazione(.env.example, valori richiesti), Test report(dimostra che la release è stata verificata), SBOM / Security scan (inventario dipendenze e sicurezza).
 
-http://192.168.113.52:8090   //my frontend dev, http://192.168.113.52:8091/ x staging, http://192.168.113.52:8092/  x production
+http://192.168.113.52:8090   //my frontend dev, 🔥http://192.168.113.52:8091/ x staging, http://192.168.113.52:8092/  x production
 192.168.113.52
-http://192.168.113.52:8000/docs   //🔥Swagger UI endpoints
+http://192.168.113.40:8001/docs   //🔥Swagger UI endpoints
 http://192.168.113.52:8000  //fastapi
 http://192.168.113.52:5555  //flower (admin, beaflwer93!, )
 http://192.168.113.52:8080  //chainlit (admin, admin) ma intanto non lo uso piu
-http://192.168.113.52:6333  //qdrant (http://192.168.113.52:6333/dashboard)
+http://192.168.113.52:6333  //qdrant (http://192.168.113.52:6339/dashboard)
 http://192.168.113.52:6379  //redis
 http://192.168.113.52:1433  //sqlserver
 opena also LangSmith x tracing query LLM.
