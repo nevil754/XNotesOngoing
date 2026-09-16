@@ -22,7 +22,7 @@ text: Inizio test caricamento e settaggio Server per ospitare & runnare il RAG s
 CODE VERRA CARICATO REALMENTE SU 'Azure DevOps Services | Sign In'(see link in mexs w mauro)(here magari dovra essere replicata infrastruttura a environments come ho gia fatto in /srv/)
 https://dev.azure.com/compet-e/_git/RAG-System    //repo(backend) su azure devops
 
-#######################################
+####################################### #
 
 prjRAG1_env
 conda create -n prjRAG1_env python=3.11 -c conda-forge
