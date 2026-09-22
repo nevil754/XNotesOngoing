@@ -25,4 +25,6 @@ https://github.com/coderonfleek/simple-coding-agent
 -https://github.com/lawglance/lawglance  //LawGlance, langchain-chromadb-django-openaiapi-redis, rag-based chatbot system, chat con documenti rag e knowledge base legale., buono x learn RAG avanzato.
 -https://github.com/freelawproject/juriscraper   //python, scraping framework custom, parsing HTML/XML court websites, integrazione w sistemi giudiziari USA, top x data ingestion layer (prende dati grezzi dal mondo legale, e li trasforma in dataset utilizzabili).
 //python ingestion robusta da fonti reali (vertical niche scraper di US courts), scraping ONLINE framework custom, parsing HTML/XML court websites, integrazione w sistemi giudiziari USA, top x learn big(semi-big) data ingestion layer (prende dati grezzi dal mondo legale, e li trasforma in dataset utilizzabili)
+//https://www.juriscan.co/?utm_source=chatgpt.com
+//https://github.com/andygeek/juriscan SBAGLIATO URL QUESTA NON E' REPO DEL juriscan VERO.
 --https://github.com/fossology/fossology   //opensource compliance software, no EU-law ingestion puro no scraping web-scale
