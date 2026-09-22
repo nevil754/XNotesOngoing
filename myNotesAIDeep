@@ -10,6 +10,11 @@ https://github.com/coderonfleek/simple-coding-agent
 
 ######################### 
 
+- create new python environment: in vscode in bar top '>' e 'python create environment'.
+
+- create new python environment: in vscode in bar top '>' e 'python create environment'> venv > python3.11 (quello che vuoi)> .venv > 'skip pack installation'(perché poi tu li scaricherai facendo pip install -r requirements.txt).
+//ovviamnete il file requirements.txt viene generato SULLA STESSA MACCHINA dove vuoi che giri il prj facendo lo script.
+
 
 
 
