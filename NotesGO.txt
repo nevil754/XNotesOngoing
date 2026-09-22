@@ -1,0 +1,516 @@
+
+########🔥REPRODUCI AL 100% ESATTAMENTE CON STESSE VERSIONS PLUGINGS installate (anche con quelle TRANSITIVE!!):
+devi assicurarti di bloccare le dipendenze transitive (quelle che anche se non scarichi direttamente, vengono scaricate).
+
+1.crea ambiente asettico
+conda create -n envCompeteSrlRAGproductionOKpluginsTransitivi python=3.11.9  #USO VERSION 3.11.9🔥 best stability
+conda activate envCompeteSrlRAGproductionOKpluginsTransitivi
+python -m pip install --upgrade pip
+pip install pip-tools
+
+2.assicurati che i file dove hai elencato tutti i plugins, non si chiamino .txt ma si chiamino .in ! 
+3.genera i lock file con versioni transitive bloccate runnando (in root prj):
+pip-compile requirements.in --output-file requirements.txt --resolver=backtracking --no-header --annotate
+//prima avevo anche '--pre' finale per gestire la versione alpha di markitdown, ma ora faccio direttamente >=0.0.1
+pip-compile requirements-dev.in --output-file requirements-dev.txt --resolver=backtracking --no-header --annotate
+
+ora hai appena creato i files .txt, con ogni singolo pacchetto (diretto e TRANSITIVO) pinnato alla versione esatta!!
+INFATTI SE GUARDI IL FILE .TXT GENERATO VEDRAI ANCHE LE DIPENDENZE TRANSITIVE CON LE LORO VERSIONI!! quindi ora se fai 'pip install..' su quello, pip non decide piu come vuole lui le dipendenze transitive!!
+4. assicurati di aggiungere '--no-deps' nei Dockerfile (e.g.celery.Dockerfile) quando fai ... --no-cache-dir --no-deps -r requirements.txt
+5. solo ORA puoi installare i pacchetti in modo deterministico
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+//tutto è già pinato — pip non ha margine per "risolvere"(CIOE CHE DECIDE LUI) niente!! ORA PRJ E' RIPRODUCIBILE AL 100% ovunque senza che ci siano bug che le dipendenze transitive le versioni sono cambiate!!
+//ora non hai piu bug silenziosi causati dalle incostistenze delle versions dei pacchetti transitivi, tutto il prj con pacchetti diretti&transitivi E RIPRODUCIBILE ESATTAMENTE UGUALE su qualsiasi macchina.
+
+//è ok, xk ricorda che in produzione Docker ogni container è già un ambiente isolato!
+
+//attualmente nel mio env creato  avevo markitdown==0.0.1a2 ora invece ho tolto '--pre' dal comando per generare il file .txt e l'ho cambiato in -> markitdown>=0.0.1, e ho rigenerato il file requirements.txt. CMQN SAPERE CHE ATTUALMENTE NEL MIO ENV HO ANCORA LA VERSIONE markitdown==0.0.1a2 (e le sue dipendenze transitive). mentre il file .txt è correttamente aggiornato.
+
+⚠️⚠️PERO ATTENTION, TU ATTUALMENTE FAI QUESTO SU PC WINDOWS, MA POI DEPLOYO SU SERVER LINUX ⚠️⚠️
+quindi il lock va compilato sulla STESSA PIATTAFORMA + stessa versione Python su cui gira in produzione (nel mio caso Linux python:3.11-slim-bookworm)('-bookworm' per pinnare la version di python!) !!
+quindi
+# in root prj, sul server Linux (o in qualsiasi macchina con Docker)
+docker run --rm -v "$(pwd):/w" -w /w python:3.11-slim-bookworm bash -c "
+  pip install pip-tools &&
+  pip-compile requirements.in     --output-file requirements.txt     --resolver=backtracking --no-header --annotate &&
+  pip-compile requirements-dev.in --output-file requirements-dev.txt --resolver=backtracking --no-header --annotate
+"
+Questo genera i .txt (replace quelli gia esistenti generati w windows) dentro un ambiente bookworm identico a quello di produzione!
+ora devi passare questi files: assicurati che su forgejo i files attuali windows si chiamino e.g.requirements_windows.txt, e poi sul server passi i files linux generati su Frogejo (sul server fai fai push).
+
+QUANDO CAMBIA QUALCOSA IN files .in
+rigenera i files i 2 .txt
+grep -i 'email-validator' requirements.txt          # deve esserci
+grep -iE 'nvidia|cuda-|triton' requirements.txt     # deve essere VUOTO
+head -3 requirements.txt                            # --extra-index-url cpu ancora in cima
+
+docker compose build fastapi celery-worker-high celery-worker-default celery-beat
+docker compose up -d
+
+########################DOCKER & RUN CONTAINERS ALL APPLICATIONS
+
+docker-compose -f docker-compose.yml up -d    //questo lo lanci in production (quindi il docker-compose.override.yml non viene caricato)
+docker-compose up -d   //questo ok lo lanci in develop (no -d cosi vedi i logs), e visto che non specifici il file allora anche il file docker-compose.override.yml viene caricato!!
+
+//in sviluppo il comand per far parti non usa -d (detached), cosi rimane legato e vedi tutti i logs su terminale
+con 'docker-compose -f docker-compose.yml up -d', docker rispetta i depends_on e avvia i container in questo ordine:
+-Prima ondata: i container senza dipendenze partono subito in parallelo: redis, qdrant, sqlserver. Non aspettano nessuno.
+-Seconda ondata: Docker aspetta che sqlserver superi il suo healthcheck (il SELECT 1 via sqlcmd). Questo può richiedere 30-60 secondi perché SQL Server è lento ad avviarsi. Solo quando il healthcheck passa, Docker considera sqlserver come service_healthy.
+-Terza ondata: solo a quel punto partono fastapi, celery-worker-high, celery-worker-default. Tutti e tre dipendono da sqlserver: condition: service_healthy. Redis e Qdrant usano condition: service_started che è meno restrittivo — basta che il processo sia partito.
+Sempre attivi: celery-beat dipende solo da Redis, parte presto. flower dipende solo da Redis, parte presto.
+//see also screenshot 'myimgs/docker-production-architecture.svg'
+
+-dentro la rete docker, tutti i containers si vedono tramite il nome del servizio come hostname.
+e.g. è per questo che hai fatto in .env SQLSERVER_HOST=sqlserver, xk sqlserver è il nome container (docker auto gestisce dns interno che risolve sqlserver all'ip privato del container).
+-le porte esposte al di fuori del docker system sono quelle con 'ports:' cioe attualmente 8000(fastapi), 5555(flower x dashboard monitoring), 1433 6379 6333 6334 (only x debug develop).
+//in production finita terresti solo esposta port 8000(fastapi)!
+-ricorda che i volumes(x persistent data) vengono salvati all'esterno del docker system in linux solitamente in /var/lib/docker/volumes/  su Windows Docker Desktop solitamente C:\Users\Username\AppData\Local\docker\volumes , i containers appena ri-attivi si ri-collegano ai loro volumes e trovano tutti i dati intatti.
+
+//tutto cio dentro il docker-compose.yml E' UN UNICO DOCKER COMPOSE STACK (rete docker interna privata in cui i containers si parlano) !!al suo esterno si vedranno solo le :ports esposte dichiarate.
+
+DEPLOY SU SERVER:
+su server devi aver installato: Docker Engine, Docker Compose docker cli, e magari anche 🔥Nginx(ma intanto tu non vai sul web, reverse proxy che gestisce SSL/HTTPS e il dominio)(nginx deve stare davanti fastapi, ascolta su porta 443 HTTPS gira le req internamente a fastapi su porta 8000)(nginx lo installi sul server target, oppure direttamente come container all'interno di questo docker-compose cioe questo DOCKER COMPOSE STACK)
+//su server non installi nient'altro, tutto python le librerie i driver ODBC ect 🔥VIVONO DENTRO LE IMG DOCKER!!
+
+e.g. nginx
+server {
+    listen 443 ssl;
+    server_name app.tuodominio.it;
+    ssl_certificate /etc/ssl/cert.pem;
+    ssl_certificate_key /etc/ssl/key.pem;
+    location / {
+        proxy_pass http://localhost:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        # Fondamentale per SSE (streaming token-by-token)
+        proxy_buffering off;
+        proxy_cache off;
+    }
+}
+
+//SEMPRE meglio fare prima un 'docker compose up --build' locale sulla tua macchina, prima di andare sul server, se non funziona sul tuo pc allora aggiusta prima di passare al server!
+//Docker Desktop è pensato x dev test debugging su pc, SU SERVER PRODUCTION (non usi GUI interface) USI SOLO Docker Engine, Docker Compose, systemd, Nginx(CHE SI METTE DAVANTI A FastApi) / Traefik(piu easy deploy veloce ma meno pro). 
+Nginx lo carichi gia direttamente sul server se hai e.g. 20apps(docker-compose) sullo stesso server.
+//SOLO Ngnix è pubblico! quindi NO esposizione porte FastApi al web! tutto resta interno Docker network. 
+//in production di solito si usa server proprio, oppure VPS(macchina virtuale su internet, quelle che compri su Hetzner) / Cloud server (Linux)
+1.-copia il prj sul server  e.g. git clone <https:\\repo>   //quando fai push puoi caricare code su github o 🔥GitLab(self-hosted dell'azienda) .al posto di git si potrebbe anche usare SCP (ma è davvero poco usato xk non ha cronologia e rollercback queste cose temporarali)
+2.-entra nel server tramite ssh  e.g. ssh user@server e poi cd /app/project
+3.-crea file .env e.g.'nano .env'
+//installa docker on server 
+4.-avvia il tutto con docker e.g.'docker compose up -d --build' //-d è detach cioe in background, --build rebuild images
+5.-una volta tutto avviato e pronto, testa i servizi accendendoci e.g.ChainLit -> http://SERVER_IP:8080
+8000 FastAPI
+8080 Chainlit
+5555 Flower
+6379 Redis
+1433 SQL Server
+6333 Qdrant
+6.-sul server per il firewall fai se che apra le tue porte che esponi solo se è necessario! PRIMA BARRIERA FIREWALL (è quello che setti prima che il traffico arrivi al tuo server, e.g. da pannello Hetzner) e SECONDA BARRIERA FIREWALL all'interno del server, e.g. installando 'ufw' (better than iptables che è piu potente ma raw a deep livello linux server)
+7.-update quando vuoi (x aggiornamenti) sul server con e.g.'docker compose pull' 'docker compose up -d' 
+PC (sviluppo)
+   ↓ git push
+Server
+   ↓ git pull
+docker compose up --build
+   ↓
+Prj online
+modifichi il code -> push su github o gitlab -> ssh e vai nel server nel root prj -> scarichi le modifiche 'git pull' -> aggiorni i containers 'docker compose up -d --build' (docker ricostruisce le imgs che sono cambiate, riavvi i containers necessari, ovviamente mantiene i volumi xk sono esterni per sempre sul server).
+//ovviamente con GitHub Actions puoi automatizzare auto che quando fai 'git push'->deploy automatico su server.
+
+🔥🔥🔥SET SERVER PRO ( x more continue on 'how-server-works.txt' )
+-quando compri VPS(e.g.Hetzner 4$/month) ti da anche subito IP pubblico (e.g. 95.123.45.67), se nel docker-compose fai x redis e.g."6379:6379" fa pubblica la porta del container target sulla scheda di rete del server, allora ora sul web chiunque puo fare 95.123.45.67:6379 ed raggiungere direttamente il tuo redis! ovviamente se per caso non specifichi 'ports' x redis nel docker-compose, all'interno della rete docker cmnq redis è chiamabile (anche xk hanno naming dei containers x riconoscersi tra di loro), ma dall'esterno e.g.SERVER_IP:6379 non funziona. ovviamente anche se non hai Nginx cmnq e.g.95.123.45.67:6379 funziona e chiunque puo accedere al tuo redis.
+-oggi si fa di solito 
+Internet
+   ↓
+80 / 443 / 22  //🔥porte allowed da Firewall cloud del provider (e.g.hetzner), 80 x HTTP  443 x HTTPS  22 x SSH remote connection, numeri definiti dall'IANA quindi che si aspettano tutti. questa è la 🔥PRIMA BARRIERA del firewall, STA ANCORA PRIMA DEL TUO SERVER (se blocchi una porta il server non sa nemmeno che esiste). Sul server setti anche la SECONDA BARRIERA cioe traffico gia arrivato al server installando 'ufw' (better than iptables che è piu potente ma raw a deep livello linux server)
+   ↓
+🔥Nginx
+   ↓
+FastAPI
+//se vuoi accedere al tuo db e.g.container sqlserver che sta girando (x magari fare delle query x check) allora allow questi ip targets sul firewall.
+quindi con Ngix di solito si lasciano esposte solo 
+nginx:
+  ports:
+    - "80:80"
+    - "443:443"
+tutto il resto resta disponibile solo internamente alla rete docker del docker-compose!
+
+-set server x internet from 0: 
+install Ubuntu Server 24.04 LTS (su server hetzner è gia installato)
+apt update && apt upgrade -y   //aggiorna il system
+//crea utente non root, consigliato poi disabilitare root login (sempre attacked by hackers)
+adduser deploy
+usermod -aG sudo deploy
+//set firewall (is PRIMA PROTEZIONE)
+apt install ufw -y
+//apri solo cio che ti serve, blocca il resto, e attivalo
+ufw allow 22     # SSH
+ufw allow 80     # HTTP
+ufw allow 443    # HTTPS
+ufw default deny incoming
+ufw default allow outgoing
+ufw enable
+//installa Docker Engine e Docker Compose
+curl -fsSL https://get.docker.com | sh
+usermod -aG docker deploy   //aggiunge utente docker
+apt install docker-compose-plugin -y
+docker --version
+docker compose version
+//🔥 install Nginx sul server
+apt install nginx
+...e ti manca solo link dominio-https-tuo docker-compose sul server.  //forse consigliato apt install certbot python3-certbot-nginx, certbot --nginx, see more in file KingStone2/DEVELOPER/DOCKER/hetzner1.txt come avevi fatto.
+
+OTHERS:
+-runna i tests: 'pytest -v' (anche con docker spento), pytest tests/integration/test_health.py (visto che lo hai settato in un certo modo, funziona anche con fastapi spento). e poi ovviamente devi fare i tests degli endpoint with e.g. postman
+-checks container attivi:  'docker compose ps'
+-⚡️main.py SEMPRE IN ROOT PRJ (quindi fuori da /app) !!: se fosse dentro /app allora python aggiungerebbe un dir corrente al sys.path quindi tutti gli import dovrebbero essere e.g. 'from app.core.settings import' e dovresti aggiungere anche app/ al pythonpath esplicitamente nel dockerfile.
+-trovi img fastapi python ufficiali in https://hub.docker.com/ filtrando x 'Docker Official Image'.
+
+########################DB
+
+tabella audit: cronologia IMMUTABILE di tutto quello che succede nel sistema (chi ha fatto cosa, quando lo ha fatto, con che dati, da dove, ect)
+fondamentale in contesti enterprise🔥
+e.g. record di audit
+{
+  "user_id": 42,
+  "action": "rag_query",
+  "timestamp": "2026-05-26T12:00:00Z",
+  "query": "contratto società X",
+  "tokens_used": 1200,
+  "status": "success"
+}
+cosi anche per compliance legale (GDPR / GDPR-like), puoi rispondere alle domanda dell'utente "Cosa avete fatto con i miei dati?". senza saresti 'cieco'.
+
+-IDENTITY(1,1)
+-NEWSEQUENTIALID(): UUID/GUID univoco MA sequenziale
+🔥-DATETIME2(3)  datetime2 è piu preciso del legacy DATETIME, e con 3 arrivi fino ai millisencondi, quindi in production DATETIME2(3) è quasi lo standart odierno
+🔥-GETUTCDATE()  return DATETIME legacy cioe data e ora corrente del server SQL in formato UTC, MA OGGI E' CONSIGLIATO INVECE 🔥SYSUTCDATETIME() che return type DATETIME2  (precisione ~100 nanosecondi)!!
+-i '-' non sono validi in sqlserver nei nomi di schema/tabelle! quindi li converto sempre!
+-i [] wrappano i nomi particolari delle tue tabelle, cosi che anche i caratteri speciali sono letti ok
+-DECLARE crea var locale
+-EXEC sp_executesql @sql;  esegue sql dentro quella var locale 
+-scalar():  e.g.se runni SELECT COUNT(*) FROM documents allora ti ritorna 1tabella(con dentro 1 sola colonna e 1 sola riga), pero se usi sqlalchemy allora ti return un obj result Result. scalar() prende il primo valore della prima riga, quindi fa  Result->(42,) quindi ottieni finalmente 42 pulito!!
+-MERGE : fai in un'unica istruzione cioe che richiederebbe select+update+insert
+-'OFFSET 0 ROWS FETCH NEXT :limit ROWS ONLY'  OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY significa "salta :offset rows e prendi le prossime :limit rows", e.g. per page 2 con page_size 20 -> OFFSET 20 ROWS FETCH NEXT 20 ROWS ONLY, quindi salta i primi 20 e prendi i successivi 20
+-COALESCE(x,y,...): prende il primo che ritorna qualcosa (quindi non è Null) partendo da sx.  
+- OFFSET 0 ROWS FETCH NEXT :limit ROWS ONLY  cool effetto paginazione in query sql
+
+🔥📈MULTI-TENANT ARCHITECTURE
+techniques multi-tenant: 
+-🔥Schema-Per-Tenant (QUELLO CHE USO IO, BEST, una query su tenant_azienda1 NON puo vedere dati di tenant_azienda2), 
+-Row-level (una tabella per tutte le aziende, ogni tab ha un tenant_id, soluzione piu easy ma moolti possibili bugs)
+-Database-Per-Tenant (massima security e isolamento, ma non è ottimo economicamente avere 1 database per ogni azienda)
+ricorda che uno 'schema' è un contenitore logico, che puo contere piu tabelle.
+la mia procedura CREATE OR ALTER PROCEDURE shared.sp_provision_tenant  🔥🔥CREA AUTOMATICAMENTE UNO SCHEMA SQL COMPLETO PER OGNI CLIENTE see screenshot multi-tenant-architecture.svg QUINDI OGNI 'AZIENDA' GLI VIENE CREATO UN SUO INTERO SCHEMA SOLO PER LUI!!
+
+NEL MIO TENANT-ARCHITECTURE
+-layer1. quando user fa login (succede anche al sign-up), riceve il token JWT gia con tenant_id nel payload, poi nelle req successive il token sara sempre nell'header (uso Authorization: Bearer <token>)
+-layer2. middleware app/api/middleware/tenant.py legge il tenant_id e lo inietta nel request.state.tenant_id, ora ogni parte del codice puo leggere tenant_id
+-in app/db/sqlserver.py con la class TenantDB riceve il tenant_id e imposta lo schema corretto sulla connessione SQLAlchemy, ora tutte le queries trovano il tenant automaticamente le tab del tenant target senza specificare lo schema (il tenant = 1 azienda) esplicitamente.
+-usando Redis, utilizzi e.g. tenant:[AZIENDAX]:cache:query:{hash}, quindi 100% non puoi mischiare e per sbaglio ottenere cache di altri tenant(1 schema = 1 azienda)
+-usando qdrant, OGNI TENANT HA LA SUA QDRANT COLLECTION, quindi e.g. tenant_[AZIENDAX]_documents quindi 100% non prendi per sbaglio i vettori numerici di altre qdrant collections
+-usando Celery, ogni task celery ha il tenant_id negli headers dei mexs, quindi 100% ISOLAMENTO e non mischi con altri tenant
+
+########REDIS & CELERY
+REDIS
+Redis supporta fino a 16 databases logici (all'interno sempre della stessa istanza Redis)🔥(da 0 a 15) nello stesso processo, separati logicamente. Così un FLUSHDB sulla cache non tocca la coda Celery.
+-quando fastapi riceve un upload di un documento, scrive un mex Redis nella coda of target tenant tenant.AZIENDAX.default, celery legge quella coda e prende il task.
+-quando celery finisce un task, scrive risulato in Redis con chiave celery-task-meta-{task_id} (i risultati hanno TTL tempo di vita di 24h poi vengono cancellate da redis). fastapi puo sempre interrogare AsyncResult(task_id) e cosi sapere se la task è Pending | Started | Success | Failure. 
+-utillizzo di Redis per cachare risposte rag (e.g.cache:{tid}:query:{hash}) / sessioni chat degli ultimi N turni (session:{tid}:{user}) / rate limiting per tenant 
+
+await self.redis.append_message( conv_id, { "role": "user", "content": question }, settings.memory_short_term_turns);  //AGGIUNGI IL MEX ALLA CRONOLOGIA DELLA CONVERSAZIONE(sessione) gestita da redis; pero se vuoi sapere se una query è gia stata fatta dovresti leggere tutta la cronologia->cercare la domanda->verificare che sia identica 🥵🥵🥵, quindi in quel caso meglio salvare obj in cache sotto una key target!(lo fai here qua sotto w set_query_cache()!!)
+response = {  #build obj 
+            "answer": result["answer"],
+            "conversation_id": conv_id,
+            "message_id": message_id,
+            "sources": result["sources"],   #citazioni
+            "tokens_in": result.get("tokens_in"),
+            "tokens_out": result.get("tokens_out"),
+            "latency_ms": result.get("latency_ms"),
+        }
+await self.redis.set_query_cache( query_hash, json.dumps(response) ) 
+
+CELERY
+per eseguire jobs in background, si attiva automaticamente e.g.caricamente di pdf di 200pagine 🤯
+-con acks_late=True Celery fa l'ACK a Redis solo DOPO che il task è completato con successo, in questo modo se un worker che sta elaborando il task crasha allora il task rimane in coda e un'altro worker lo prende in carico quindi segnalazione finale a Redis solo dopo che il task è stato completato con successfully!!
+-prefetch_multiplier=1  1 WORKER PUO PRENDERE SOLO 1 TASK ALLA VOLTA, questo evita e.g. che un worker si carica di piu tasks in memoria e va in oom!!
+-hai 2 code separate: 'high' e 'default',  🔥questo evita che un tenant che carica 200pdf insieme non blocchi negli altri tenat le risposte chat in real-time
+-celery ha un componente che si chiama 'Celery Beat' che fa da scheduler('from celery.schedules import crontab', azioni che succedono auto ogni X time), il problema è che CeleryBeat mantiene tutto in RAM!!
+quindi al posto utilizzi 🔥🔥RedBeat (plugin celery-redbeat) che salva i task periodoci in modo persistente su redis, quindi ora il flow diventa: redbeat legge redis -> capisce quali tasks devono partire -> invia task a celery -> update stato.
+//quindi ora redis diventa anche un db per schedulers! 
+-raise self.retry(exc=exc, countdown=60 * (2 ** self.request.retries))  #self.retry() lancia internamente un'eccezione speciale (Retry) che dice al worker che il task non è fallito definitivamente ma rimettilo in coda e riprovalo più tardi.
+
+flow:⭐️⭐️⭐️
+1. fastapi riceve la query, il middleware estrae tenant_id dal JWT e lo inietta nel request.state
+2. chat_service.py esegue GET tenant:acme:cache:query:{hash} quindi se ha gia quella query in cache allora return subito, se no invece...
+3. se query non è gia in cache allora LRANGE tenant:acme:session:{conv_id} cioe carica da Redis->su cache, sono gli ultimi N turni, salvati su Redis per cosi non dover interrogare il db
+4. ora viene eseguito retrieval su qdrant- ...- reranking-passi tutto a llm, e la risposta viene passata al client via SSE
+5. quando la risposta è completa, allora aggiorna session Redis - mette risposta in cache - incrementa usage_stats per il billing
+//quindi Celery entra in gioco se la query triggera un'azione lenta e.g.upload 200docs / web scapring aggressivo (ricordati che con Tavily hai 1k req/mese free, quindi va bene solo x development!! )
+
+
+⚡️⚡️-Memoria Temporale Graph(anche di anni) per agents (quella che il pro sto pensando di sviluppare io):
+🔥--ZEP(https://github.com/getzep/zep?utm_source=chatgpt.com): self-hosted, memoria persistente temporal resoning knowledge graph dinamico context retrieval ultraveloce, e.g.2024 Nelvison preferisce Nvidia 2026 Nelvison preferisce SpaceX quindi il system sa cosa era vero quando è cambiato ed cosa oggi è vero! GOOD GOOD.
+--Mem0: memory abstraction layer minimal molto piu semplice di Zep, ok production ready.
+--MemGPT(old) / Letta(new version): non solo save memory ma anche costruisce agents stateful permanenti, lavora quasi come ram o hard disk di un pc, è molto piu agentico OVERKILL per te now. 
+//CMNQ PUOI FARE MEGLIO TEMPORAL MEMORY CUSTOMIZZATO USANDO redis-qdrant-sqlserver-langchain-langgraph
+
+memoria temporale nella tua app (lo farai in v2): nelle tabelle del tenant, dovresti aggiungere anche 'summary' 'conversation_summaries' 'user_facts', e in app/rag/memory/long_term.py file dovresti aggiungere methodo summarize_conversation() e anche per estrazione extract_facts_from_conversation() e poi nel app/rag/memory/context_builder.py in build_context() assembli TUTTO le info (anche quelle di anni fa) prima di passare all'LLM. abilita anche memroy nel config.yaml.
+
+########ARCHITECTURE
+
+-stateless vs stateful service: con stateless il servizio NON conserva memoria tra una richiesta e l’altra OGNI RICHIESTA E' INDIPENDENTE E' FACILEMENTE SCALABILE, con stateful il servizio conserva stato/dati tra richieste.
+//nella mia app ho stateless(sono fastapi, celerey workers, api gateway) e stateful(redis, sqlserver, qdrant).
+/nella mia app pero il mio single microservice (tutto il mio blocco di docker-compose) non avrà mai molto traffico/utenti contemporanei, quindi non necessatrio usare Kubernetes, cmnq here see how kubernetes works...
+-kubernetes x scalare: il tuo prj è gia ottimo monolith (non necessarrio trasformarlo in architettura microservices a meno che non vuoi suddividere il lavoro tra piu devs/ oppure diventa big), per i pods di kubenetes(ciascun pod puo contentere 1/1+ sotto-containers e.g.fastapi) k8 ama gli STATELESS!!
+🔥🔥KUBERNETES SCALA I SERVIZI STATELESS, quindi HORIZONTAL-SCALING!! // il VERTICAL-SCALING si fa aumentanto le risorse hardware su una target istanza e.g. 1 server  4 CPU 8GB RAM -> 16 CPU 64GB RAM
+-redis/sqlserver/qdrant sono solitamente STATEFUL(hanno dati che devono restare coerenti, non puoi avere copie indipendenti), quindi NON utilizzare kubernetes ma usa invece:
+--redis: redis managed (consigliato), Redis cluster stateful set (avanzato)
+--sql server: managed DB (consigliato), StatefulSet+AlwaysOn
+--qdrant: cloud(consigliato), cluster con shard
+//quindi per i servizi stateful se vuoi scalare, di solito si usa cloud managed all'inizio, cosi risparmi tempo e fatica invece di settare tutto te.
+
+########
+
+-config.yaml contiene parametri funzionali dell'app e nessun segreto, .env contiene SOLO segreti che non vanno su .git.
+- from pydantic import BaseModel, Field.  class User(BaseModel): name:str, age:int   : grazie a BaseModel se ricevi obj {"name": "Mario", "age": "123"} allora pyndatic fa la validazione automatica, e puoi fare anche e.g. user.model_dump(), fastapi usa BaseModel per generare swagger ui, openai schemas, ect. 
+Field serve x aggiungere metadati e regole ai fields e.g.name: str = Field(..., min_length=3, max_length=50)
+-json.loads(): converts json strutturato in corrisponding python obj
+-json.dumps(): converts python obj in corrisponding json formatted string
+-*args vs **kargs:  
+    *args serve per passare numero X di vars e.g. ad una funzione e.g. def sum(*args),
+    **kargs per passare X vars in key-value 
+
+-jwt.decode() : 
+token = extract_bearer_token(auth_header)
+payload = jwt.decode(
+            token,
+            settings.jwt_secret_key,
+            algorithms=[settings.jwt_algorithm],
+        )
+jwt.decode() decodifica e soprattutto verifica l'integrità e la validità (si assicura che non sia alterato) del token
+
+🔥-bcrypt vs hashlib.md5() vs hashlib.sha256() : 
+--hashlib.md5(): algh MD5, 🟢length 32 caratteri, output 128 bit, velocissimo, insicuro x la crittografia sono state trovate vulnerabilita di collisione, quindi NON usarlo x psw / token / auth.
+--hashlib.sha256(): algh SHA-256, 🟢length 64 chars, output 256 bit, piu sicuro di MD5 molto usato, NON usarlo x le psw (xk sha-256 è troppo veloce e attaccante puo fare miliardi di tentativi).
+--bcrypt : nasce apposta x le psws, SI per le psws, 🟢length ~60 chars
+🔥-@contextmanager : x context manager sincronico, usato x e.g. file/ lock/ connessioni non async, e.g.
+@contextmanager
+def my_resource():
+    print("Apro risorsa")
+    try:
+        yield "connessione"
+    finally:
+        print("Chiudo risorsa")
+-@asynccontextmanager : x async, e.g.
+@asynccontextmanager
+async def resource():
+    print("start")
+    try:
+        yield "data"
+    finally:
+        print("end")
+
+🔥-@classmethod : dice a python che questa funzione appartiene alla classe e NON all'istanza. per validator pydantic è lo standart. come primo param della function devi usare 'cls', quindi questa funct diventa un factory method cosi non devi scrivere ovunque PaginatedResponse(...) !!
+
+-@staticmethod : when a function logically belongs to a class but does not need access to self or cls.
+- tenant: Annotated[TenantContext, Depends(get_current_tenant)],  #Annotated blocca il type che puo essere solo di quel tipo, 🔥Depends(...) dice a fastpi di eseguire PRIMA get_current_tenant e poi SOLO DOPO questa funct.
+-@dataclass: decoratore da mettere sulla classe e ti da auto __init__, __repr__, __eq__ e altri metodi utili.
+-from typing import Any, Generic, TypeVar   #Generic per tipi generici, TypeVar per definire variabili di tipo generico
+-from __future__ import annotations : oggi da python moderno non è necessario, ma è molto importante lasciarlo soprattutto in prj grandi x legacy. trasforma qualcosa come  'def get_user()->User:' in 'def get_user() -> "User":' quindi tutte le annotazioni vengono conservate come str.
+-rsplit(): splitta str into a lista, starting from the right.
+🔥🔥- items = [ DocumentSchema.model_validate( dict(r._mapping) ) for r in rows ]  #_mapping converte row sqlalchemy (e.g. rows = await db.execute(....)) in dict-like, dict() converte in dict normale, model_validate() valida e trasforma in DocumentSchema. quindi il risultato è un array di types DocumentSchema, OTTIMO X CONVERTIRE LE ROWS RESULT DAL DB -> DICT PYTHON CON OBJ VALIDATI  
+🔥-return CollectionSchema.model_validate( dict(row.fetchone()._mapping) )   #fetchone() prende 1 row, _mapping converte row sqlalchemy in dict-like, dict() converte in dict normale, model_validate() valida e trasforma in CollectionSchema
+
+!-zip: itera su piu liste (o sequenze) in parallelo, mettendo insieme gli elementi che sono nella stessa posizione index, e ottieni qualcosa come [(Xelems),(Xelems),(Xelems)].
+🔥- #!/usr/bin/env python3  in cima a file python è un shebang ASSOLUTAMENTE DA AGGIUNGERE SE QUESTO FILE .PY E' DIRETTAMENTE ESEGUIBILE DAL SYSTEM (e.g. create_tenant.py)  e serve nei system linux/unix/macos e dice al system e.g. here che deve runnare python. #! indica che ora segue un interprete, /usr/bin/env python chiede al system di trovare python nel PATH, serve se vuoi eseguire file con 
+chmod +x script.py
+./script.py
+🔥-python di default non gestisce bene async, quindi:
+import asyncio;
+loop = asyncio.get_event_loop();   #loop = asyncio.new_event_loop(); 
+loop.run_in_executor() (prende una funzione no async e la manda in process pool e non blocca il processo main)  loop.run_until_complete() ("esegui questa async function fino alla fine", blocca tutto finche finisce.) 
+
+🔥async def aensure_collection( tenant_slug: str, force_recreate: bool = False ) -> str:
+    import asyncio
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor( None, ensure_collection, tenant_slug, force_recreate )   #l'ordine dei params sono  executor - funzione da eseguire - first params della funzione - second param della funzione - ect.
+
+########
+
+-from typing import AsyncGenerator  & yield, utilizzati x streaming SSE (token by token): turns a regular function into a generator, which produces a sequence of values on demand instead of computing them all at once, and 🔥Generator funct per return data non usano 'return' ma usano 'yield'.
+//from fastapi.responses import StreamingResponse  #🔥x streaming response, fastapi apre connessione http lunga
+//return StreamingResponse(  #FASTAPI APRE CONNESSIONE HTTP LUNGA
+//      event_generator(),  #ogni yield viene inviato immediatamente 
+//      media_type="text/event-stream",  #🔥fondamentale il browser DEVE sapere che questo è SSE
+//      headers={
+//          "Cache-Control": "no-cache",   #no cache
+//          "X-Accel-Buffering": "no",     #🔥disabilita buffering nginx, altrimenti nginx potrebbe accumulare tutto e restituire tutto solo alla fine!!
+//      },
+//  )
+-@property   #trasforma function -> proprieta leggibile come attributo (quindi ora fai settings.sqlserver_url come se fosse una var normale)
+🔥-SQLAlchemy (best only in python): puo lavorare con SQL Server, PostgreSQL, MySQL ect, perche non parla direttamente con il db ma invece con i drivers (chiamati "DBAPI"), quindi in pratica se vuoi usare un db target devi avere sqlalchemy + importare driver target (e.g.sqlserver usa pyodbc, postgresql usa psycopg2) + e modifichi con tue info la connection string.
+quando hai tutto ok, grazie a sqlalchemy puoi fare: obj python al posto delle tabs, execute sql query raw, scrivere sql query con interpolation python.
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession  #x session db asyncrona
+!-il caricamento di files (e.g. pdf), trasformarli sempre in flusso di bytes per trasportarli! i tokens sono altro serve solo x text chat.
+-loguru x logs strutturati ottimi x OpenTelemetry/ELK/ect!
+logger.info("Logout", user_id=tenant.user_id, sessions_deleted=deleted)  #log w loguru, che crea record tipo
+# {
+#     "message": "Logout",
+#     "extra": {
+#         "user_id": "...",
+#         "sessions_deleted": 5
+#     }
+# }
+#pero nel tuo observability.py hai
+#fmt = (
+#    "<green>{time}</green> | "
+#    "<level>{level}</level> | "
+#    "<cyan>{name}</cyan>:<cyan>{line}</cyan> | "
+#    "<level>{message}</level>"
+#) quindi non hai {extra}, quindi in console non renderizzerai anche e.g. user_id e sessions_deleted, ma questi SERVONO CMNQ NEL RECORD LOGURU xk e.g. Grafana/OpenTelemetry/ELK li usano!!!
+- @lru_cache(maxsize=1)  trasforma la functione in singleton, quindi la seconda volta se l'istanza è gia in cache allora ritornalo al chiamante senza doverlo ricaricare.
+-good technique x costruction command sql!! 
+offset = (page - 1) * page_size   #offset è il jump da dove deve iniziare, e.g. se setti che pagesize è 20elems allora per leggere pagina 3 devi saltare 40elems iniziali!
+    where = "WHERE 1=1"
+    params: dict = {"limit": page_size, "offset": offset}
+    if collection_id:
+        where += " AND collection_id = :coll_id"
+        params["coll_id"] = collection_id
+    if status_filter:
+        where += " AND status = :status"
+        params["status"] = status_filter
+    total_row = await db.execute(
+        text(f"SELECT COUNT(*) FROM documents {where}"), params
+    )
+-embeddings
+model = get_embedding_model()
+vectors = list(model.query_embed([text]))  #🔥🔥here accade l'embedding docs!!
+#⭐️⭐️i modelli retrieval di solito hanno 2 modalita: document embedding e query embedding, quindi con BGE utilizziamo embed(myDocument) e query_embed(myQuery)
+-Cross-Encoder vs Bi-Encoder: 
+🔥--Cross-Encoder: prende 2 frasi insieme dallo stesso input, le frasi intereagiscono direttamente dentro il modello. cattura relazioni piu sottili tra le frasi, ma è lento(deve ricalcolare ogni coppia) e non scala a milioni di confronti. PERFETTO X RE-RANKING TECHNIQUE quando hai gia poche coppie da valutare e vuoi massima precision!!
+--Bi-Encoder: elabora 2 frasi separatamente, Frase A → embedding u   Frase B → embedding v   e poi confronta u e v con una misura tipo cosine similarity. è meno preciso, ma puoi pre-calcolare gli embeddings perfetto per milioni di confronti. ok x tanti documenti e ricerca veloce.
+-BM25 vs SPLADE type x Sparse Search:
+--bm25: con query e.g. "come funziona una fattura elettronica", bm25 vede solo 'fattura'-'elettronica' 
+🔥--SPLADE: con query e.g. "come funziona una fattura elettronica", splade puo espandere e vedere quindi 'fattura'-'elettronica'-'invoice'-'xml'-'fiscale'-'documento' ciascuno con pesi diversi (questo è very very good!!), per questo spesso recupera documenti migliori rispetto a bm25 base!!
+
+-ReRanking
+from sentence_transformers import CrossEncoder  #🔥CrossEncoder è il wrapper
+reranker = CrossEncoder(settings.reranker_model, max_length=512,  #max token per chunk)
+#🔥reranking CrossEncoder fa (query, documento) -> score. è piu lento dell'embeddings.
+
+
+
+-rag techniques:
+--KNN(K-Nearest Neighbors) algoritmo di ricerca trova quali sono i K vettori piu vicini  //more in course Coursera con anche img di layer a piu livelli e parti dal 'roof'. può usare per trovare questi K, techniques: cosine similarity / dot product / Euclidean Distance / Manhattan Distance.
+--cosine similarity (è lo standart moderno today in rag): quanto sono simili 2 vettori? misura l'angolo tra i vettori, formula cos(A,B) = (A · B) / (||A|| ||B||), nei rag solitamente è 0.70-0.95 (1 sarebbe 2 vettori completamente identici).
+--HNSW (Hierarchical Navigable Small World) : usato da qdrant, quando fai qdrant.search() allora qdrant fa HNSW graph->cosine similarity->top k.
+--dot product: formula A · B, molto usata quando i vettori sono normalizzati in openai/pinecone/weaviate
+🔥🔥--RRF (Reciprocal Rank Fusion) (l'ho utilizzata in file retriever.py🚀🚀): in RAG quando fai Dense search il ranking è e.g.A → B → C, e invece quando fai Sparse search (BM25) il ranking puo essere e.g.C → A → D, dunque combini questi ranking con questa formula score=1/(rank+k) in questo modo i risultati forti in entrambi i ranking salgono (mentre quelli deboli scendono).
+
+⭐️⭐️⭐️-QUESTO E IL TOP FLOW:
+    #1. Hybrid Search (dense + sparse (puoi usare type BM25 (è basic) oppure SPLADE(better, che usa reti neurali), sono i 2 types x this piu utilizzati ))(eseguito uno dopo l'altro) → Top 20 risultati. ottieni 2 ranking separati.
+    #2. RRF (Reciprocal Rank Fusion) → in input 2 ranking separati (1 di dense e 1 di sparse) i risultati forti in entrambi i ranking salgono (mentre quelli deboli scendono) come output 1 ranking unico.
+    #2. MMR (Maximal Marginal Relevance) → Top 10 diversificati. penalizza i chunk troppo simili tra loro, in questo modo hai solo risultati diversi (no clones) i piu importanti.
+    #3. ReRanker (Cross-Encoder technique w model BAAI/bge-reranker-base) → Top 5 precisi. prende in input i risultati e con model BAAI/bge-reranker-base assegna un ranking a ciascuno, quindi poi return solo i X bests.
+    //🔥model x dense BM25 il model 'prithivida/Splade_PP_en_v1' è uno type SPLADE dei piu usati today excellent qualita-speed.
+
+-agent AI: un agent è di solito è llm+prompt specializzato+tool+obbiettivo.
+quindi in realta il famoso che tutti amano 'alverare di agenti' in realta è 1 modello llm -> 23 prompt specializzati -> pipeline coordinata.
+                Orchestrator (QUESTO è l'unico che decide🔥(ASSAI SCONSIGLIATO DI FARE PIU DI 1 agent che puo decidere, many bugs/difficie tests, ect)!! creato con LangGraph(TOP)/crewai/ect)
+                      │
+     ┌────────────────┼───────────────┐
+     │                │               │
+ Planner         Researcher       Developer
+     │                │               │
+     └────────────────┼───────────────┘
+                      │
+                  Reviewer
+                      │
+                     QA
+                      │
+                   Output
+quindi oggi l'80% dei FAMOSI "multi-agent systems" sono in realtà workflow orchestrati🔥.
+- https://github.com/garrytan/gstack by Gary Tan (YC Combinator CEO):  utile SOLO se il prj/repo è migliaia di files (altrimenti è piu semplice e anche piu potente claude come lo utilizzi normalmente), al posto di usare claude normal che ci puo mettere anche 20+ minutes per analizzare il code base, usi questo.  con questi runni multipli agenti anche parzialmente in parallelo (quindi risparmi tempo), ogni agente vede solo i suoi files (invece di all repository), al livello di utilizzo di tokens questo system ne puo utilizzare anche di piu (x2/x3) di claude normal (perche gli agents si scambiano anche il contexts), questo system lo utilizzi da CLI(interfaccia a linea di comando), ogni agente lavora nel suo worktree git (very good, very da pro). task enorme (repo enorme) -> suddividi -> molti agenti -> ogni agente lavora su un pezzo,  molto utile SOLO se code base enorme il claude normale ci metterebbe tantissimo TEMPO perche fa un medium-task a cascata uno dopo l'altro.
+-collaborazione pratica a prj azienda: 
+//cloni repo aziendale
+git clone git@github.com:azienda/progetto.git
+cd progetto
+//crei branch dalla base corretta 
+git checkout develop
+git pull
+git checkout -b feature/login-google
+//lavori e fai commit 
+git add .
+git commit -m "Aggiunto login con Google OAuth"
+//aggiorni il branch prima della PR
+git fetch origin
+git rebase origin/develop
+//push branch 
+git push origin feature/login-google
+//apri pull request da 
+feature/login-google → develop
+//code review obbligatoria (almeno 1/2 reviews), CI/CD automatica (test, lint, build), eventuali fix obbligatori
+//Merge (gestito da maintainer o dev senior)
+//differenze Merge vs Rebase: merge(mantiene storia completa, crea commit “merge”), rebase(riscrive la storia, MOLTO USATO IN AZIENDA). in azienda di solito si usa rebase, in repository opensource di solito si usa merge.
+
+-ml manipulation (some techniques that i never heard, TO CHECK if are good) from github.com/pradeesh-ml/legal-ai:
+--QLoRA (Quantized Low-Rank Adaptation): metodo per fare fine-tuning di LLM enormi usando pochissima memoria, fa quantizzazione a 4bit.
+--LoRA adapters: non modifichi il modello intero ma alleni solo piccole matrici low-rank (adapter), quindi qualita quasi identica al full fine-tuning costi molto ridotti e training anche su gpu piccole (e.g.T4).
+--Unsloth: framework ottimizzato per fine-tuning LLM, fa 2x–5x training speed  -70% VRAM usage   kernel CUDA ottimizzati, cosi hai training stabile.
+--GGUF: serve per il modello finale, dopo traning QLoRA hai base model (quantized 4-bit)++ LoRA adapters dopodiche gli adapters vengono fusi base model+adapters→full model  infine converti per l'export GGUF 16-bit (FP16 weights). quindi il training leggero lo fai 4bit mentre il modello finale sara molto piu stabile a 16-bit GGUF.
+
+
+#####################################################
+
+#######
+//e.g. ⚡️plugin ZEP è un temporal memory (si ricorda anche di anni, solo che costa tanto quindi io posso offrire qualcosa di meglio!) anche per risparmiare context & consume of tokens; ALL agents need of this!!  
+⭐️⭐️⭐️CHATBOT LONGMEMORY ADAPTABILITY personalization engine 
+//questo è agentic memory (dal 2026 gli agents stanno usando il web piu degli umani, e gli servono strumenti!)
+//🔥pensa che l'applicazione deve essere un wrapper, cioe e.g. booking.com ha wrappato le stanze/localibed e gli ha dato tutti gli strumenti, stessa per altri casi simili.!
+
+Long-term Memory + User Profile + Retrieval + Reflection loop:
+ricordi cose sull’utente nel lungo periodo, aggiorni queste info nel tempo, le usi per cambiare comportamento!, non "inventa memoria" ma la costruisce incrementalmente, sia multi-sessione + persistente.
+-3 memory layers: 
+--Short-term memory (sessione corrente): chat history recente, buffer (ultimi N mexs). tools langchain+langgraph.
+--Long-term memory (episodica): eventi importanti (e.g."utente lavora in fintech","gli piace React","sta costruendo agentic tool"), salvati in Qdrant.
+--User profile memory (strutturata): json aggiornato nel tempo, questo è il vero 'cervello dell'utente', salvata su db PostgreSQL🔥.
+e.g.
+{
+  "name": "Nevil",
+  "job": "agentic layer engineer",
+  "interests": ["AI", "robots"],
+  "goals": ["build robot"],
+  "preferences": {
+    "tone": "direct",
+    "detail_level": "high"
+  }
+}
+- redis, embeddings, reranking, llm orchestration.
+-FLOW: 
+user mex
+˅
+Vector search (episodic memory)(cerca simili conversazioni passate) + Profile fetch (carica user profile JSON)
+˅
+context building 
+e.g.
+`
+User profile:
+- job: backend engineer
+- interests: AI, SaaS
+Relevant memories:
+- previously said: building SaaS tools for devs
+`
+˅
+llm response
+˅
+memory write update: utilizzi un agent 'memory extractor', langgraph node prende user_message + assistent_response e si chiede 'Questo è un fatto da salvare?' se si allora update il json dell'user & episodic memory su qdrant.
+
+OGGI GLI AGENTS NON HANNO MEMORIA con questo voglio che ce la abbiano ora.
+
+#######
+- 
+-tavility x scraping web (come https://www.tavily.com/) apposta per agents! perche devono poter andare sul web! e ci sono poche opzioni attualmente.
+
